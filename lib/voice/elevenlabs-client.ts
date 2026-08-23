@@ -26,14 +26,22 @@ export function isAudioPrimed(): boolean {
   return sharedAudio !== null;
 }
 
+// Shortest valid silent WAV. WebKit only unlocks an element that actually
+// began playing a real source inside the gesture — a src-less play() is not
+// enough there.
+const SILENT_WAV =
+  "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=";
+
 export function primeAudio(): void {
   if (typeof window === "undefined" || sharedAudio) return;
   const audio = new Audio();
   (audio as any).disableRemotePlayback = true;
-  audio.muted = true;
-  audio.play().catch(() => {});
-  audio.pause();
-  audio.muted = false;
+  audio.src = SILENT_WAV;
+  const done = () => {
+    audio.pause();
+    audio.removeAttribute("src");
+  };
+  audio.play().then(done).catch(done);
   sharedAudio = audio;
 }
 

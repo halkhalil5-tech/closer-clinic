@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Archivo, IBM_Plex_Mono, Source_Sans_3 } from "next/font/google";
 import "./globals.css";
 import { RegisterSW } from "@/components/register-sw";
+import { AudioUnlock } from "@/components/audio-unlock";
 
 // Display: Archivo variable with the width axis — headers use it expanded
 // (font-stretch 125%) at weight 800, ALL CAPS. See .display in globals.css.
@@ -62,6 +63,7 @@ export default function RootLayout({
       <body>
         {children}
         <RegisterSW />
+        <AudioUnlock />
       </body>
     </html>
   );
