@@ -1,26 +1,158 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /*
+   * Closer Clinic — surgical suite × fight gym.
+   * Warm graphite base (not navy), bone numerals, one paper surface on the
+   * scorecard. Mint is reserved for wins, active states, and primary CTAs.
+   */
+  --color-bg: #10151a;
+  --color-panel: #151b21;
+  --color-panel-2: #1a2126;
+  --color-line: #2a323a;
+  --color-line-strong: #3b454e;
+  --color-ink: #e7e9e6;
+  --color-dim: #a8b1ad;
+  --color-muted: #828d89;
+  --color-faint: #5e6763;
+  --color-mint: #37c98b;
+  --color-mint-deep: #1f8a5e;
+  --color-mint-ink: #04241a;
+  --color-amber: #e5a33b;
+  --color-red: #e5533d;
+
+  /* bone: all large numerals and display headers */
+  --color-bone: #e8e3d8;
+
+  /* surface system: base page, raised panels, hairline dividers */
+  --color-raised: #1a2126;
+  --color-hairline: rgb(255 255 255 / 0.1);
+
+  /* paper: the printed scorecard surface and its darkened accents */
+  --color-paper: #f4f1e8;
+  --color-paper-ink: #1a1f24;
+  --color-paper-mint: #1e7d57;
+  --color-paper-amber: #8a6118;
+  --color-paper-red: #b23a28;
+
+  /* legacy aliases kept for compatibility during the sweep */
+  --color-navy-950: #10151a;
+  --color-navy-900: #151b21;
+  --color-navy-850: #151b21;
+  --color-navy-800: #1a2126;
+  --color-navy-700: #2a323a;
+  --color-ink-dim: #a8b1ad;
+  --color-warn: #e5a33b;
+  --color-danger: #e5533d;
+  --color-mint-bright: #37c98b;
+  --color-mint-dim: #1f8a5e;
+
+  --font-display: var(--font-archivo), "Archivo", system-ui, sans-serif;
+  --font-body: var(--font-source-sans), "Source Sans 3", system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), "IBM Plex Mono", ui-monospace, monospace;
+
+  --radius-card: 0.375rem;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  background: var(--color-bg);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: 15px;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100dvh;
 }
+
+::selection {
+  background: var(--color-mint-deep);
+  color: var(--color-ink);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-line) transparent;
+}
+
+/* ---- display type: expanded grotesque, heavy, caps ---- */
+.display {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-stretch: 125%;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  line-height: 0.95;
+}
+
+.microlabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--color-muted);
+}
+
+/* row titles: same display family, normal width, mixed case — scans fast
+   without colliding with the caps microlabels */
+.display-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-stretch: 95%;
+  letter-spacing: 0;
+  line-height: 1.15;
+}
+
+/* Raised surface: tone + a faint warm top-edge highlight instead of a border. */
+.raised {
+  background: var(--color-raised);
+  box-shadow: inset 0 1px 0 rgb(255 250 240 / 0.05);
+}
+
+/* The single glowing element per screen — warm bone light, not neon. */
+.glow-bone {
+  text-shadow: 0 0 22px rgb(232 227 216 / 0.3);
+}
+
+/* ---- purposeful motion only ---- */
+
+/* mic pulsing while listening */
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgb(55 201 139 / 0.5); }
+  70% { box-shadow: 0 0 0 14px rgb(55 201 139 / 0); }
+  100% { box-shadow: 0 0 0 0 rgb(55 201 139 / 0); }
+}
+.mic-live {
+  animation: pulse-ring 1.5s ease-out infinite;
+}
+
+/* rubric bars fill on the scorecard */
+@keyframes bar-fill {
+  from { width: 0; }
+}
+.bar-fill {
+  animation: bar-fill 600ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* verdict stamp: hits with rotation + scale, rests slightly askew */
+@keyframes stamp-in {
+  0% { opacity: 0; transform: scale(1.6) rotate(-14deg); }
+  55% { opacity: 1; transform: scale(0.96) rotate(-3deg); }
+  75% { transform: scale(1.03) rotate(-5deg); }
+  100% { opacity: 1; transform: scale(1) rotate(-4deg); }
+}
+.stamp-in {
+  animation: stamp-in 420ms cubic-bezier(0.2, 0.9, 0.3, 1.2) 150ms both;
+}
+
+/* "patient is responding" — a quiet breathing ellipsis, never a spinner */
+@keyframes respond-dot {
+  0%, 60%, 100% { opacity: 0.2; }
+  30% { opacity: 1; }
+}
+.respond-dot { animation: respond-dot 1.1s infinite; }
+.respond-dot:nth-child(2) { animation-delay: 0.14s; }
+.respond-dot:nth-child(3) { animation-delay: 0.28s; }

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="0" fill="#060f1d"/>
+  <!-- pulse line reading "close" upward -->
+  <path d="M64 320 L160 320 L200 240 L248 352 L296 192 L336 288 L448 288"
+        fill="none" stroke="#3ce0a9" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="448" cy="288" r="22" fill="#3ce0a9"/>
+  <text x="256" y="448" text-anchor="middle" font-family="Menlo, monospace" font-size="64" font-weight="700" letter-spacing="14" fill="#e9eff7">CLOSE</text>
+</svg>
