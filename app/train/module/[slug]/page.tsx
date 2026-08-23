@@ -25,6 +25,12 @@ export default async function ModulePage({ params }: { params: Promise<{ slug: s
   const mod = modules.find((m) => m.slug === slug);
   if (!mod || !doc || !lesson) notFound();
 
+  // The forward path once this module is complete.
+  const nextMod =
+    [...modules]
+      .sort((a, b) => a.order - b.order)
+      .find((m) => m.order > mod.order) ?? null;
+
   const progress = (await store.getLessonProgress(user.id)).find(
     (p) => p.lessonSlug === lesson.slug
   );
@@ -83,6 +89,7 @@ export default async function ModulePage({ params }: { params: Promise<{ slug: s
             quizScore: progress?.quizScore ?? null,
             drillPassed: progress?.drillPassed ?? null,
           }}
+          next={nextMod ? { slug: nextMod.slug, title: nextMod.title, order: nextMod.order } : null}
         />
       </div>
     </main>

@@ -103,11 +103,13 @@ interface Props {
   lesson: TrainingLesson;
   moduleTitle: string;
   initial: { quizScore: number | null; drillPassed: boolean | null };
+  next: { slug: string; title: string; order: number } | null;
 }
 
-export function ModuleDocView({ doc, lesson, moduleTitle, initial }: Props) {
+export function ModuleDocView({ doc, lesson, moduleTitle, initial, next }: Props) {
   const router = useRouter();
   const checkPassed = (initial.quizScore ?? 0) >= QUIZ_PASS_PCT;
+  const moduleComplete = checkPassed && (!lesson.drill || initial.drillPassed === true);
 
   return (
     <div className="flex flex-col gap-6 pb-10">
@@ -229,6 +231,32 @@ export function ModuleDocView({ doc, lesson, moduleTitle, initial }: Props) {
             )}
           </div>
           <DrillBlock lesson={lesson} onRefresh={() => router.refresh()} />
+        </section>
+      )}
+
+      {/* forward path — appears once check (and drill) are passed */}
+      {moduleComplete && (
+        <section>
+          <SectionLabel>Module complete</SectionLabel>
+          {next ? (
+            <Link
+              href={`/train/module/${next.slug}`}
+              className="display mt-2 flex w-full items-center justify-between rounded-card border border-mint/60 px-4 py-3.5 text-[15px] tracking-wide text-mint"
+            >
+              <span>
+                Next · Module {next.order} — {next.title}
+              </span>
+              <span aria-hidden>→</span>
+            </Link>
+          ) : (
+            <Link
+              href="/train"
+              className="display mt-2 flex w-full items-center justify-between rounded-card border border-mint/60 px-4 py-3.5 text-[15px] tracking-wide text-mint"
+            >
+              <span>Curriculum complete — back to the ladder</span>
+              <span aria-hidden>→</span>
+            </Link>
+          )}
         </section>
       )}
 
