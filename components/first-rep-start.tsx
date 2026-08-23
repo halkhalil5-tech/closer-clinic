@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { primeAudio } from "@/lib/voice/elevenlabs-client";
 
 export function FirstRepStart({ scenarioSlug }: { scenarioSlug: string }) {
   const router = useRouter();
@@ -10,6 +11,7 @@ export function FirstRepStart({ scenarioSlug }: { scenarioSlug: string }) {
 
   async function start() {
     if (busy) return;
+    primeAudio(); // unlock patient audio while inside the tap gesture
     setBusy(true);
     setError(null);
     try {

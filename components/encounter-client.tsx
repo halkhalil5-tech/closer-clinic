@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Difficulty, PersonaSnapshot } from "@/lib/types";
 import { buildVoiceEngine, type VoiceCaps } from "@/lib/voice/engine";
+import { isAudioPrimed } from "@/lib/voice/elevenlabs-client";
 import type { SttSession } from "@/lib/voice/types";
 
 interface ChatMessage {
@@ -89,18 +90,43 @@ export function EncounterClient({
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages, sending, interim, micState]);
 
-  // Speak the opener once (mobile Safari may hold audio until first gesture).
+  // Browsers block audio until the page sees a real user gesture, so the
+  // opener is spoken on the first pointer/key input — which also unlocks
+  // playback for every later patient line.
   const spokeOpener = useRef(false);
+  const voiceOnRef = useRef(voiceOn);
+  const messagesRef = useRef(messages);
   useEffect(() => {
-    if (!spokeOpener.current && voiceOn && messages.length > 0) {
-      spokeOpener.current = true;
-      const last = messages[messages.length - 1];
-      if (last.role === "patient") {
-        engine.tts.speak(last.text, { age: persona.age, name: persona.name });
+    voiceOnRef.current = voiceOn;
+    messagesRef.current = messages;
+  }, [voiceOn, messages]);
+  useEffect(() => {
+    const speakOpener = () => {
+      engine.tts.prime?.();
+      if (spokeOpener.current || !voiceOnRef.current) return;
+      const msgs = messagesRef.current;
+      if (msgs.length === 1 && msgs[0].role === "patient") {
+        spokeOpener.current = true;
+        engine.tts.speak(msgs[0].text, { age: persona.age, name: persona.name });
       }
+    };
+    // Audio already unlocked by the "begin rep" tap (same document) — speak now.
+    if (isAudioPrimed()) {
+      speakOpener();
+      return;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [voiceOn]);
+    const unlock = () => {
+      document.removeEventListener("pointerdown", unlock, true);
+      document.removeEventListener("keydown", unlock, true);
+      speakOpener();
+    };
+    document.addEventListener("pointerdown", unlock, true);
+    document.addEventListener("keydown", unlock, true);
+    return () => {
+      document.removeEventListener("pointerdown", unlock, true);
+      document.removeEventListener("keydown", unlock, true);
+    };
+  }, [engine, persona.age, persona.name]);
 
   useEffect(() => {
     return () => {
@@ -120,6 +146,7 @@ export function EncounterClient({
     async (text: string) => {
       const clean = text.trim();
       if (!clean || sending || grading) return;
+      engine.tts.prime?.(); // still inside the send gesture — keep playback unlocked
       setError(null);
       setSending(true);
       setDraft("");

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { primeAudio } from "@/lib/voice/elevenlabs-client";
 import type { Difficulty, Scenario } from "@/lib/types";
 
 const DIFFICULTIES: { id: Difficulty; label: string; blurb: string }[] = [
@@ -44,6 +45,7 @@ export function LaunchSheet({
 
   async function start() {
     if (starting) return;
+    primeAudio(); // unlock patient audio while inside the tap gesture
     setStarting(true);
     setError(null);
     localStorage.setItem(LAST_DIFFICULTY_KEY, difficulty);

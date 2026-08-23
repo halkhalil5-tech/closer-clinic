@@ -119,6 +119,14 @@ class WebSpeechTts implements TextToSpeech {
     return this.preferredVoice;
   }
 
+  /** Chrome requires a gesture before speechSynthesis will speak at all. */
+  prime(): void {
+    if (!this.isSupported()) return;
+    const utterance = new SpeechSynthesisUtterance(" ");
+    utterance.volume = 0;
+    window.speechSynthesis.speak(utterance);
+  }
+
   speak(text: string, _opts?: TtsUtteranceOptions): Promise<void> {
     return new Promise((resolve) => {
       if (!this.isSupported()) return resolve();

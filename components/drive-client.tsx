@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { buildVoiceEngine, type VoiceCaps } from "@/lib/voice/engine";
+import { primeAudio } from "@/lib/voice/elevenlabs-client";
 import type { SttSession } from "@/lib/voice/types";
 
 interface ScenarioLite {
@@ -123,6 +124,9 @@ export function DriveClient({
   }
 
   async function start() {
+    // Unlock audio synchronously, while we're still inside the tap gesture —
+    // after the awaits below the browser no longer counts this as user input.
+    primeAudio();
     setError(null);
     setPhase("connecting");
     try {

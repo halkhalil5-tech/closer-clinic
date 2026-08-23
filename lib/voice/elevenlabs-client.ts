@@ -14,6 +14,29 @@ import type { TextToSpeech, TtsUtteranceOptions } from "./types";
 
 const MIME = "audio/mpeg";
 
+/**
+ * One shared <audio> element for the whole app. Browsers only allow
+ * programmatic playback on an element that was play()ed inside a real user
+ * gesture, so this must be called synchronously from a pointer/key handler —
+ * before any awaits. Safe to call repeatedly.
+ */
+let sharedAudio: HTMLAudioElement | null = null;
+
+export function isAudioPrimed(): boolean {
+  return sharedAudio !== null;
+}
+
+export function primeAudio(): void {
+  if (typeof window === "undefined" || sharedAudio) return;
+  const audio = new Audio();
+  (audio as any).disableRemotePlayback = true;
+  audio.muted = true;
+  audio.play().catch(() => {});
+  audio.pause();
+  audio.muted = false;
+  sharedAudio = audio;
+}
+
 function mediaSourceCtor(): (new () => MediaSource) | null {
   if (typeof window === "undefined") return null;
   const w = window as any;
@@ -37,17 +60,11 @@ export class ElevenLabsTts implements TextToSpeech {
     return true;
   }
 
-  /** Create + unlock the audio element while we're inside a user gesture. */
+  /** Unlock playback while we're inside a user gesture. */
   prime(): void {
-    if (this.audio) return;
-    const audio = new Audio();
-    (audio as any).disableRemotePlayback = true;
-    audio.muted = true;
-    // A play() attempt inside the gesture unlocks future programmatic playback.
-    audio.play().catch(() => {});
-    audio.pause();
-    audio.muted = false;
-    this.audio = audio;
+    primeAudio();
+    if (!this.audio && sharedAudio) this.audio = sharedAudio;
+    this.fallback.prime?.();
   }
 
   async speak(text: string, opts?: TtsUtteranceOptions): Promise<void> {
@@ -87,7 +104,7 @@ export class ElevenLabsTts implements TextToSpeech {
   }
 
   private ensureAudio(): HTMLAudioElement {
-    if (!this.audio) this.audio = new Audio();
+    if (!this.audio) this.audio = sharedAudio ?? new Audio();
     return this.audio;
   }
 
