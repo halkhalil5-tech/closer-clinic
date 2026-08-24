@@ -801,6 +801,61 @@ export class SupabaseStore implements Store {
     if (error) throw error;
   }
 
+  async listUnlockedPacks(userId: string): Promise<import("../packs").UnlockedPack[]> {
+    const supabase = await createClient();
+    // RLS returns public packs plus this user's unlocked ones.
+    const { data: packs } = await supabase.from("packs").select("*");
+    if (!packs || packs.length === 0) return [];
+    const { data: stations } = await supabase
+      .from("scenarios")
+      .select("*")
+      .in("pack_id", packs.map((p: any) => p.id))
+      .eq("active", true);
+    return packs.map((p: any) => ({
+      pack: {
+        id: p.id,
+        name: p.name,
+        vendor: p.vendor,
+        specialty: p.specialty,
+        branding: p.branding ?? {},
+        distribution: p.distribution,
+      },
+      stations: (stations ?? [])
+        .filter((s: any) => s.pack_id === p.id)
+        .map(mapScenario),
+    }));
+  }
+
+  async redeemPackCode(
+    userId: string,
+    code: string
+  ): Promise<{ ok: true; packName: string } | { ok: false; error: string }> {
+    // Codes are unreadable under RLS by design — validate with the admin client.
+    const { createAdminClient } = await import("../supabase/admin");
+    const admin = createAdminClient();
+    if (!admin) return { ok: false, error: "Pack redemption isn't available right now." };
+    const { data: codeRow } = await admin
+      .from("pack_codes")
+      .select("pack_id, redeemed_count")
+      .eq("code", code.trim().toUpperCase())
+      .maybeSingle();
+    if (!codeRow) return { ok: false, error: "That code doesn't match any pack." };
+    const { data: pack } = await admin
+      .from("packs")
+      .select("name")
+      .eq("id", codeRow.pack_id)
+      .maybeSingle();
+    const { error } = await admin
+      .from("pack_unlocks")
+      .upsert({ user_id: userId, pack_id: codeRow.pack_id }, { onConflict: "user_id,pack_id" });
+    if (error) return { ok: false, error: "Couldn't unlock the pack. Try again." };
+    await admin
+      .from("pack_codes")
+      .update({ redeemed_count: (codeRow.redeemed_count ?? 0) + 1 })
+      .eq("code", code.trim().toUpperCase());
+    return { ok: true, packName: pack?.name ?? "Pack" };
+  }
+
   async getScriptCard(userId: string, stationSlug: string) {
     const supabase = await createClient();
     const { data } = await supabase

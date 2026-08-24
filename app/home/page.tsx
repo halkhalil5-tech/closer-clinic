@@ -180,6 +180,7 @@ export default async function HomePage({
       <HomeClient
         scenarios={roster.builtIn}
         customScenarios={roster.custom}
+        packs={roster.packs}
         editedSlugs={roster.editedSlugs}
         overrideConfigs={roster.overrideConfigs}
         locked={locked}

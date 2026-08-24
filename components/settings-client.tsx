@@ -1,5 +1,6 @@
 "use client";
 
+import { RedeemPack } from "@/components/redeem-pack";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -143,6 +144,10 @@ export function SettingsClient({
         </span>
         <span className="font-mono text-[12px] text-muted">→</span>
       </a>
+
+      <section className="border border-line bg-panel p-3">
+        <RedeemPack />
+      </section>
 
       <section className="border border-line bg-panel p-3">
         <div className="text-[14px] font-semibold">Subscription</div>

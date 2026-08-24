@@ -159,6 +159,13 @@ export interface Store {
   /** Clinic display name for card footers; null for solo accounts. */
   getClinicName(userId: string): Promise<string | null>;
 
+  // vendor packs
+  listUnlockedPacks(userId: string): Promise<import("../packs").UnlockedPack[]>;
+  redeemPackCode(
+    userId: string,
+    code: string
+  ): Promise<{ ok: true; packName: string } | { ok: false; error: string }>;
+
   listTeamTraining(adminUserId: string): Promise<TeamTrainingRow[]>;
   /** Clinic admin sets a member's seat role (provider vs front desk). */
   setSeatRole(adminUserId: string, memberUserId: string, role: import("../types").StationRole): Promise<void>;
@@ -185,6 +192,8 @@ export interface UserRoster {
   custom: Scenario[];
   /** Built-in stations, overrides applied. */
   builtIn: Scenario[];
+  /** Unlocked vendor packs, grouped, overrides applied. */
+  packs: import("../packs").UnlockedPack[];
   /** Slugs carrying a price override (for the "edited" indicator). */
   editedSlugs: string[];
   /** Override configs by slug, for pre-filling the edit sheet. */
@@ -196,10 +205,11 @@ export async function listRosterForUser(
   userId: string,
   specialty: string
 ): Promise<UserRoster> {
-  const [base, custom, overrides] = await Promise.all([
+  const [base, custom, overrides, packs] = await Promise.all([
     store.listScenarios(specialty),
     store.listCustomScenarios(userId),
     store.listScenarioOverrides(userId),
+    store.listUnlockedPacks(userId),
   ]);
   const bySlug = new Map(overrides.map((o) => [o.scenarioSlug, o]));
   return {
@@ -207,6 +217,10 @@ export async function listRosterForUser(
       .filter((s) => !s.isPrep)
       .map((s) => applyOverride(s, bySlug.get(s.slug) ?? null)),
     builtIn: base.map((s) => applyOverride(s, bySlug.get(s.slug) ?? null)),
+    packs: packs.map((p) => ({
+      pack: p.pack,
+      stations: p.stations.map((s) => applyOverride(s, bySlug.get(s.slug) ?? null)),
+    })),
     editedSlugs: overrides.map((o) => o.scenarioSlug),
     overrideConfigs: Object.fromEntries(overrides.map((o) => [o.scenarioSlug, o.config])),
   };

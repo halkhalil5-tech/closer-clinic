@@ -52,6 +52,54 @@ for (const s of SCENARIOS) {
 }
 console.log(`Seeded ${SCENARIOS.length} scenarios.`);
 
+// ------------------------------ vendor packs ------------------------------
+const { NORTHWIND_PACK, NORTHWIND_STATIONS, NORTHWIND_CODE } = await import("../lib/packs.ts");
+{
+  const { error } = await supabase.from("packs").upsert(
+    {
+      id: NORTHWIND_PACK.id,
+      name: NORTHWIND_PACK.name,
+      vendor: NORTHWIND_PACK.vendor,
+      specialty: NORTHWIND_PACK.specialty,
+      branding: NORTHWIND_PACK.branding,
+      distribution: NORTHWIND_PACK.distribution,
+    },
+    { onConflict: "id" }
+  );
+  if (error) { console.error("pack upsert failed:", error.message); process.exit(1); }
+  for (const s of NORTHWIND_STATIONS) {
+    const { error: e } = await supabase.from("scenarios").upsert(
+      {
+        slug: s.slug,
+        specialty: s.specialty,
+        role: s.role ?? "provider",
+        title: s.title,
+        service_desc: s.serviceDesc,
+        price_display: s.priceDisplay,
+        price_structure: s.priceStructure,
+        clinical_context: s.clinicalContext,
+        patient_cc: s.patientCc,
+        close_goal: s.closeGoal,
+        objection_seeds: s.objectionSeeds,
+        difficulty_notes: s.difficultyNotes ?? null,
+        is_custom: false,
+        active: true,
+        sort_order: sort++,
+        pack_id: NORTHWIND_PACK.id,
+      },
+      { onConflict: "slug" }
+    );
+    if (e) { console.error(`pack station ${s.slug} failed:`, e.message); process.exit(1); }
+    console.log(`✓ ${s.slug} (pack)`);
+  }
+  const { error: ce } = await supabase.from("pack_codes").upsert(
+    { code: NORTHWIND_CODE, pack_id: NORTHWIND_PACK.id },
+    { onConflict: "code" }
+  );
+  if (ce) { console.error("pack code failed:", ce.message); process.exit(1); }
+  console.log(`✓ pack code ${NORTHWIND_CODE}`);
+}
+
 // ------------------------- training content -------------------------
 // Same canonical-source pattern: packs live in lib/training/*, the seed
 // upserts them. A dental pack is another import + spread here.

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import type { Difficulty, PriceConfig, Scenario } from "@/lib/types";
+import type { UnlockedPack } from "@/lib/packs";
 import { guessConfigFromScenario } from "@/lib/pricing";
 import { PriceEditSheet } from "@/components/price-edit-sheet";
 import { LaunchSheet } from "@/components/launch-sheet";
@@ -27,6 +28,7 @@ function splitPrice(priceDisplay: string): { lead: string; rest: string | null }
 interface Props {
   scenarios: Scenario[];
   customScenarios?: Scenario[];
+  packs?: UnlockedPack[];
   editedSlugs?: string[];
   overrideConfigs?: Record<string, PriceConfig>;
   locked?: boolean;
@@ -38,6 +40,7 @@ interface Props {
 export function HomeClient({
   scenarios,
   customScenarios = [],
+  packs = [],
   editedSlugs = [],
   overrideConfigs = {},
   locked = false,
@@ -48,7 +51,9 @@ export function HomeClient({
   const [roleTab, setRoleTab] = useState<"provider" | "front_desk">("provider");
   const [launching, setLaunching] = useState<Scenario | null>(() =>
     initialLaunchSlug
-      ? [...customScenarios, ...scenarios].find((s) => s.slug === initialLaunchSlug) ?? null
+      ? [...customScenarios, ...scenarios, ...packs.flatMap((p) => p.stations)].find(
+          (s) => s.slug === initialLaunchSlug
+        ) ?? null
       : null
   );
   const edited = new Set(editedSlugs);
@@ -267,6 +272,49 @@ export function HomeClient({
           </a>
         )}
       </section>
+
+      {/* vendor packs: grouped under the vendor's accent */}
+      {roleTab === "provider" &&
+        packs.map(({ pack, stations }) => (
+          <section key={pack.id} className="mt-5">
+            <div className="flex items-baseline justify-between">
+              <div className="flex items-center gap-2">
+                <span
+                  className="h-2 w-2 shrink-0 rounded-full"
+                  style={{ backgroundColor: pack.branding.accent ?? "var(--color-bone)" }}
+                />
+                <div className="microlabel">{pack.name}</div>
+              </div>
+              <div className="text-xs text-muted">{pack.vendor}</div>
+            </div>
+            <div className="mt-1 divide-y divide-hairline">
+              {stations.map((s) => (
+                <div key={s.slug} className="relative">
+                  <button
+                    onClick={() => setLaunching(s)}
+                    className="group relative block min-h-[44px] w-full py-3.5 pl-3.5 pr-3 text-left transition-colors hover:bg-raised active:bg-raised"
+                  >
+                    <span
+                      className="absolute inset-y-0 left-0 w-[3px] transition-all group-hover:w-[5px]"
+                      style={{ backgroundColor: pack.branding.accent ?? "var(--color-bone)" }}
+                    />
+                    <div className="flex items-baseline justify-between gap-3">
+                      <span className="display-title min-w-0 flex-1 truncate text-[15px] text-ink">
+                        {s.title}
+                      </span>
+                      <span className="shrink-0 font-mono text-[14px] font-semibold tabular-nums text-bone">
+                        {splitPrice(s.priceDisplay).lead}
+                      </span>
+                    </div>
+                    <p className="mt-1 truncate text-[13px] italic leading-snug text-ink/60">
+                      &ldquo;{s.patientCc}&rdquo;
+                    </p>
+                  </button>
+                </div>
+              ))}
+            </div>
+          </section>
+        ))}
 
       {launching && (
         <LaunchSheet

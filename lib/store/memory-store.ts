@@ -24,6 +24,7 @@ import { listScenarios as codeScenarios, getScenario as codeScenario } from "../
 import { PODIATRY_MODULES, PODIATRY_LESSONS } from "../training/podiatry-pack";
 import { PODIATRY_OBJECTION_CARDS } from "../training/objection-cards";
 import { getModuleDocFromCode } from "../training/module-docs";
+import { NORTHWIND_CODE, NORTHWIND_PACK, NORTHWIND_STATIONS } from "../packs";
 import { computeTrainingStatus } from "../training";
 import { DEV_USER } from "../config";
 
@@ -46,6 +47,7 @@ interface MemoryDb {
   assignments: AssignmentRow[];
   cardSessions: { userId: string; at: string }[];
   scriptCards: Map<string, { contentHash: string; lines: import("../script-card").ScriptCardLines }>;
+  unlockedPackIds: Set<string>;
 }
 
 const g = globalThis as unknown as { __closerClinicDb?: MemoryDb };
@@ -74,6 +76,7 @@ function db(): MemoryDb {
       assignments: [],
       cardSessions: [],
       scriptCards: new Map(),
+      unlockedPackIds: new Set(),
     };
     if (process.env.DEV_SEED_STATS === "1") seedStats(g.__closerClinicDb);
   }
@@ -90,6 +93,7 @@ function db(): MemoryDb {
   d.assignments ??= [];
   d.cardSessions ??= [];
   d.scriptCards ??= new Map();
+  d.unlockedPackIds ??= new Set();
   return d;
 }
 
@@ -305,9 +309,14 @@ class MemoryStore implements Store {
     return codeScenarios(specialty);
   }
 
+  private packScenario(slug: string): Scenario | undefined {
+    if (!db().unlockedPackIds.has(NORTHWIND_PACK.id)) return undefined;
+    return NORTHWIND_STATIONS.find((s) => s.slug === slug);
+  }
+
   async getScenario(slug: string): Promise<Scenario | null> {
     // Customs/preps are found even when retired — encounter history needs them.
-    return codeScenario(slug) ?? db().customScenarios.get(slug) ?? null;
+    return codeScenario(slug) ?? this.packScenario(slug) ?? db().customScenarios.get(slug) ?? null;
   }
 
   /* --------------------- custom scenarios & overrides --------------------- */
@@ -647,6 +656,22 @@ class MemoryStore implements Store {
 
   async setRequireCurriculum(_adminUserId: string, value: boolean): Promise<void> {
     db().requireCurriculum = value;
+  }
+
+  async listUnlockedPacks(): Promise<import("../packs").UnlockedPack[]> {
+    if (!db().unlockedPackIds.has(NORTHWIND_PACK.id)) return [];
+    return [{ pack: NORTHWIND_PACK, stations: NORTHWIND_STATIONS }];
+  }
+
+  async redeemPackCode(
+    _userId: string,
+    code: string
+  ): Promise<{ ok: true; packName: string } | { ok: false; error: string }> {
+    if (code.trim().toUpperCase() !== NORTHWIND_CODE) {
+      return { ok: false, error: "That code doesn't match any pack." };
+    }
+    db().unlockedPackIds.add(NORTHWIND_PACK.id);
+    return { ok: true, packName: NORTHWIND_PACK.name };
   }
 
   async getScriptCard(userId: string, stationSlug: string) {
