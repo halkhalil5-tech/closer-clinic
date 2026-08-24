@@ -46,3 +46,28 @@ describe("withStartTimes", () => {
     expect(out[0].beat).toBe("said the number");
   });
 });
+
+describe("stripMp3Metadata", () => {
+  // Minimal MPEG1 Layer III 64kbps 44.1kHz frame: length 208, sync header.
+  const frame = (fill: number) => {
+    const f = Buffer.alloc(208, fill);
+    f[0] = 0xff; f[1] = 0xfb; f[2] = 0x50; f[3] = 0x00; // MPEG1 L3, 64kbps, 44.1kHz
+    return f;
+  };
+
+  it("removes a leading ID3v2 tag and Xing frame, keeps audio frames", async () => {
+    const { stripMp3Metadata } = await import("@/lib/audio-pairs");
+    const id3 = Buffer.concat([Buffer.from("ID3"), Buffer.from([3, 0, 0, 0, 0, 0, 20]), Buffer.alloc(20)]);
+    const xing = frame(0);
+    Buffer.from("Xing").copy(xing, 36);
+    const audio = Buffer.concat([frame(0xaa), frame(0xbb)]);
+    const out = stripMp3Metadata(Buffer.concat([id3, xing, audio]));
+    expect(out.equals(audio)).toBe(true);
+  });
+
+  it("leaves a clean frame stream untouched", async () => {
+    const { stripMp3Metadata } = await import("@/lib/audio-pairs");
+    const audio = Buffer.concat([frame(0x11), frame(0x22)]);
+    expect(stripMp3Metadata(audio).equals(audio)).toBe(true);
+  });
+});

@@ -59,6 +59,50 @@ export async function recordTtsChars(chars: number): Promise<void> {
 
 /* ------------------------------ generation ------------------------------ */
 
+const MPEG1_SAMPLE_RATES = [44100, 48000, 32000];
+const MPEG2_SAMPLE_RATES = [22050, 24000, 16000];
+const L3_BITRATES_V1 = [0, 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320];
+const L3_BITRATES_V2 = [0, 8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160];
+
+/**
+ * Strip ID3v2 tags and the Xing/Info metadata frame from an MP3 segment.
+ * Stitched takes must be one clean frame stream: browsers read the FIRST
+ * segment's duration header and stop playback there (the "stops at 0:07" bug),
+ * and mid-stream tags can stall decoders.
+ */
+export function stripMp3Metadata(buf: Buffer): Buffer {
+  let b = buf;
+  // ID3v2 tag at the start (syncsafe 28-bit size).
+  if (b.length > 10 && b[0] === 0x49 && b[1] === 0x44 && b[2] === 0x33) {
+    const size =
+      ((b[6] & 0x7f) << 21) | ((b[7] & 0x7f) << 14) | ((b[8] & 0x7f) << 7) | (b[9] & 0x7f);
+    b = b.subarray(10 + size);
+  }
+  // Skip to the first frame sync.
+  let i = 0;
+  while (i + 4 < b.length && !(b[i] === 0xff && (b[i + 1] & 0xe0) === 0xe0)) i++;
+  b = b.subarray(i);
+  // Drop leading Xing/Info/LAME frames (up to 2).
+  for (let n = 0; n < 2; n++) {
+    if (b.length < 4 || b[0] !== 0xff || (b[1] & 0xe0) !== 0xe0) break;
+    const mpeg1 = (b[1] & 0x18) === 0x18;
+    const bitrateIdx = (b[2] >> 4) & 0x0f;
+    const srIdx = (b[2] >> 2) & 0x03;
+    if (bitrateIdx === 0 || bitrateIdx === 15 || srIdx === 3) break;
+    const bitrate = (mpeg1 ? L3_BITRATES_V1 : L3_BITRATES_V2)[bitrateIdx] * 1000;
+    const sampleRate = (mpeg1 ? MPEG1_SAMPLE_RATES : MPEG2_SAMPLE_RATES)[srIdx];
+    const padding = (b[2] >> 1) & 0x01;
+    const frameLen = Math.floor(((mpeg1 ? 144 : 72) * bitrate) / sampleRate) + padding;
+    const head = b.subarray(0, Math.min(frameLen, b.length)).toString("latin1");
+    if (head.includes("Xing") || head.includes("Info") || head.includes("LAME")) {
+      b = b.subarray(frameLen);
+    } else {
+      break;
+    }
+  }
+  return b;
+}
+
 async function ttsSegment(text: string, voiceId: string): Promise<Buffer> {
   const apiKey = process.env.ELEVENLABS_API_KEY;
   if (!apiKey) throw new Error("TTS not configured");
@@ -93,9 +137,8 @@ async function renderTake(
       while (next < lines.length) {
         const i = next++;
         const line = lines[i];
-        segments[i] = await ttsSegment(
-          line.text,
-          line.speaker === "patient" ? voices.patient : voices.doctor
+        segments[i] = stripMp3Metadata(
+          await ttsSegment(line.text, line.speaker === "patient" ? voices.patient : voices.doctor)
         );
       }
     })

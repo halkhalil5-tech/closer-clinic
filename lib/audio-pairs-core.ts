@@ -7,7 +7,7 @@ import type { PairLine, Scenario } from "./types";
  */
 
 /** Bump to invalidate every cached pair after a script-prompt change. */
-export const PAIR_SCRIPT_VERSION = 1;
+export const PAIR_SCRIPT_VERSION = 2; // v2: segments sanitized before stitching
 
 /** ElevenLabs mp3_44100_64 is 64 kbps CBR: duration ≈ bytes × 8 / 64000. */
 export const MP3_BYTES_PER_MS = 8;
