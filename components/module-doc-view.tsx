@@ -5,6 +5,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { ModuleDoc, TrainingLesson } from "@/lib/types";
 import { QUIZ_PASS_PCT } from "@/lib/types";
+import { buildVoiceEngine, type VoiceCaps } from "@/lib/voice/engine";
+import { primeAudio } from "@/lib/voice/elevenlabs-client";
+import type { SttSession } from "@/lib/voice/types";
+
+/** Same per-device preference the encounter room uses. */
+const VOICE_PREF_KEY = "closer-clinic:patient-voice";
 
 /* ------------------------------ tiny helpers ------------------------------ */
 
@@ -104,9 +110,10 @@ interface Props {
   moduleTitle: string;
   initial: { quizScore: number | null; drillPassed: boolean | null };
   next: { slug: string; title: string; order: number } | null;
+  voiceCaps: VoiceCaps;
 }
 
-export function ModuleDocView({ doc, lesson, moduleTitle, initial, next }: Props) {
+export function ModuleDocView({ doc, lesson, moduleTitle, initial, next, voiceCaps }: Props) {
   const router = useRouter();
   const checkPassed = (initial.quizScore ?? 0) >= QUIZ_PASS_PCT;
   const moduleComplete = checkPassed && (!lesson.drill || initial.drillPassed === true);
@@ -230,7 +237,7 @@ export function ModuleDocView({ doc, lesson, moduleTitle, initial, next }: Props
               <span className="font-mono text-[10px] font-semibold uppercase tracking-wide text-mint">Passed</span>
             )}
           </div>
-          <DrillBlock lesson={lesson} onRefresh={() => router.refresh()} />
+          <DrillBlock lesson={lesson} voiceCaps={voiceCaps} onRefresh={() => router.refresh()} />
         </section>
       )}
 
@@ -430,7 +437,15 @@ interface DrillMsg {
   text: string;
 }
 
-function DrillBlock({ lesson, onRefresh }: { lesson: TrainingLesson; onRefresh: () => void }) {
+function DrillBlock({
+  lesson,
+  voiceCaps,
+  onRefresh,
+}: {
+  lesson: TrainingLesson;
+  voiceCaps: VoiceCaps;
+  onRefresh: () => void;
+}) {
   const drill = lesson.drill!;
   const [drillId, setDrillId] = useState<string | null>(null);
   const [messages, setMessages] = useState<DrillMsg[]>([]);
@@ -440,7 +455,30 @@ function DrillBlock({ lesson, onRefresh }: { lesson: TrainingLesson; onRefresh: 
   const [verdict, setVerdict] = useState<{ passed: boolean; feedback: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // Drills are real encounters, so they get the same patient voice + mic as
+  // the room. The engine needs the drill's encounter id, so it's built on start.
+  const engineRef = useRef<ReturnType<typeof buildVoiceEngine> | null>(null);
+  const sttRef = useRef<SttSession | null>(null);
+  const [micState, setMicState] = useState<"idle" | "recording">("idle");
+  const [interim, setInterim] = useState("");
+  const voiceOnRef = useRef(true);
+
+  useEffect(() => {
+    const saved = localStorage.getItem(VOICE_PREF_KEY);
+    if (saved !== null) voiceOnRef.current = saved === "on";
+    return () => {
+      sttRef.current?.cancel();
+      engineRef.current?.tts.cancel();
+    };
+  }, []);
+
+  function speak(text: string) {
+    if (!voiceOnRef.current) return;
+    void engineRef.current?.tts.speak(text, {});
+  }
+
   async function start() {
+    primeAudio(); // unlock playback while we're inside the tap gesture
     setBusy(true);
     setError(null);
     try {
@@ -455,6 +493,8 @@ function DrillBlock({ lesson, onRefresh }: { lesson: TrainingLesson; onRefresh: 
       setMessages([{ role: "patient", text: data.patient }]);
       setTurnsLeft(data.maxTurns);
       setVerdict(null);
+      engineRef.current = buildVoiceEngine(data.drillId, voiceCaps);
+      speak(data.patient);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Couldn't start the drill.");
     } finally {
@@ -462,9 +502,37 @@ function DrillBlock({ lesson, onRefresh }: { lesson: TrainingLesson; onRefresh: 
     }
   }
 
+  function toggleMic() {
+    if (micState === "recording") {
+      sttRef.current?.stop();
+      return;
+    }
+    if (busy || !drillId || !engineRef.current) return;
+    engineRef.current.tts.cancel(); // patient yields the floor to the mic
+    engineRef.current.tts.prime?.();
+    setError(null);
+    setMicState("recording");
+    setInterim("");
+    sttRef.current = engineRef.current.stt.start({
+      onInterim: (t) => setInterim(t),
+      onFinal: (t) => {
+        setDraft((d) => (d ? `${d} ${t}` : t));
+        setInterim("");
+      },
+      onError: (message) => setError(message),
+      onEnd: () => {
+        sttRef.current = null;
+        setMicState("idle");
+        setInterim("");
+      },
+    });
+  }
+
   async function send() {
     const text = draft.trim();
     if (!text || busy || !drillId) return;
+    engineRef.current?.tts.prime?.(); // still inside the send gesture
+    if (micState === "recording") sttRef.current?.cancel();
     setBusy(true);
     setError(null);
     setDraft("");
@@ -479,6 +547,7 @@ function DrillBlock({ lesson, onRefresh }: { lesson: TrainingLesson; onRefresh: 
       if (!res.ok) throw new Error(data.error || "Try again.");
       setMessages((m) => [...m, { role: "patient", text: data.patient }]);
       setTurnsLeft(data.turnsLeft);
+      speak(data.patient);
       if (data.turnsLeft <= 0) {
         const g = await fetch(`/api/drills/${drillId}/grade`, { method: "POST" }).then((r) => r.json());
         if (g.passed !== undefined) {
@@ -559,7 +628,25 @@ function DrillBlock({ lesson, onRefresh }: { lesson: TrainingLesson; onRefresh: 
         )}
       </div>
       {error && <p className="py-1 text-[13px] text-red">{error}</p>}
+      {micState === "recording" && (
+        <p className="py-1 text-[13px] italic text-muted">{interim || "Listening…"}</p>
+      )}
       <div className="mt-2 flex items-end gap-2">
+        <button
+          onClick={toggleMic}
+          disabled={busy}
+          aria-label={micState === "recording" ? "Stop recording" : "Speak your line"}
+          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full border disabled:opacity-40 ${
+            micState === "recording"
+              ? "border-red bg-red/15 text-red"
+              : "border-line-strong text-bone"
+          }`}
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-5 w-5">
+            <rect x="9" y="3" width="6" height="11" rx="3" />
+            <path d="M5 11a7 7 0 0 0 14 0M12 18v3" strokeLinecap="round" />
+          </svg>
+        </button>
         <textarea
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
@@ -570,7 +657,7 @@ function DrillBlock({ lesson, onRefresh }: { lesson: TrainingLesson; onRefresh: 
             }
           }}
           rows={1}
-          placeholder="Your line..."
+          placeholder={micState === "recording" ? "Speak — tap mic to stop" : "Speak or type your line..."}
           className="max-h-24 min-h-11 flex-1 resize-none border border-line bg-bg px-3 py-2.5 text-[14px] text-ink placeholder:text-muted focus:border-mint focus:outline-none"
         />
         <button

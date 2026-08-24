@@ -90,6 +90,10 @@ export default async function ModulePage({ params }: { params: Promise<{ slug: s
             drillPassed: progress?.drillPassed ?? null,
           }}
           next={nextMod ? { slug: nextMod.slug, title: nextMod.title, order: nextMod.order } : null}
+          voiceCaps={{
+            tts: Boolean(process.env.ELEVENLABS_API_KEY),
+            stt: Boolean(process.env.DEEPGRAM_API_KEY),
+          }}
         />
       </div>
     </main>
