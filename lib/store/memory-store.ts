@@ -45,6 +45,7 @@ interface MemoryDb {
   siteImports: { userId: string; url: string; at: string }[];
   assignments: AssignmentRow[];
   cardSessions: { userId: string; at: string }[];
+  scriptCards: Map<string, { contentHash: string; lines: import("../script-card").ScriptCardLines }>;
 }
 
 const g = globalThis as unknown as { __closerClinicDb?: MemoryDb };
@@ -72,6 +73,7 @@ function db(): MemoryDb {
       siteImports: [],
       assignments: [],
       cardSessions: [],
+      scriptCards: new Map(),
     };
     if (process.env.DEV_SEED_STATS === "1") seedStats(g.__closerClinicDb);
   }
@@ -87,6 +89,7 @@ function db(): MemoryDb {
   d.siteImports ??= [];
   d.assignments ??= [];
   d.cardSessions ??= [];
+  d.scriptCards ??= new Map();
   return d;
 }
 
@@ -644,6 +647,23 @@ class MemoryStore implements Store {
 
   async setRequireCurriculum(_adminUserId: string, value: boolean): Promise<void> {
     db().requireCurriculum = value;
+  }
+
+  async getScriptCard(userId: string, stationSlug: string) {
+    return db().scriptCards.get(`${userId}:${stationSlug}`) ?? null;
+  }
+
+  async upsertScriptCard(
+    userId: string,
+    stationSlug: string,
+    contentHash: string,
+    lines: import("../script-card").ScriptCardLines
+  ): Promise<void> {
+    db().scriptCards.set(`${userId}:${stationSlug}`, { contentHash, lines });
+  }
+
+  async getClinicName(): Promise<string | null> {
+    return null; // dev mode is a solo account
   }
 
   async setSeatRole(): Promise<void> {

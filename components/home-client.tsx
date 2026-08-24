@@ -256,6 +256,16 @@ export function HomeClient({
             ))}
           </div>
         )}
+        {roleTab === "provider" && (
+          <a
+            href="/api/script-cards"
+            target="_blank"
+            rel="noreferrer"
+            className="mt-3 block py-1 text-center font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-muted underline underline-offset-2"
+          >
+            Print all script cards
+          </a>
+        )}
       </section>
 
       {launching && (

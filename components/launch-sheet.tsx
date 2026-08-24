@@ -114,6 +114,15 @@ export function LaunchSheet({
 
         <PairPlayer fetchBody={{ stationSlug: scenario.slug }} />
 
+        <a
+          href={`/api/script-card/${scenario.slug}`}
+          target="_blank"
+          rel="noreferrer"
+          className="mt-2 block py-1 text-center font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-muted underline underline-offset-2"
+        >
+          Print script card
+        </a>
+
         {error && <p className="mt-2 text-sm text-red">{error}</p>}
         <button
           onClick={start}

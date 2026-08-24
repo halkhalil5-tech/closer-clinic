@@ -106,10 +106,11 @@ export async function generateGrade(
 /** One-shot JSON generation (pair scripts, script-card tightening). */
 export async function generateJson(
   prompt: string,
-  maxTokens = 2000
+  maxTokens = 2000,
+  devStub?: () => string
 ): Promise<{ raw: string; usage: ModelUsage }> {
   if (!hasModelAccess()) {
-    return { raw: stubPairScriptJson(), usage: { inputTokens: 0, outputTokens: 0 } };
+    return { raw: (devStub ?? stubPairScriptJson)(), usage: { inputTokens: 0, outputTokens: 0 } };
   }
   const res = await client().messages.create({
     model: MODEL,

@@ -801,6 +801,49 @@ export class SupabaseStore implements Store {
     if (error) throw error;
   }
 
+  async getScriptCard(userId: string, stationSlug: string) {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("script_cards")
+      .select("content_hash, lines")
+      .eq("user_id", userId)
+      .eq("station_slug", stationSlug)
+      .maybeSingle();
+    return data ? { contentHash: data.content_hash, lines: data.lines } : null;
+  }
+
+  async upsertScriptCard(
+    userId: string,
+    stationSlug: string,
+    contentHash: string,
+    lines: import("../script-card").ScriptCardLines
+  ): Promise<void> {
+    const supabase = await createClient();
+    const { error } = await supabase
+      .from("script_cards")
+      .upsert(
+        { user_id: userId, station_slug: stationSlug, content_hash: contentHash, lines },
+        { onConflict: "user_id,station_slug" }
+      );
+    if (error) throw error;
+  }
+
+  async getClinicName(userId: string): Promise<string | null> {
+    const supabase = await createClient();
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("clinic_id")
+      .eq("id", userId)
+      .maybeSingle();
+    if (!profile?.clinic_id) return null;
+    const { data: clinic } = await supabase
+      .from("clinics")
+      .select("name")
+      .eq("id", profile.clinic_id)
+      .maybeSingle();
+    return clinic?.name ?? null;
+  }
+
   async setSeatRole(
     _adminUserId: string,
     memberUserId: string,

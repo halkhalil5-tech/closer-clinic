@@ -145,6 +145,20 @@ export interface Store {
   // clinic admin (Phase 1: the signed-in admin's own team policy; Phase 2 wires real clinic membership)
   getRequireCurriculum(adminUserId: string): Promise<boolean>;
   setRequireCurriculum(adminUserId: string, value: boolean): Promise<void>;
+  // script cards (per-user tightened lines, cached on content hash)
+  getScriptCard(
+    userId: string,
+    stationSlug: string
+  ): Promise<{ contentHash: string; lines: import("../script-card").ScriptCardLines } | null>;
+  upsertScriptCard(
+    userId: string,
+    stationSlug: string,
+    contentHash: string,
+    lines: import("../script-card").ScriptCardLines
+  ): Promise<void>;
+  /** Clinic display name for card footers; null for solo accounts. */
+  getClinicName(userId: string): Promise<string | null>;
+
   listTeamTraining(adminUserId: string): Promise<TeamTrainingRow[]>;
   /** Clinic admin sets a member's seat role (provider vs front desk). */
   setSeatRole(adminUserId: string, memberUserId: string, role: import("../types").StationRole): Promise<void>;
