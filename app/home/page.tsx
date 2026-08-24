@@ -3,6 +3,9 @@ import { redirect } from "next/navigation";
 import { getAuthedUser } from "@/lib/auth";
 import { getStore, listRosterForUser } from "@/lib/store";
 import { computeStats } from "@/lib/stats";
+import { pickFirstRepStation } from "@/lib/first-rep";
+import { WARMUP_CARDS } from "@/lib/training/podiatry-pack";
+import { FirstRepStart } from "@/components/first-rep-start";
 import { findWeakSkill, moduleForRubric } from "@/lib/training";
 import { RUBRIC_LABELS } from "@/lib/types";
 import { AppNav } from "@/components/app-nav";
@@ -47,6 +50,12 @@ export default async function HomePage({
     store.listTrainingModules(specialty),
     store.listOutcomeLogs(user.id, { sinceDays: 7 }),
   ]);
+  // Activation: curriculum done (stations open) but not one graded rep yet —
+  // one tap starts the highest-priced warmup-covered station. Gone after rep 1.
+  const gradedEver = recent.some((r) => r.grade);
+  const firstRepStation =
+    !locked && !gradedEver ? pickFirstRepStation(roster.builtIn, WARMUP_CARDS) : null;
+
   // Assigned drills, pinned atop Home.
   const seatAssignments = await store.listAssignmentsForSeat(user.id);
   const fullHistory =
@@ -117,12 +126,25 @@ export default async function HomePage({
             </span>
           </span>
           <span className="ml-auto text-[11px] text-muted">
-            {stats.reps > 0 ? `${stats.closes} of ${stats.reps} closed` : "no graded reps yet"}
+            {stats.reps > 0
+              ? `${stats.closes} of ${stats.reps} closed`
+              : firstRepStation
+                ? "day one"
+                : "no graded reps yet"}
           </span>
           <svg viewBox="0 0 20 20" className="h-3.5 w-3.5 shrink-0 text-muted" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="m8 5 5 5-5 5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </Link>
+
+        {firstRepStation && (
+          <div className="mt-3">
+            <FirstRepStart
+              scenarioSlug={firstRepStation.slug}
+              label={`Run your first rep — ${firstRepStation.title}`}
+            />
+          </div>
+        )}
 
         {/* daily-use bridges into the real clinic day */}
         {!locked && (

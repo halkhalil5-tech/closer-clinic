@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { primeAudio } from "@/lib/voice/elevenlabs-client";
 
-export function FirstRepStart({ scenarioSlug }: { scenarioSlug: string }) {
+export function FirstRepStart({ scenarioSlug, label }: { scenarioSlug: string; label?: string }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -37,7 +37,7 @@ export function FirstRepStart({ scenarioSlug }: { scenarioSlug: string }) {
         disabled={busy}
         className="display w-full rounded-card bg-mint py-4 text-[16px] tracking-wide text-mint-ink disabled:opacity-60"
       >
-        {busy ? "Opening the door" : "Walk into the room"}
+        {busy ? "Opening the door" : (label ?? "Walk into the room")}
       </button>
     </>
   );
