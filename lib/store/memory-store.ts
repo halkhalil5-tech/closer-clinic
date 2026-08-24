@@ -57,6 +57,7 @@ function db(): MemoryDb {
         email: DEV_USER.email,
         name: DEV_USER.name,
         specialty: "podiatry",
+        clinicId: null,
         onboarded: true,
       },
       encounters: new Map(),
@@ -270,22 +271,25 @@ function seedStats(mem: MemoryDb) {
   );
 
   // Real-world outcome logs: presented shockwave/orthotics most days, ~60% closed.
-  const outcomes: [daysAgo: number, service: string, closed: boolean][] = [
-    [6, "Shockwave series", false],
-    [5, "Shockwave series", true],
-    [5, "Custom orthotics", true],
-    [3, "Laser nail program", false],
-    [2, "Shockwave series", true],
-    [1, "Custom orthotics", false],
-    [1, "Shockwave series", true],
+  const outcomes: [daysAgo: number, service: string, slug: string, closed: boolean, cents: number | null][] = [
+    [6, "Shockwave series", "shockwave-plantar-fasciitis", false, null],
+    [5, "Shockwave series", "shockwave-plantar-fasciitis", true, 60000],
+    [5, "Custom orthotics", "custom-orthotics", true, null], // default → "est."
+    [3, "Laser nail program", "laser-nail-fungus-program", false, null],
+    [2, "Shockwave series", "shockwave-plantar-fasciitis", true, 60000],
+    [1, "Custom orthotics", "custom-orthotics", false, null],
+    [1, "Shockwave series", "shockwave-plantar-fasciitis", true, 60000],
   ];
-  for (const [daysAgo, service, closed] of outcomes) {
+  for (const [daysAgo, service, slug, closed, cents] of outcomes) {
     const at = new Date(Date.now() - daysAgo * 86_400_000);
     mem.outcomeLogs.push({
       id: randomUUID(),
       userId: DEV_USER.id,
       date: at.toISOString().slice(0, 10),
       service,
+      stationSlug: slug,
+      amountCents: cents ?? (closed ? 100000 : null),
+      amountEntered: cents !== null,
       presented: true,
       closed,
       createdAt: at.toISOString(),

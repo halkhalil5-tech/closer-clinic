@@ -162,10 +162,13 @@ export function SimVsRealChart({
   byDay,
   real,
   windowDays,
+  revenueByDay = [],
 }: {
   byDay: DayPoint[];
   real: RealDayPoint[];
   windowDays: number;
+  /** Closed revenue per day (cents); rendered as weekly bars behind the lines. */
+  revenueByDay?: { date: string; cents: number }[];
 }) {
   const W = 340;
   const H = 150;
@@ -182,6 +185,18 @@ export function SimVsRealChart({
   }
   const x = (i: number) => PAD.left + (days.length === 1 ? iw / 2 : (i / (days.length - 1)) * iw);
   const y = (rate: number) => PAD.top + (1 - rate) * ih;
+
+  // Weekly revenue bars: bucket the window's days into weeks ending today.
+  const revByDate = new Map(revenueByDay.map((r) => [r.date, r.cents]));
+  const weeks: { startIdx: number; endIdx: number; cents: number }[] = [];
+  for (let end = days.length - 1; end >= 0; end -= 7) {
+    const start = Math.max(0, end - 6);
+    let cents = 0;
+    for (let i = start; i <= end; i++) cents += revByDate.get(days[i]) ?? 0;
+    weeks.unshift({ startIdx: start, endIdx: end, cents });
+  }
+  const maxWeekCents = Math.max(0, ...weeks.map((w) => w.cents));
+  const hasRevenue = maxWeekCents > 0;
 
   function pathFor(rateOf: (date: string) => number | null): string[] {
     const segs: string[] = [];
@@ -221,6 +236,24 @@ export function SimVsRealChart({
   return (
     <div>
       <svg viewBox={`0 0 ${W} ${H}`} className="w-full">
+        {hasRevenue &&
+          weeks.map((w, i) => {
+            const h = (w.cents / maxWeekCents) * ih * 0.8;
+            const x0 = x(w.startIdx);
+            const x1 = x(w.endIdx);
+            const bw = Math.max(6, x1 - x0);
+            return (
+              <rect
+                key={`w${i}`}
+                x={(x0 + x1) / 2 - bw / 2}
+                y={PAD.top + ih - h}
+                width={bw}
+                height={h}
+                fill="var(--color-amber)"
+                opacity="0.18"
+              />
+            );
+          })}
         {[0, 0.5, 1].map((r) => (
           <g key={r}>
             <line x1={PAD.left} x2={W - PAD.right} y1={y(r)} y2={y(r)} stroke={GRID} strokeWidth="1" />
@@ -275,6 +308,11 @@ export function SimVsRealChart({
           <span className="h-0.5 w-4 bg-bone" /> Real world
           {!hasReal && <span className="normal-case tracking-normal">— none logged yet</span>}
         </span>
+        {hasRevenue && (
+          <span className="flex items-center gap-1.5 font-mono text-[9px] font-semibold uppercase tracking-[0.12em] text-muted">
+            <span className="h-2 w-4 bg-amber/30" /> Closed $/wk
+          </span>
+        )}
       </div>
     </div>
   );

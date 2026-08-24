@@ -7,7 +7,17 @@ import { computeTrainingStatus } from "@/lib/training";
 import { averageLetter, isoDaysAgo } from "@/lib/letter-grades";
 import { AppNav } from "@/components/app-nav";
 import { SimVsRealChart, ScenarioBars, type RealDayPoint } from "@/components/charts";
-import { OutcomeLog } from "@/components/outcome-log";
+import { OutcomeLog, type LogService } from "@/components/outcome-log";
+import {
+  closedRevenue,
+  defaultAmountCents,
+  formatCents,
+  paybackMultiple,
+  revenueByDay,
+  revenueDelta,
+  stationLeaks,
+} from "@/lib/revenue";
+import { PLAN_PRICE_CLINIC_CENTS, PLAN_PRICE_INDIVIDUAL_CENTS } from "@/lib/config";
 
 export const dynamic = "force-dynamic";
 
@@ -30,10 +40,11 @@ export default async function ProgressPage({
   const store = await getStore();
   const profile = await store.getCurrentUser();
   const specialty = profile?.specialty ?? "podiatry";
-  const [rows, scenarios, outcomes, modules, lessons, progress, unlocks, roster] = await Promise.all([
+  const [rows, scenarios, outcomes, allOutcomes, modules, lessons, progress, unlocks, roster] = await Promise.all([
     store.listEncountersWithGrades(user.id, { sinceDays: windowDays }),
     store.listScenarios(),
     store.listOutcomeLogs(user.id, { sinceDays: windowDays }),
+    store.listOutcomeLogs(user.id),
     store.listTrainingModules(specialty),
     store.listTrainingLessons(specialty),
     store.getLessonProgress(user.id),
@@ -65,6 +76,33 @@ export default async function ProgressPage({
     realByDay.set(o.date, d);
   }
   const real = [...realByDay.values()];
+
+  // ------------------------- revenue attribution -------------------------
+  const rosterAll = [...roster.custom, ...roster.builtIn];
+  const priceBySlug = new Map(rosterAll.map((s) => [s.slug, defaultAmountCents(s)]));
+  const titleBySlug = new Map(rosterAll.map((s) => [s.slug, s.title]));
+  const logServices: LogService[] = rosterAll.map((s) => ({
+    slug: s.slug,
+    title: s.title,
+    defaultCents: defaultAmountCents(s),
+  }));
+
+  const today = new Date().toISOString().slice(0, 10);
+  const revenue = closedRevenue(outcomes, priceBySlug);
+  const delta = revenueDelta(allOutcomes, priceBySlug, today);
+  const monthStart = isoDaysAgo(30).slice(0, 10);
+  const monthRevenue = closedRevenue(
+    allOutcomes.filter((o) => o.date >= monthStart),
+    priceBySlug
+  );
+  const planCents = profile?.clinicId ? PLAN_PRICE_CLINIC_CENTS : PLAN_PRICE_INDIVIDUAL_CENTS;
+  const payback = paybackMultiple(monthRevenue.cents, planCents);
+  const leaks = stationLeaks(outcomes, priceBySlug, titleBySlug).slice(0, 5);
+  const revByDay = [...revenueByDay(outcomes, priceBySlug)].map(([date, cents]) => ({
+    date,
+    cents,
+  }));
+  const neverLogged = allOutcomes.length === 0;
 
   // The consult logger lives here now; week counts always cover the last 7
   // days regardless of the selected chart window.
@@ -196,15 +234,100 @@ export default async function ProgressPage({
         </main>
       ) : (
       <main className="px-4">
-        {/* moved here from Stations — identical logging logic and writes */}
+        {/* -------- closed revenue: the number a clinic renews on -------- */}
         <section className="mt-3 border border-line bg-panel p-3">
-          <OutcomeLog
-            title="Log today's consults"
-            services={[...roster.custom, ...roster.builtIn].map((s) => s.title)}
-            weekPresented={weekLogs.length}
-            weekClosed={weekLogs.filter((o) => o.closed).length}
-          />
+          <div className="flex items-baseline justify-between">
+            <div className="microlabel">Closed revenue · {windowDays}D</div>
+            {revenue.estimated && revenue.cents > 0 && (
+              <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-muted">
+                est.
+              </span>
+            )}
+          </div>
+          {neverLogged ? (
+            <div className="mt-2">
+              <p className="text-[13px] text-dim">
+                Log today&apos;s consults to see what you&apos;re closing.
+              </p>
+              <div className="mt-3">
+                <OutcomeLog
+                  title="Log today's consults"
+                  services={logServices}
+                  weekPresented={weekLogs.length}
+                  weekClosed={weekLogs.filter((o) => o.closed).length}
+                />
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="mt-1 font-mono text-[34px] font-semibold leading-none tabular-nums text-bone">
+                {formatCents(revenue.cents)}
+              </div>
+              <div className="mt-1.5 text-[12px] text-muted">
+                {delta?.kind === "delta" ? (
+                  <>
+                    vs. your first 30 days:{" "}
+                    <span className={`font-mono font-semibold tabular-nums ${delta.cents >= 0 ? "text-mint" : "text-red"}`}>
+                      {delta.cents >= 0 ? "+" : ""}
+                      {formatCents(delta.cents)}
+                    </span>
+                    {delta.estimated && " est."}
+                  </>
+                ) : delta ? (
+                  <>logging since {new Date(`${delta.date}T00:00:00Z`).toLocaleDateString()}</>
+                ) : null}
+              </div>
+              {monthRevenue.cents > 0 && (
+                <div className="mt-2 border-t border-hairline pt-2 text-[12px] text-dim">
+                  This month&apos;s closes ={" "}
+                  <span className="font-mono font-semibold tabular-nums text-mint">{payback}×</span>{" "}
+                  your subscription.
+                </div>
+              )}
+            </>
+          )}
         </section>
+
+        {!neverLogged && (
+          <section className="mt-3 border border-line bg-panel p-3">
+            <OutcomeLog
+              title="Log today's consults"
+              services={logServices}
+              weekPresented={weekLogs.length}
+              weekClosed={weekLogs.filter((o) => o.closed).length}
+            />
+          </section>
+        )}
+
+        {/* -------- the leak table: which station to drill next -------- */}
+        {leaks.length > 0 && leaks.some((l) => l.presented > 0 || l.didntPresent > 0) && (
+          <section className="mt-3 border border-line bg-panel p-3">
+            <div className="microlabel">Where consults leak · {windowDays}D</div>
+            <div className="mt-1 divide-y divide-hairline">
+              {leaks.map((l, i) => (
+                <div key={l.slug} className="flex items-center gap-2 py-2">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5">
+                      <span className="truncate text-[13px] font-semibold text-ink">{l.title}</span>
+                      {i === 0 && l.leakCents > 0 && (
+                        <span className="shrink-0 font-mono text-[8px] font-bold uppercase tracking-[0.14em] text-amber">
+                          Biggest leak
+                        </span>
+                      )}
+                    </div>
+                    <div className="mt-0.5 font-mono text-[10px] uppercase tracking-tight text-muted">
+                      {l.presented} presented · {l.closed} closed
+                      {l.didntPresent > 0 && ` · ${l.didntPresent} not presented`}
+                    </div>
+                  </div>
+                  <span className={`shrink-0 font-mono text-[14px] font-semibold tabular-nums ${l.leakCents > 0 ? "text-amber" : "text-muted"}`}>
+                    {l.leakCents > 0 ? formatCents(l.leakCents) : "—"}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
         {stats.weakestRubric && (
           <section className="mt-3 flex items-baseline justify-between border border-amber/40 bg-amber/[0.07] px-3 py-2.5">
@@ -249,7 +372,7 @@ export default async function ProgressPage({
         <section className="mt-3 border border-line bg-panel p-3">
           <div className="microlabel">Close rate — sim reps vs real world</div>
           <div className="mt-2">
-            <SimVsRealChart byDay={stats.byDay} real={real} windowDays={windowDays} />
+            <SimVsRealChart byDay={stats.byDay} real={real} windowDays={windowDays} revenueByDay={revByDay} />
           </div>
         </section>
 

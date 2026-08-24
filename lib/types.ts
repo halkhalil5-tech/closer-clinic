@@ -127,6 +127,7 @@ export interface AppUser {
   email: string;
   name: string | null;
   specialty: Specialty | null;
+  clinicId: string | null;
   onboarded: boolean;
 }
 
@@ -394,6 +395,12 @@ export interface OutcomeLogRow {
   /** YYYY-MM-DD local date the provider is logging for. */
   date: string;
   service: string;
+  /** Station link; null on legacy logs whose title no longer matches a scenario. */
+  stationSlug?: string | null;
+  /** Price snapshot at log time (whole cents); null on legacy logs. */
+  amountCents?: number | null;
+  /** True when the provider typed the amount; false = prefilled default ("est."). */
+  amountEntered?: boolean;
   presented: boolean;
   closed: boolean;
   createdAt: string;
