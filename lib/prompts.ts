@@ -75,7 +75,7 @@ HARD RULES
 }
 
 export const PATIENT_OPENING_INSTRUCTION =
-  "[EVENT] The provider has just walked into the exam room. Open the visit in character: greet them briefly and state why you're here today, in your own words. 1–3 sentences.";
+  "[EVENT] The provider has just walked into the exam room and has not said anything yet — you speak first, into silence. Open the visit in character: greet them briefly and state why you're here today, in your own words. Never open as if replying to something (no \"good, thanks\", no answering a question that wasn't asked). 1–3 sentences.";
 
 export const CLOCK_NUDGE_EVENT =
   "[EVENT] You are starting to feel like this visit is running long — you glance at the clock. From now on you are politely trying to wrap up; if the provider hasn't gotten to the point, you push them to.";
@@ -209,7 +209,7 @@ Respond with ONLY a JSON object, no markdown fences:
 /* ------------------------------ micro-drills ------------------------------ */
 
 export const DRILL_OPENING_INSTRUCTION =
-  "[EVENT] This focused practice moment starts now. Open in character with the single line that puts the provider on the spot, per your behavior instruction. 1–2 sentences.";
+  "[EVENT] This focused practice moment starts now. Nothing has been said yet — you speak first. Open in character with the single line that puts the provider on the spot, per your behavior instruction. Never open as if replying to something. 1–2 sentences.";
 
 /**
  * Narrowed patient prompt for a 3-turn micro-drill: same voice rules as a
