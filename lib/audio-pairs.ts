@@ -83,12 +83,22 @@ async function renderTake(
   lines: PairLine[],
   voices: { patient: string; doctor: string }
 ): Promise<{ audio: Buffer; lines: PairLine[]; durationMs: number; chars: number }> {
-  // Parallel per-line synthesis: order is preserved by index, and it keeps a
-  // 12–16-line take well inside a serverless function's time budget.
-  const segments = await Promise.all(
-    lines.map((line) =>
-      ttsSegment(line.text, line.speaker === "patient" ? voices.patient : voices.doctor)
-    )
+  // Bounded-parallel per-line synthesis: order is preserved by index. Capped
+  // at 4 in flight — ElevenLabs plans allow 10 concurrent requests total and
+  // two takes can render back-to-back.
+  const segments: Buffer[] = new Array(lines.length);
+  let next = 0;
+  await Promise.all(
+    Array.from({ length: Math.min(4, lines.length) }, async () => {
+      while (next < lines.length) {
+        const i = next++;
+        const line = lines[i];
+        segments[i] = await ttsSegment(
+          line.text,
+          line.speaker === "patient" ? voices.patient : voices.doctor
+        );
+      }
+    })
   );
   const chars = lines.reduce((n, l) => n + l.text.length, 0);
   const annotated = withStartTimes(
