@@ -16,7 +16,7 @@ export { PAIR_SCRIPT_VERSION, pairContentHash, withStartTimes };
  * content, so an edit regenerates and an unchanged station never does.
  */
 
-const DOCTOR_VOICE = "onwK4e9ZLuTAKqWW03F9"; // Daniel — precise, measured
+const DOCTOR_VOICE = "nPczCjzI2devNBz1zQrb"; // Brian — polished American
 const PAIR_PATIENT_VOICE = "XrExE9yKIg1WjnnlVkGX"; // Matilda — warm, distinct from Daniel
 const ELEVENLABS_MODEL = process.env.ELEVENLABS_MODEL || "eleven_flash_v2_5";
 
