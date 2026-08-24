@@ -406,6 +406,24 @@ export interface OutcomeLogRow {
   createdAt: string;
 }
 
+/* ------------------------------ audio pairs ------------------------------ */
+
+/** One spoken line of a scripted encounter take. */
+export interface PairLine {
+  speaker: "patient" | "doctor";
+  text: string;
+  /** Take B only: what changed the outcome at this moment (pin annotation). */
+  beat?: string;
+  /** Filled at render time: where this line starts in the stitched audio. */
+  startMs?: number;
+}
+
+/** "Common close" (A) vs "The fix" (B) — same scenario, two outcomes. */
+export interface PairScript {
+  take: "A" | "B";
+  lines: PairLine[];
+}
+
 export const QUIZ_PASS_PCT = 80;
 export const TEST_OUT_PASS_TOTAL = 75;
 

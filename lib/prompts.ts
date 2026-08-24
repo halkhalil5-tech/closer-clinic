@@ -291,6 +291,40 @@ CALIBRATION: a first-week trainee typically totals 35–55. 60–75 is a solid r
 
 ETHICS LINE (applies across categories): this app trains confident recommendation of clinically appropriate care — never pressure. Penalize overselling: recommending beyond what the chart supports or inventing urgency/risk caps framing at 8/20. Penalize pressure past a genuine no: once the patient has given a clear, informed, stable refusal, continuing to push caps objections at 8/20 — the correct behavior is to respect the no, chart the indication, and set a return trigger, which scores HIGH. A close obtained by pressure after a genuine no is not credited as "closed".`;
 
+/* ------------------------------ audio pairs ------------------------------ */
+
+/**
+ * Script generator for the "Listen" feature: the same consult twice. Take A is
+ * a realistic, mediocre close — believable, not cartoonish. Take B is the same
+ * visit run correctly, with `beat` marking the 2–4 moments that changed the
+ * outcome. Every patient is fictional.
+ */
+export function buildPairScriptPrompt(scenario: Scenario, moduleFocus?: string): string {
+  return `Write two short scripted versions of the SAME consult for audio training. Healthcare case-acceptance roleplay; both characters are fictional.
+
+STATION
+- Service: ${scenario.serviceDesc}
+- Price: ${scenario.priceDisplay} (${scenario.priceStructure})
+- Clinical context: ${scenario.clinicalContext}
+- Patient's complaint: ${scenario.patientCc}
+- Close goal: ${scenario.closeGoal}
+- Typical objections: ${scenario.objectionSeeds.join("; ")}
+${moduleFocus ? `- Skill focus for Take B: ${moduleFocus}` : ""}
+
+TAKE A — "Common close": a realistic, mediocre attempt. The doctor is competent and likeable but hedges on the price, over-explains, apologizes ("I know it's a lot"), answers objections with reassurance instead of isolation, and ends with "do you want to think about it?". The patient leaves warm but unbooked. This must sound like a real clinic on a real Tuesday — NOT a parody.
+
+TAKE B — "The fix": the SAME patient, same opening, done right: reflect the patient's words, tie the recommendation to the findings, say the number plainly and stop talking, isolate the real objection with a question, and use an assumptive/alternative close. The patient books. Mark the 2–4 provider moments that changed the outcome with a short "beat" note (e.g. "said the number and stopped talking").
+
+RULES
+- Each take: 10–16 lines, alternating naturally; 60–90 seconds spoken (150–230 words).
+- Same patient name, personality, and objection in both takes.
+- Doctor lines only get "beat" notes, only in Take B.
+- Natural speech: contractions, small hesitations in Take A. No stage directions, no narration.
+
+Respond with ONLY a JSON object, no markdown fences:
+{"takes": [{"take": "A", "lines": [{"speaker": "patient"|"doctor", "text": "..."}]}, {"take": "B", "lines": [{"speaker": "patient"|"doctor", "text": "...", "beat": "optional"}]}]}`;
+}
+
 export function buildGraderPrompt(
   scenario: Scenario,
   snapshot: PersonaSnapshot,

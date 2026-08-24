@@ -103,7 +103,51 @@ export async function generateGrade(
   };
 }
 
+/** One-shot JSON generation (pair scripts, script-card tightening). */
+export async function generateJson(
+  prompt: string,
+  maxTokens = 2000
+): Promise<{ raw: string; usage: ModelUsage }> {
+  if (!hasModelAccess()) {
+    return { raw: stubPairScriptJson(), usage: { inputTokens: 0, outputTokens: 0 } };
+  }
+  const res = await client().messages.create({
+    model: MODEL,
+    max_tokens: maxTokens,
+    temperature: 1,
+    messages: [{ role: "user", content: prompt }],
+  });
+  const raw = res.content
+    .filter((b): b is Anthropic.TextBlock => b.type === "text")
+    .map((b) => b.text)
+    .join("")
+    .trim();
+  return {
+    raw,
+    usage: { inputTokens: res.usage.input_tokens, outputTokens: res.usage.output_tokens },
+  };
+}
+
 /* ------------------------- dev stubs (no API key) ------------------------- */
+
+function stubPairScriptJson(): string {
+  const a = [
+    { speaker: "patient", text: "So what are my options here, doc? [DEV STUB]" },
+    { speaker: "doctor", text: "Well, there's a treatment we offer — it's pretty effective, I know the price is a lot though..." },
+    { speaker: "patient", text: "How much are we talking?" },
+    { speaker: "doctor", text: "It's around six hundred, but, um, do you want to think about it?" },
+    { speaker: "patient", text: "Yeah... let me think about it." },
+  ];
+  const b = [
+    { speaker: "patient", text: "So what are my options here, doc? [DEV STUB]" },
+    { speaker: "doctor", text: "Based on your exam, this is exactly what the treatment exists for.", beat: "tied it to the findings" },
+    { speaker: "patient", text: "How much are we talking?" },
+    { speaker: "doctor", text: "The full series is $600.", beat: "said the number and stopped talking" },
+    { speaker: "patient", text: "Okay. When can we start?" },
+    { speaker: "doctor", text: "Mornings or afternoons work better for you?", beat: "alternative close" },
+  ];
+  return JSON.stringify({ takes: [{ take: "A", lines: a }, { take: "B", lines: b }] });
+}
 
 function stubPatientReply(transcript: TranscriptMessage[], systemPrompt = ""): string {
   // Quote the actual price from the system prompt, so price overrides are

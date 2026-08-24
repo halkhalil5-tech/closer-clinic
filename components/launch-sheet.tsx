@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { primeAudio } from "@/lib/voice/elevenlabs-client";
+import { PairPlayer } from "@/components/pair-player";
 import type { Difficulty, Scenario } from "@/lib/types";
 
 const DIFFICULTIES: { id: Difficulty; label: string; blurb: string }[] = [
@@ -110,6 +111,8 @@ export function LaunchSheet({
         <p className="mt-1.5 min-h-4 text-xs text-muted">
           {DIFFICULTIES.find((d) => d.id === difficulty)?.blurb}
         </p>
+
+        <PairPlayer fetchBody={{ stationSlug: scenario.slug }} />
 
         {error && <p className="mt-2 text-sm text-red">{error}</p>}
         <button

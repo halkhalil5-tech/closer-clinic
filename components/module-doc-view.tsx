@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { ModuleDoc, TrainingLesson } from "@/lib/types";
+import { PairPlayer } from "@/components/pair-player";
 import { QUIZ_PASS_PCT } from "@/lib/types";
 import { buildVoiceEngine, type VoiceCaps } from "@/lib/voice/engine";
 import { primeAudio } from "@/lib/voice/elevenlabs-client";
@@ -111,9 +112,11 @@ interface Props {
   initial: { quizScore: number | null; drillPassed: boolean | null };
   next: { slug: string; title: string; order: number } | null;
   voiceCaps: VoiceCaps;
+  /** Modules 2–5: the Listen pair demonstrating this module's framework. */
+  listen?: { stationSlug: string; moduleFocus: string } | null;
 }
 
-export function ModuleDocView({ doc, lesson, moduleTitle, initial, next, voiceCaps }: Props) {
+export function ModuleDocView({ doc, lesson, moduleTitle, initial, next, voiceCaps, listen }: Props) {
   const router = useRouter();
   const checkPassed = (initial.quizScore ?? 0) >= QUIZ_PASS_PCT;
   const moduleComplete = checkPassed && (!lesson.drill || initial.drillPassed === true);
@@ -194,6 +197,17 @@ export function ModuleDocView({ doc, lesson, moduleTitle, initial, next, voiceCa
               </Disclosure>
             ))}
           </div>
+        </section>
+      )}
+
+      {/* listen: the same consult twice */}
+      {listen && (
+        <section id="listen" className="scroll-mt-4">
+          <SectionLabel>Listen</SectionLabel>
+          <p className="mt-1 text-[13px] leading-snug text-dim">
+            The same consult, twice. Tap the pins on The fix to hear exactly what changed.
+          </p>
+          <PairPlayer fetchBody={{ stationSlug: listen.stationSlug, moduleFocus: listen.moduleFocus }} />
         </section>
       )}
 

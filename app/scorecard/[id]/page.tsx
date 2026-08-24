@@ -7,6 +7,7 @@ import { letterFor } from "@/lib/letter-grades";
 import { recommendSection } from "@/lib/training";
 import { RerunButton } from "@/components/rerun-button";
 import { RedoButton } from "@/components/redo-button";
+import { PairPlayer } from "@/components/pair-player";
 import { PrepRerunButton } from "@/components/prep-rerun-button";
 
 export const dynamic = "force-dynamic";
@@ -227,6 +228,7 @@ export default async function ScorecardPage({ params }: { params: Promise<{ id: 
             <div className="mt-3.5">
               <RedoButton encounterId={encounter.id} paper />
             </div>
+            <PairPlayer endpoint="/api/audio/replay" fetchBody={{ encounterId: encounter.id }} paper />
           </section>
         )}
 

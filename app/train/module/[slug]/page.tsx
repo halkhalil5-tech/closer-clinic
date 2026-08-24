@@ -90,6 +90,14 @@ export default async function ModulePage({ params }: { params: Promise<{ slug: s
             drillPassed: progress?.drillPassed ?? null,
           }}
           next={nextMod ? { slug: nextMod.slug, title: nextMod.title, order: nextMod.order } : null}
+          listen={
+            mod.rubricKey && ["framing", "price", "objections", "close"].includes(mod.rubricKey)
+              ? {
+                  stationSlug: doc.repCta.stationSlug,
+                  moduleFocus: `${mod.title} — ${mod.subtitle}`,
+                }
+              : null
+          }
           voiceCaps={{
             tts: Boolean(process.env.ELEVENLABS_API_KEY),
             stt: Boolean(process.env.DEEPGRAM_API_KEY),
