@@ -128,12 +128,13 @@ async function renderTake(
   voices: { patient: string; doctor: string }
 ): Promise<{ audio: Buffer; lines: PairLine[]; durationMs: number; chars: number }> {
   // Bounded-parallel per-line synthesis: order is preserved by index. Capped
-  // at 4 in flight — ElevenLabs plans allow 10 concurrent requests total and
-  // two takes can render back-to-back.
+  // at 8 in flight — ElevenLabs plans allow 10 concurrent requests and takes
+  // render sequentially, so this stays under the account limit while keeping
+  // long takes inside the 60s serverless budget.
   const segments: Buffer[] = new Array(lines.length);
   let next = 0;
   await Promise.all(
-    Array.from({ length: Math.min(4, lines.length) }, async () => {
+    Array.from({ length: Math.min(8, lines.length) }, async () => {
       while (next < lines.length) {
         const i = next++;
         const line = lines[i];
@@ -179,6 +180,7 @@ export async function getOrCreatePair(scenario: Scenario, moduleFocus?: string):
   const hash = pairContentHash(scenario, moduleFocus);
   const baseSlug = scenario.slug;
 
+  const cachedTakes = new Map<string, { url: string; durationMs: number; lines: PairLine[] }>();
   if (admin) {
     const { data: cached } = await admin
       .from("audio_assets")
@@ -186,17 +188,17 @@ export async function getOrCreatePair(scenario: Scenario, moduleFocus?: string):
       .eq("kind", "pair")
       .eq("station_slug", baseSlug)
       .eq("content_hash", hash);
-    if (cached && cached.length === 2) {
+    for (const r of cached ?? []) {
+      cachedTakes.set(r.take, {
+        url: admin.storage.from("audio-pairs").getPublicUrl(r.storage_path).data.publicUrl,
+        durationMs: r.duration_ms ?? 0,
+        lines: r.script.lines,
+      });
+    }
+    if (cachedTakes.size === 2) {
       return {
         status: "ready",
-        takes: cached
-          .sort((a, b) => a.take.localeCompare(b.take))
-          .map((r) => ({
-            take: r.take,
-            url: admin.storage.from("audio-pairs").getPublicUrl(r.storage_path).data.publicUrl,
-            durationMs: r.duration_ms ?? 0,
-            lines: r.script.lines,
-          })),
+        takes: ["A", "B"].map((t) => ({ take: t as "A" | "B", ...cachedTakes.get(t)! })),
       };
     }
   }
@@ -209,6 +211,11 @@ export async function getOrCreatePair(scenario: Scenario, moduleFocus?: string):
 
   const out: NonNullable<PairResult["takes"]> = [];
   for (const take of takes) {
+    const prior = cachedTakes.get(take.take);
+    if (prior) {
+      out.push({ take: take.take, ...prior });
+      continue;
+    }
     const rendered = await renderTake(take.lines, {
       patient: PAIR_PATIENT_VOICE,
       doctor: DOCTOR_VOICE,
