@@ -39,7 +39,16 @@ HOW YOUR OBJECTIONS COME OUT
 ${persona.objectionFlavor}`
     : `WHO YOU ARE\nA realistic patient matching the profile below.`;
 
-  return `You are roleplaying a PATIENT in a medical office visit. This is a training simulation for the provider, but you must never acknowledge that. You are a real person in an exam room.
+  const frontDesk = scenario.role === "front_desk";
+  return `You are roleplaying a PATIENT ${
+    frontDesk
+      ? "at the CHECKOUT DESK of a medical office, talking to the front-desk staff member after your visit. The clinical decision already happened in the room; what's on the table now is scheduling, deposits, and follow-through"
+      : "in a medical office visit"
+  }. This is a training simulation for the ${
+    frontDesk ? "front-desk staff member" : "provider"
+  }, but you must never acknowledge that. You are a real person ${
+    frontDesk ? "standing at the checkout counter, often with somewhere to be" : "in an exam room"
+  }.
 
 PATIENT PROFILE
 - Name: ${snapshot.name}
@@ -52,7 +61,7 @@ ${personaBlock}
 
 YOUR SITUATION
 Chief complaint (why you're here, in your words): ${scenario.patientCc}
-The provider will likely recommend: ${scenario.serviceDesc} at ${scenario.priceDisplay} (${scenario.priceStructure}).
+${frontDesk ? "What the desk is trying to accomplish" : "The provider will likely recommend"}: ${scenario.serviceDesc} at ${scenario.priceDisplay} (${scenario.priceStructure}).
 Objections that would naturally occur to someone like you (use the ones that fit your character; rephrase in your own voice, never verbatim):
 ${scenario.objectionSeeds.map((o) => `- ${o}`).join("\n")}
 ${scenario.difficultyNotes ? `\nScenario-specific behavior note: ${scenario.difficultyNotes}` : ""}
@@ -76,6 +85,9 @@ HARD RULES
 
 export const PATIENT_OPENING_INSTRUCTION =
   "[EVENT] The provider has just walked into the exam room and has not said anything yet — you speak first, into silence. Open the visit in character: greet them briefly and state why you're here today, in your own words. Never open as if replying to something (no \"good, thanks\", no answering a question that wasn't asked). 1–3 sentences.";
+
+export const FRONT_DESK_OPENING_INSTRUCTION =
+  "[EVENT] You've just stepped up to the checkout desk after your visit; the staff member hasn't spoken yet — you speak first. Open in character with what you want (or want to avoid) at checkout, per your situation. Never open as if replying to something. 1–2 sentences.";
 
 export const CLOCK_NUDGE_EVENT =
   "[EVENT] You are starting to feel like this visit is running long — you glance at the clock. From now on you are politely trying to wrap up; if the provider hasn't gotten to the point, you push them to.";
@@ -325,6 +337,26 @@ Respond with ONLY a JSON object, no markdown fences:
 {"takes": [{"take": "A", "lines": [{"speaker": "patient"|"doctor", "text": "..."}]}, {"take": "B", "lines": [{"speaker": "patient"|"doctor", "text": "...", "beat": "optional"}]}]}`;
 }
 
+const FRONT_DESK_RUBRIC_DEFINITIONS = `RUBRIC (score each 0–20, evidence-first):
+This is a FRONT-DESK checkout conversation, not a clinical consult. The staff member is graded on converting an in-room yes (or near-yes) into calendar and payment reality. Before scoring a category, locate the specific STAFF lines relevant to it; place the performance in a band, then pick the exact score. Use the FULL 0–20 range; the middle band must be earned by mixed evidence — a skill never demonstrated scores 0–8.
+
+Bands (same shape for every category):
+  0–4   absent or harmful
+  5–8   attempted but ineffective — token gesture, or abandoned under pressure
+  9–12  adequate but generic — not wrong, but any desk anywhere
+  13–16 strong — tailored, with one clear miss
+  17–20 excellent — you would train new hires on this transcript
+
+- rapport (Rapport at the desk): 17–20 warm, uses the patient's name/situation, acknowledges their time pressure while staying in charge of the process. 9–12 polite but transactional. 0–8 cold, scripted, or talks over the patient.
+- framing (Scheduling outcome): 17–20 frames booking now as part of the care plan ("the doctor wants all three on the calendar so the series works"), offers two concrete slots, and the visits actually get booked. 13–16 books some but not all, or books all without framing. 9–12 asks "when works for you?" open-endedly. 5–8 accepts "call me later" with a soft push. 0–4 lets the patient leave with nothing scheduled and no plan.
+- price (Deposit & payment ask): 17–20 asks for the deposit/payment plainly, states what it holds or covers, no apologizing, tolerates the pause. 9–12 asks but wrapped in hedges. 5–8 apologizes for policy or hints without asking. 0–4 never asks, or waives it unprompted. HARD CAP: waiving a required deposit unprompted caps this category at 8.
+- objections (Objection handling): 17–20 isolates the real blocker with a question ("Is it the timing today, or do you want to check your schedule?") and answers it specifically. 9–12 generic reassurance. 5–8 caves immediately. 0–4 argues or pressures. Respecting a genuine hard no while creating a concrete follow-up scores HIGH, not low.
+- close (Locking the calendar): 17–20 assumptive/alternative scheduling close ("I have Tuesday 9:40 or Thursday 2:15 — which is better?") and lands the goal: sessions booked, deposit taken, or a callback with a specific day and time the PATIENT chose. 11–15 direct ask that lands a partial outcome. 6–10 vague follow-up ("we'll reach out"). HARD CAP: ending with no concrete next step caps this category at 5.
+
+CALIBRATION: a first-week hire typically totals 35–55. 60–75 is solid with one real gap. 80+ is train-the-team tape. Do not compress toward the middle; two categories differing by 8+ points is normal when the evidence differs.
+
+ETHICS LINE: never grade pressure past a genuine, stable no as good work. The desk's power is convenience and concreteness, not coercion. A deposit or booking extracted after a clear refusal is not credited toward the close goal.`;
+
 export function buildGraderPrompt(
   scenario: Scenario,
   snapshot: PersonaSnapshot,
@@ -338,7 +370,11 @@ export function buildGraderPrompt(
     })
     .join("\n");
 
-  return `You are an OSCE examiner grading a healthcare provider's case-acceptance conversation with a simulated patient. Grade the PROVIDER only. Be a rigorous but fair examiner: specific, evidence-based, and coaching-oriented. Every judgment must be grounded in the actual transcript.
+  return `You are an OSCE examiner grading a ${
+    scenario.role === "front_desk"
+      ? "clinic front-desk staff member's checkout conversation (scheduling, deposits, follow-through)"
+      : "healthcare provider's case-acceptance conversation"
+  } with a simulated patient. Grade the ${scenario.role === "front_desk" ? "STAFF (PROVIDER lines)" : "PROVIDER"} only. Be a rigorous but fair examiner: specific, evidence-based, and coaching-oriented. Every judgment must be grounded in the actual transcript.
 
 STATION
 - Service: ${scenario.serviceDesc}
@@ -348,7 +384,7 @@ STATION
 - Patient: ${snapshot.name}, ${snapshot.age}, ${snapshot.occupation}, ${snapshot.insurance} — archetype: ${snapshot.archetype}
 - Difficulty: ${difficulty}
 
-${RUBRIC_DEFINITIONS}
+${scenario.role === "front_desk" ? FRONT_DESK_RUBRIC_DEFINITIONS : RUBRIC_DEFINITIONS}
 
 TRANSCRIPT
 ${lines}

@@ -183,6 +183,75 @@ export const SCENARIOS: Scenario[] = [
     difficultyNotes:
       "The high-deductible math is the unlock: through insurance they'd pay MORE. A provider who does that math out loud, then offers 'we can do it right now, you're already numb-able,' should win. Watch for the provider forgetting to actually ask for the decision.",
   },
+  {
+    slug: "fd-schedule-the-series",
+    specialty: "podiatry",
+    role: "front_desk",
+    title: "Schedule the series",
+    serviceDesc: "Booking all three shockwave visits at checkout after the doctor closed in the room",
+    priceDisplay: "$600",
+    priceStructure: "$600 for the 3-session series, cash-pay — already accepted in the room",
+    clinicalContext:
+      "The patient just said yes to the shockwave series in the exam room and the doctor walked them up to checkout. The money decision is MADE. The risk now is the calendar: if they leave with 'we'll call you to schedule,' a third of these evaporate. The front desk's job is to get all three visits on the books before the patient touches the door.",
+    patientCc:
+      "Okay, the doctor said I'm doing the shockwave thing... I really do have to run though — can someone just call me to set up the appointments?",
+    closeGoal:
+      "All three shockwave sessions booked before the patient leaves, first one within two weeks.",
+    objectionSeeds: [
+      "Can someone just call me later? I'm double-parked.",
+      "I don't have my work schedule in front of me.",
+      "Let's just book the first one and see how it goes.",
+      "Do I really have to lock in all three now?",
+    ],
+    difficultyNotes:
+      "The patient already said yes to the money — never reopen the price. Resistance is purely logistical and time-pressured. Offering two concrete slots beats asking 'when works for you?'. On hard, the patient is genuinely rushed and needs the desk to make it fast AND complete.",
+  },
+  {
+    slug: "fd-deposit-ask",
+    specialty: "podiatry",
+    role: "front_desk",
+    title: "Deposit ask",
+    serviceDesc: "Collecting the $150 booking deposit for the laser nail program at checkout",
+    priceDisplay: "$150",
+    priceStructure: "$150 deposit today, applied to the $900 program",
+    clinicalContext:
+      "The patient accepted the $900 laser nail program in the room. Clinic policy: a $150 deposit books the series (it holds six laser slots and is fully applied to the program). Patients who skip the deposit no-show the first visit at triple the rate. The desk needs to collect it today, plainly, without apologizing for policy.",
+    patientCc:
+      "The doctor said to set up the laser package. Can I just pay when I come in for the first one?",
+    closeGoal:
+      "The $150 deposit is collected today and the first laser visit is booked.",
+    objectionSeeds: [
+      "Can't I just pay at the first visit?",
+      "You don't trust me? I've been coming here for years.",
+      "I don't have my card on me... I think.",
+      "What if I need to cancel — do I lose the deposit?",
+    ],
+    difficultyNotes:
+      "The skill is stating policy as a benefit ('this holds all six of your laser slots and comes straight off the program') without flinching. Waiving the deposit unprompted is the failure mode. The cancel question deserves a clean, honest answer — deposits transfer to a rescheduled date.",
+  },
+  {
+    slug: "fd-spouse-callback",
+    specialty: "podiatry",
+    role: "front_desk",
+    title: "\u201cI need to talk to my husband\u201d",
+    serviceDesc: "Turning a checkout spousal stall into a scheduled decision call with a held slot",
+    priceDisplay: "$600",
+    priceStructure: "$600 shockwave series — decision pending a spouse conversation",
+    clinicalContext:
+      "The doctor recommended the shockwave series; the patient warmed up but landed on 'I need to talk to my husband first.' At the desk, that either becomes a concrete plan or it becomes never. The play: validate the conversation, hold a tentative slot, and book a specific callback day/time so the decision has a deadline the patient chose.",
+    patientCc:
+      "It sounds good, honestly, but $600 is a talk-to-my-husband number. I'll call you guys after we discuss it.",
+    closeGoal:
+      "A callback scheduled for a specific day and time, plus a tentative first-session slot held in the patient's name.",
+    objectionSeeds: [
+      "I'll just call you after we talk, I promise.",
+      "I don't know when we'll get a chance to discuss it.",
+      "Why hold a slot if I might say no?",
+      "Can you just email me the info instead?",
+    ],
+    difficultyNotes:
+      "'I'll call you' is a soft no unless the desk converts it: the win is the patient picking the callback time themselves. Pressuring past the spouse conversation is a fail — the conversation is legitimate; the vagueness is the enemy. Holding the slot must be framed as zero-commitment convenience.",
+  },
 ].map((s) => ({ ...s, isCustom: false, active: true })) as Scenario[];
 
 export function getScenario(slug: string): Scenario | undefined {

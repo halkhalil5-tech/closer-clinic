@@ -27,6 +27,7 @@ for (const s of SCENARIOS) {
     {
       slug: s.slug,
       specialty: s.specialty,
+      role: s.role ?? "provider",
       title: s.title,
       service_desc: s.serviceDesc,
       price_display: s.priceDisplay,

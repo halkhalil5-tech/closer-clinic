@@ -30,6 +30,7 @@ function mapScenario(r: any): Scenario {
   return {
     slug: r.slug,
     specialty: r.specialty,
+    role: r.role ?? "provider",
     title: r.title,
     serviceDesc: r.service_desc,
     priceDisplay: r.price_display,
@@ -800,6 +801,20 @@ export class SupabaseStore implements Store {
     if (error) throw error;
   }
 
+  async setSeatRole(
+    _adminUserId: string,
+    memberUserId: string,
+    role: import("../types").StationRole
+  ): Promise<void> {
+    // RLS: only the member's clinic owner can update their profile row.
+    const supabase = await createClient();
+    const { error } = await supabase
+      .from("profiles")
+      .update({ seat_role: role })
+      .eq("id", memberUserId);
+    if (error) throw error;
+  }
+
   async listTeamTraining(adminUserId: string): Promise<TeamTrainingRow[]> {
     const supabase = await createClient();
     // Clinic members visible to this admin (RLS: clinic-admin read policies).
@@ -811,7 +826,7 @@ export class SupabaseStore implements Store {
     if (!clinic) return [];
     const { data: members, error } = await supabase
       .from("profiles")
-      .select("id, name, email, specialty")
+      .select("id, name, email, specialty, seat_role")
       .eq("clinic_id", clinic.id);
     if (error) throw error;
 
@@ -829,6 +844,7 @@ export class SupabaseStore implements Store {
       rows.push({
         userId: m.id,
         name: m.name ?? m.email,
+        seatRole: m.seat_role ?? "provider",
         email: m.email,
         lessonsCompleted: status.lessonsCompleted,
         lessonsTotal: status.lessonsTotal,

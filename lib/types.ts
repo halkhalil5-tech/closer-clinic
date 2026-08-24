@@ -2,9 +2,13 @@ export type Difficulty = "easy" | "moderate" | "hard";
 export type Specialty = "podiatry" | "dental" | "medspa";
 export type EncounterStatus = "active" | "graded" | "abandoned";
 
+export type StationRole = "provider" | "front_desk";
+
 export interface Scenario {
   slug: string;
   specialty: Specialty;
+  /** Who runs this station: the provider in the room, or the front desk at checkout. */
+  role?: StationRole;
   title: string;
   serviceDesc: string;
   priceDisplay: string;
@@ -426,6 +430,19 @@ export interface PairScript {
 
 export const QUIZ_PASS_PCT = 80;
 export const TEST_OUT_PASS_TOTAL = 75;
+
+/** Front-desk reps keep the same score keys; the meanings shift to checkout. */
+export const FRONT_DESK_RUBRIC_LABELS: Record<keyof RubricScores, string> = {
+  rapport: "Rapport at the desk",
+  framing: "Scheduling outcome",
+  price: "Deposit & payment ask",
+  objections: "Objection handling",
+  close: "Locking the calendar",
+};
+
+export function rubricLabelsFor(role?: StationRole): Record<keyof RubricScores, string> {
+  return role === "front_desk" ? FRONT_DESK_RUBRIC_LABELS : RUBRIC_LABELS;
+}
 
 export const RUBRIC_LABELS: Record<keyof RubricScores, string> = {
   rapport: "Rapport & listening",

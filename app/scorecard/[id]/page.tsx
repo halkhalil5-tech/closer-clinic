@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getAuthedUser } from "@/lib/auth";
 import { getStore } from "@/lib/store";
-import { RUBRIC_LABELS, TEST_OUT_PASS_TOTAL, type RubricScores } from "@/lib/types";
+import { rubricLabelsFor, TEST_OUT_PASS_TOTAL, type RubricScores } from "@/lib/types";
 import { letterFor } from "@/lib/letter-grades";
 import { recommendSection } from "@/lib/training";
 import { RerunButton } from "@/components/rerun-button";
@@ -125,7 +125,7 @@ export default async function ScorecardPage({ params }: { params: Promise<{ id: 
               <div key={key}>
                 <div className="flex items-baseline justify-between">
                   <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-paper-ink/65">
-                    {RUBRIC_LABELS[key]}
+                    {rubricLabelsFor(scenario?.role)[key]}
                   </span>
                   <span className="font-mono text-[13px] font-semibold tabular-nums">
                     {score}
@@ -308,7 +308,7 @@ export default async function ScorecardPage({ params }: { params: Promise<{ id: 
             className="mt-4 flex items-center gap-3 border-l-2 border-l-amber py-1.5 pl-3 transition-opacity active:opacity-70"
           >
             <span className="min-w-0 flex-1 text-[13px] leading-snug text-dim">
-              Weakest here: <span className="font-semibold text-ink">{RUBRIC_LABELS[lowest]}</span>{" "}
+              Weakest here: <span className="font-semibold text-ink">{rubricLabelsFor(scenario?.role)[lowest]}</span>{" "}
               <span className="font-mono text-[12px] tabular-nums text-amber">{grade.scores[lowest]}/20</span>
               {" — "}review{" "}
               <span className="font-semibold text-bone underline">

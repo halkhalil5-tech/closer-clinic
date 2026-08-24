@@ -646,6 +646,10 @@ class MemoryStore implements Store {
     db().requireCurriculum = value;
   }
 
+  async setSeatRole(): Promise<void> {
+    // Dev mode has a single real profile; seeded teammates are illustrative.
+  }
+
   async listTeamTraining(adminUserId: string): Promise<TeamTrainingRow[]> {
     // Dev mode: the admin's own row plus seeded teammates (Phase 2 reads real seats).
     const modules = await this.listTrainingModules("podiatry");
@@ -657,6 +661,7 @@ class MemoryStore implements Store {
       userId: adminUserId,
       name: db().profile.name ?? "You",
       email: db().profile.email,
+      seatRole: "provider",
       lessonsCompleted: status.lessonsCompleted,
       lessonsTotal: status.lessonsTotal,
       quizAvg: status.quizAvg,
@@ -670,6 +675,7 @@ class MemoryStore implements Store {
         userId: "seed-seat-2",
         name: "Dr. A. Okafor",
         email: "aokafor@clinic.example",
+        seatRole: "provider",
         lessonsCompleted: lessons.length,
         lessonsTotal: lessons.length,
         quizAvg: 92,
@@ -680,6 +686,7 @@ class MemoryStore implements Store {
         userId: "seed-seat-3",
         name: "Dr. M. Reyes",
         email: "mreyes@clinic.example",
+        seatRole: "provider",
         lessonsCompleted: 4,
         lessonsTotal: lessons.length,
         quizAvg: 78,
@@ -688,8 +695,9 @@ class MemoryStore implements Store {
       },
       {
         userId: "seed-seat-4",
-        name: "T. Nguyen, DPM",
-        email: "tnguyen@clinic.example",
+        name: "K. Brooks",
+        email: "kbrooks@clinic.example",
+        seatRole: "front_desk",
         lessonsCompleted: 0,
         lessonsTotal: lessons.length,
         quizAvg: null,

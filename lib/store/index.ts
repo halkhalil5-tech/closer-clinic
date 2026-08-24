@@ -29,6 +29,7 @@ export interface TeamTrainingRow {
   userId: string;
   name: string;
   email: string;
+  seatRole: import("../types").StationRole;
   lessonsCompleted: number;
   lessonsTotal: number;
   quizAvg: number | null;
@@ -145,6 +146,8 @@ export interface Store {
   getRequireCurriculum(adminUserId: string): Promise<boolean>;
   setRequireCurriculum(adminUserId: string, value: boolean): Promise<void>;
   listTeamTraining(adminUserId: string): Promise<TeamTrainingRow[]>;
+  /** Clinic admin sets a member's seat role (provider vs front desk). */
+  setSeatRole(adminUserId: string, memberUserId: string, role: import("../types").StationRole): Promise<void>;
 }
 
 /* ------------------- user-scoped scenario resolution ------------------- */

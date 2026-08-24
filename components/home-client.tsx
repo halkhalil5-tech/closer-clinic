@@ -45,12 +45,14 @@ export function HomeClient({
   initialDifficulty,
 }: Props) {
   const [editing, setEditing] = useState<Scenario | null>(null);
+  const [roleTab, setRoleTab] = useState<"provider" | "front_desk">("provider");
   const [launching, setLaunching] = useState<Scenario | null>(() =>
     initialLaunchSlug
       ? [...customScenarios, ...scenarios].find((s) => s.slug === initialLaunchSlug) ?? null
       : null
   );
   const edited = new Set(editedSlugs);
+  const visibleScenarios = scenarios.filter((s) => (s.role ?? "provider") === roleTab);
 
   function StationRow({ s }: { s: Scenario }) {
     const price = splitPrice(s.priceDisplay);
@@ -62,7 +64,9 @@ export function HomeClient({
           className="group relative block min-h-[44px] w-full py-3.5 pl-3.5 pr-9 text-left transition-colors hover:bg-raised active:bg-raised"
         >
           <span
-            className={`absolute inset-y-0 left-0 w-[3px] transition-all group-hover:w-[5px] group-active:w-[5px] ${priceTier(s.priceDisplay)}`}
+            className={`absolute inset-y-0 left-0 w-[3px] transition-all group-hover:w-[5px] group-active:w-[5px] ${
+              s.role === "front_desk" ? "bg-amber" : priceTier(s.priceDisplay)
+            }`}
           />
           <div className="flex items-baseline justify-between gap-3">
             <span className="display-title min-w-0 flex-1 truncate text-[15px] text-ink">
@@ -70,6 +74,11 @@ export function HomeClient({
               {s.isCustom && (
                 <span className="ml-2 align-middle font-mono text-[8px] font-bold uppercase tracking-[0.16em] text-muted">
                   Custom
+                </span>
+              )}
+              {s.role === "front_desk" && (
+                <span className="ml-2 align-middle font-mono text-[8px] font-bold uppercase tracking-[0.16em] text-amber">
+                  Front desk
                 </span>
               )}
             </span>
@@ -196,10 +205,32 @@ export function HomeClient({
       <section className="mt-5">
         <div className="flex items-baseline justify-between">
           <div className="microlabel">Station roster</div>
-          <div className="text-xs text-muted">{scenarios.length} active</div>
+          <div className="text-xs text-muted">{visibleScenarios.length} active</div>
+        </div>
+
+        {/* who's training: the provider in the room, or the desk at checkout */}
+        <div className="mt-2 flex border border-line">
+          {(["provider", "front_desk"] as const).map((r, i) => (
+            <button
+              key={r}
+              onClick={() => setRoleTab(r)}
+              className={`flex-1 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] ${
+                i > 0 ? "border-l border-line" : ""
+              } ${
+                roleTab === r
+                  ? r === "front_desk"
+                    ? "bg-amber text-bg"
+                    : "bg-mint text-mint-ink"
+                  : "bg-panel text-muted"
+              }`}
+            >
+              {r === "provider" ? "Provider" : "Front desk"}
+            </button>
+          ))}
         </div>
 
         {/* the builder entry */}
+        {roleTab === "provider" && (
         <Link
           href="/stations/new"
           className="mt-1 flex min-h-[44px] items-center gap-2.5 border-b border-hairline py-3 pl-3.5 transition-colors hover:bg-raised active:bg-raised"
@@ -212,14 +243,15 @@ export function HomeClient({
             AI-built station
           </span>
         </Link>
+        )}
 
-        {scenarios.length === 0 ? (
+        {visibleScenarios.length === 0 ? (
           <p className="mt-3 py-6 text-center text-sm text-dim">
             No scenarios for your specialty yet. More are on the way.
           </p>
         ) : (
           <div className="divide-y divide-hairline">
-            {scenarios.map((s) => (
+            {visibleScenarios.map((s) => (
               <StationRow key={s.slug} s={s} />
             ))}
           </div>

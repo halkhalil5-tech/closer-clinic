@@ -6,6 +6,7 @@ import { assignmentStatus, dueLabel, dueTone } from "@/lib/assignments";
 import type { AssignmentSeatStatus } from "@/lib/types";
 import { RequireCurriculumToggle } from "@/components/require-curriculum-toggle";
 import { AssignmentCreate, AssignmentRetire } from "@/components/assignment-admin";
+import { SeatRoleToggle } from "@/components/seat-role-toggle";
 
 export const dynamic = "force-dynamic";
 
@@ -78,10 +79,11 @@ export default async function AdminTrainingPage() {
                 m.lessonsTotal > 0 ? Math.round((m.lessonsCompleted / m.lessonsTotal) * 100) : 0;
               return (
                 <div key={m.userId} className="py-3">
-                  <div className="flex items-baseline justify-between gap-3">
+                  <div className="flex items-center justify-between gap-3">
                     <span className="min-w-0 flex-1 truncate text-[14px] font-semibold text-ink">
                       {m.name}
                     </span>
+                    <SeatRoleToggle userId={m.userId} initial={m.seatRole} self={m.userId === user.id} />
                     <span className="shrink-0 font-mono text-[12px] tabular-nums text-bone">
                       {m.lessonsCompleted}/{m.lessonsTotal}
                     </span>

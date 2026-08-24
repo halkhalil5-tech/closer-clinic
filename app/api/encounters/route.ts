@@ -3,7 +3,7 @@ import { z } from "zod";
 import { getAuthedUser } from "@/lib/auth";
 import { getStore, resolveScenarioForUser } from "@/lib/store";
 import { rollPersona } from "@/lib/personas";
-import { buildPatientSystemPrompt, PATIENT_OPENING_INSTRUCTION } from "@/lib/prompts";
+import { buildPatientSystemPrompt, FRONT_DESK_OPENING_INSTRUCTION, PATIENT_OPENING_INSTRUCTION } from "@/lib/prompts";
 import { generatePatientReply } from "@/lib/anthropic";
 import { splitReceptivity } from "@/lib/receptivity";
 import { computeTrainingStatus } from "@/lib/training";
@@ -76,7 +76,11 @@ export async function POST(req: Request) {
 
   // The patient opens the visit so the provider walks into a live room.
   const opening: TranscriptMessage[] = [
-    { role: "event", text: PATIENT_OPENING_INSTRUCTION, at: new Date().toISOString() },
+    {
+      role: "event",
+      text: scenario.role === "front_desk" ? FRONT_DESK_OPENING_INSTRUCTION : PATIENT_OPENING_INSTRUCTION,
+      at: new Date().toISOString(),
+    },
   ];
 
   let patientOpener: string;
