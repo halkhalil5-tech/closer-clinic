@@ -1,30 +1,26 @@
 import type { Metadata, Viewport } from "next";
-import { Archivo, IBM_Plex_Mono, Source_Sans_3 } from "next/font/google";
+import { Inter } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import { RegisterSW } from "@/components/register-sw";
 import { AudioUnlock } from "@/components/audio-unlock";
+import { Toaster } from "sonner";
 
-// Display: Archivo variable with the width axis — headers use it expanded
-// (font-stretch 125%) at weight 800, ALL CAPS. See .display in globals.css.
-const archivo = Archivo({
-  subsets: ["latin"],
-  variable: "--font-archivo",
-  axes: ["wdth"],
+// Headings: General Sans (Fontshare), 700, tight tracking.
+const generalSans = localFont({
+  src: [
+    { path: "./fonts/general-sans-500.woff2", weight: "500", style: "normal" },
+    { path: "./fonts/general-sans-600.woff2", weight: "600", style: "normal" },
+    { path: "./fonts/general-sans-700.woff2", weight: "700", style: "normal" },
+  ],
+  variable: "--font-general-sans",
   display: "swap",
 });
 
-// Data: scores, prices, vitals, timestamps.
-const plexMono = IBM_Plex_Mono({
+// Body/UI: Inter 400/500. Numerals ride the same family with tabular-nums.
+const inter = Inter({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-plex-mono",
-  display: "swap",
-});
-
-// Body: humanist sans for prose only.
-const sourceSans = Source_Sans_3({
-  subsets: ["latin"],
-  variable: "--font-source-sans",
+  variable: "--font-inter",
   display: "swap",
 });
 
@@ -36,7 +32,7 @@ export const metadata: Metadata = {
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
-    statusBarStyle: "black-translucent",
+    statusBarStyle: "default",
     title: "Closer Clinic",
   },
   icons: {
@@ -45,10 +41,9 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#10151a",
+  themeColor: "#ffffff",
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
   viewportFit: "cover",
 };
 
@@ -56,14 +51,23 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html
-      lang="en"
-      className={`${archivo.variable} ${plexMono.variable} ${sourceSans.variable}`}
-    >
+    <html lang="en" className={`${generalSans.variable} ${inter.variable}`}>
       <body>
         {children}
         <RegisterSW />
         <AudioUnlock />
+        <Toaster
+          position="top-center"
+          toastOptions={{
+            style: {
+              background: "#ffffff",
+              color: "#0a3540",
+              border: "1px solid color-mix(in srgb, #0a3540 8%, transparent)",
+              borderRadius: "12px",
+              fontSize: "13.5px",
+            },
+          }}
+        />
       </body>
     </html>
   );

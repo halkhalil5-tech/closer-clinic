@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Zap } from "lucide-react";
 import { redirect } from "next/navigation";
 import { getAuthedUser } from "@/lib/auth";
 import { getStore, listRosterForUser } from "@/lib/store";
@@ -151,9 +152,9 @@ export default async function HomePage({
           <div className="mt-2 flex items-center justify-between">
             <Link
               href="/train/cards?shuffle=5"
-              className="py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-bone"
+              className="flex items-center gap-1 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-bone"
             >
-              ⚡ Warmup
+              <Zap className="h-3.5 w-3.5 text-teal" strokeWidth={1.5} /> Warmup
             </Link>
             <Link
               href="/prep"
