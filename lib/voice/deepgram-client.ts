@@ -1,6 +1,7 @@
 "use client";
 
 import type { SpeechToText, SttHandlers, SttSession } from "./types";
+import { publishMicStream } from "./audio-levels";
 
 /**
  * Press-to-talk STT via the server-side Deepgram route. Records with
@@ -27,6 +28,7 @@ export class RecorderStt implements SpeechToText {
     const chunks: Blob[] = [];
 
     const cleanup = () => {
+      publishMicStream(null);
       stream?.getTracks().forEach((t) => t.stop());
       stream = null;
     };
@@ -40,6 +42,7 @@ export class RecorderStt implements SpeechToText {
           return;
         }
         stream = s;
+        publishMicStream(s); // analysis-only tap for the session visualizer
         const mime = MediaRecorder.isTypeSupported("audio/mp4")
           ? "audio/mp4"
           : MediaRecorder.isTypeSupported("audio/webm;codecs=opus")

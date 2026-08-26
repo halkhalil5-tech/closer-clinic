@@ -6,6 +6,7 @@ import { ChevronDown, Mic, Send, Square, Volume2, VolumeX } from "lucide-react";
 import type { Difficulty, PersonaSnapshot } from "@/lib/types";
 import { buildVoiceEngine, type VoiceCaps } from "@/lib/voice/engine";
 import { isAudioPrimed } from "@/lib/voice/elevenlabs-client";
+import { useAudioLevels } from "@/lib/voice/audio-levels";
 import type { SttSession } from "@/lib/voice/types";
 import { SessionVisualizer, type VisualizerMode } from "@/components/session-visualizer";
 import { ReceptivityGauge } from "@/components/receptivity-gauge";
@@ -88,6 +89,7 @@ export function EncounterClient({
     () => buildVoiceEngine(encounterId, voiceCaps),
     [encounterId, voiceCaps]
   );
+  const { getLevel } = useAudioLevels();
 
   const sttRef = useRef<SttSession | null>(null);
   const draftRef = useRef("");
@@ -373,7 +375,7 @@ export function EncounterClient({
 
       {/* the orb: live while either side is speaking, breathing when quiet */}
       <div className="relative h-24 shrink-0">
-        <SessionVisualizer mode={mode} />
+        <SessionVisualizer mode={mode} getSignal={getLevel} />
         {(recording || speaking) && (
           <span className="absolute bottom-1 left-1/2 -translate-x-1/2 font-mono text-[9px] font-semibold uppercase tracking-[0.24em] text-success">
             {recording ? "Listening" : "Patient speaking"}

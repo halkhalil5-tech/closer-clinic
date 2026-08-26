@@ -22,6 +22,11 @@ const MIME = "audio/mpeg";
  */
 let sharedAudio: HTMLAudioElement | null = null;
 
+/** Read-only: the shared playback element, for amplitude analysis taps. */
+export function getSharedAudio(): HTMLAudioElement | null {
+  return sharedAudio;
+}
+
 export function isAudioPrimed(): boolean {
   return sharedAudio !== null;
 }

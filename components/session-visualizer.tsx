@@ -10,12 +10,22 @@ export type VisualizerMode = "idle" | "patient" | "listening";
  * provider's mic is live. Custom-drawn — no widget look. 60fps via rAF;
  * prefers-reduced-motion collapses it to a static ring.
  */
-export function SessionVisualizer({ mode }: { mode: VisualizerMode }) {
+export function SessionVisualizer({
+  mode,
+  getSignal,
+}: {
+  mode: VisualizerMode;
+  /** Optional live 0–1 amplitude sampler; the orb tracks it when healthy and
+   *  falls back to state-driven animation when it isn't. */
+  getSignal?: () => { level: number; live: boolean };
+}) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const modeRef = useRef<VisualizerMode>(mode);
+  const getSignalRef = useRef<typeof getSignal>(getSignal);
   useEffect(() => {
     modeRef.current = mode;
-  }, [mode]);
+    getSignalRef.current = getSignal;
+  }, [mode, getSignal]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -30,6 +40,11 @@ export function SessionVisualizer({ mode }: { mode: VisualizerMode }) {
     // Energy eases toward the mode's target so transitions feel physical,
     // never switched.
     let energy = 0;
+    // Decaying peak of the live signal: while a source is speaking and the
+    // analysers are actually producing data, the orb tracks amplitude; if
+    // levels stay at zero (no context, Safari suspended, WebSpeech fallback)
+    // this never rises and the state-driven targets carry the animation.
+    let signalPeak = 0;
 
     function size() {
       if (!canvas) return;
@@ -51,8 +66,18 @@ export function SessionVisualizer({ mode }: { mode: VisualizerMode }) {
       const cy = h / 2;
       const base = Math.min(w, h) * 0.28;
 
-      const target = modeRef.current === "idle" ? 0.12 : modeRef.current === "patient" ? 0.75 : 1;
-      energy += (target - energy) * 0.06;
+      let target = modeRef.current === "idle" ? 0.12 : modeRef.current === "patient" ? 0.75 : 1;
+      const sig = modeRef.current !== "idle" ? getSignalRef.current?.() : undefined;
+      if (sig?.live) {
+        signalPeak = Math.max(signalPeak * 0.99, sig.level);
+        if (signalPeak > 0.04) {
+          // amplitude-driven: breathe at the floor, surge with speech
+          target = 0.18 + Math.min(1, sig.level * 1.7) * 1.02;
+        }
+      } else {
+        signalPeak *= 0.95;
+      }
+      energy += (target - energy) * (sig?.live && signalPeak > 0.04 ? 0.25 : 0.06);
 
       ctx.clearRect(0, 0, w, h);
 
