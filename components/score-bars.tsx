@@ -1,6 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion } from "motion/react";
+import { dimensionLetterFor, letterColorFor } from "@/lib/letter-grades";
 
 export interface ScoreBar {
   key: string;
@@ -15,17 +16,16 @@ export function ScoreBars({ bars }: { bars: ScoreBar[] }) {
     <div className="flex flex-col gap-3">
       {bars.map((b, i) => {
         const pct = (b.score / 20) * 100;
-        const color =
-          b.score >= 14
-            ? "var(--color-success)"
-            : b.score >= 8
-              ? "var(--color-amber)"
-              : "var(--color-danger)";
+        const letter = dimensionLetterFor(b.score);
+        const color = letterColorFor(letter);
         return (
           <div key={b.key}>
             <div className="flex items-baseline justify-between">
               <span className="microlabel">{b.label}</span>
               <span className="font-mono text-[14px] font-semibold tabular-nums text-ink">
+                <span className="display mr-1.5 text-[15px]" style={{ color }}>
+                  {letter}
+                </span>
                 {b.score}
                 <span className="text-muted">/20</span>
               </span>

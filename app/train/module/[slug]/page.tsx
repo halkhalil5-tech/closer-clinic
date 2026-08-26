@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { getAuthedUser } from "@/lib/auth";
 import { getStore } from "@/lib/store";
 import { readingMinutes, rubricAverage } from "@/lib/training";
+import { dimensionLetterFor, letterColorFor } from "@/lib/letter-grades";
 import { RUBRIC_LABELS } from "@/lib/types";
 import { ModuleDocView } from "@/components/module-doc-view";
 
@@ -74,6 +75,9 @@ export default async function ModulePage({ params }: { params: Promise<{ slug: s
               skill.avg < 12 ? "text-amber" : "text-bone"
             }`}
           >
+            <span className="display mr-1 text-[15px]" style={{ color: letterColorFor(dimensionLetterFor(skill.avg)) }}>
+              {dimensionLetterFor(skill.avg)}
+            </span>
             {skill.avg.toFixed(1)}
             <span className="text-[10px] font-normal text-muted">/20</span>
           </span>

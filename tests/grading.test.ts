@@ -77,3 +77,29 @@ describe("sumScores", () => {
     expect(sumScores({ rapport: 0, framing: 0, price: 0, objections: 0, close: 0 })).toBe(0);
   });
 });
+
+describe("dimensionLetterFor — consistent with the session bands", () => {
+  it("maps 0–20 scores onto the same scale as the overall letter", async () => {
+    const { dimensionLetterFor, letterFor } = await import("@/lib/letter-grades");
+    // five identical dimension scores must letter the same as their total
+    for (const s of [4, 9, 12, 14, 16, 17, 18, 19, 20]) {
+      expect(dimensionLetterFor(s)).toBe(letterFor(s * 5));
+    }
+    expect(dimensionLetterFor(18)).toBe("A−");
+    expect(dimensionLetterFor(16)).toBe("B−");
+    expect(dimensionLetterFor(14)).toBe("C−");
+    expect(dimensionLetterFor(12)).toBe("D−");
+    expect(dimensionLetterFor(11)).toBe("F");
+    // fractional averages round like the total would
+    expect(dimensionLetterFor(17.5)).toBe("B+");
+  });
+
+  it("letterColorFor buckets A/B/C/DF", async () => {
+    const { letterColorFor } = await import("@/lib/letter-grades");
+    expect(letterColorFor("A−")).toContain("grade-a");
+    expect(letterColorFor("B+")).toContain("grade-b");
+    expect(letterColorFor("C")).toContain("grade-c");
+    expect(letterColorFor("D−")).toContain("grade-d");
+    expect(letterColorFor("F")).toContain("grade-d");
+  });
+});

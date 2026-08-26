@@ -5,7 +5,7 @@ import { getAuthedUser } from "@/lib/auth";
 import { getStore, listRosterForUser } from "@/lib/store";
 import { computeStats } from "@/lib/stats";
 import { computeTrainingStatus } from "@/lib/training";
-import { averageLetter, isoDaysAgo } from "@/lib/letter-grades";
+import { averageLetter, dimensionLetterFor, isoDaysAgo, letterColorFor } from "@/lib/letter-grades";
 import { AppNav } from "@/components/app-nav";
 import { SimVsRealChart, ScenarioBars, type RealDayPoint } from "@/components/charts";
 import { OutcomeLog, type LogService } from "@/components/outcome-log";
@@ -336,7 +336,11 @@ export default async function ProgressPage({
               <div className="microlabel text-amber">Weakest category</div>
               <div className="display mt-0.5 text-[15px] text-ink">{stats.weakestRubric.label}</div>
             </div>
-            <span className="font-mono text-[15px] font-semibold tabular-nums text-amber">
+            <span
+              className="font-mono text-[15px] font-semibold tabular-nums"
+              style={{ color: letterColorFor(dimensionLetterFor(stats.weakestRubric.avg)) }}
+            >
+              <span className="display mr-1">{dimensionLetterFor(stats.weakestRubric.avg)}</span>
               {stats.weakestRubric.avg.toFixed(1)}<span className="text-faint">/20</span>
             </span>
           </section>

@@ -42,3 +42,20 @@ export function averageLetter(totals: number[], window = 10): string | null {
 export function isoDaysAgo(days: number): string {
   return new Date(Date.now() - days * 86_400_000).toISOString();
 }
+
+/**
+ * Letter for one 0–20 rubric dimension, consistent with the session grade:
+ * score × 5 lands on the same 100-point scale the overall letter uses, so a
+ * rep of five 16s reads B− on every bar and B− overall.
+ */
+export function dimensionLetterFor(score: number): string {
+  return letterFor(Math.round(score * 5));
+}
+
+/** Grade color (CSS var): A mint, B teal, C gold, D/F danger. */
+export function letterColorFor(letter: string): string {
+  if (letter.startsWith("A")) return "var(--color-grade-a)";
+  if (letter.startsWith("B")) return "var(--color-grade-b)";
+  if (letter.startsWith("C")) return "var(--color-grade-c)";
+  return "var(--color-grade-d)";
+}

@@ -4,13 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import confetti from "canvas-confetti";
 import { Check } from "lucide-react";
+import { letterColorFor } from "@/lib/letter-grades";
 
-export function letterColor(letter: string): string {
-  if (letter.startsWith("A")) return "var(--color-grade-a)";
-  if (letter.startsWith("B")) return "var(--color-grade-b)";
-  if (letter.startsWith("C")) return "var(--color-grade-c)";
-  return "var(--color-grade-d)";
-}
 
 /**
  * The grade moment: a 96px grade-colored letter that rises in while the
@@ -71,7 +66,7 @@ export function GradeHero({
     return () => clearTimeout(t);
   }, [letter, encounterId, reduced]);
 
-  const color = letterColor(letter);
+  const color = letterColorFor(letter);
 
   return (
     <div>

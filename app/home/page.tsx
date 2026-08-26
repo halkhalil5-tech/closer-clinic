@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Flame, Zap } from "lucide-react";
+import { dimensionLetterFor, letterColorFor } from "@/lib/letter-grades";
 import { redirect } from "next/navigation";
 import { getAuthedUser } from "@/lib/auth";
 import { getStore, listRosterForUser } from "@/lib/store";
@@ -186,8 +187,11 @@ export default async function HomePage({
               Your{" "}
               <span className="font-semibold text-ink">{RUBRIC_LABELS[weak.rubricKey]}</span>{" "}
               is your weakest skill —{" "}
-              <span className="font-mono text-[12px] tabular-nums text-amber">
-                {weak.avg.toFixed(1)}/20
+              <span
+                className="font-mono text-[12px] font-semibold tabular-nums"
+                style={{ color: letterColorFor(dimensionLetterFor(weak.avg)) }}
+              >
+                {dimensionLetterFor(weak.avg)} · {weak.avg.toFixed(1)}/20
               </span>{" "}
               over your last {weak.reps} reps.{" "}
               <span className="font-semibold text-bone underline">
