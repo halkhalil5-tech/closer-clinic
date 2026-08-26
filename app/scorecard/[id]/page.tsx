@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { ChevronRight } from "lucide-react";
 import { getAuthedUser } from "@/lib/auth";
 import { getStore } from "@/lib/store";
 import { rubricLabelsFor, TEST_OUT_PASS_TOTAL, type RubricScores } from "@/lib/types";
@@ -9,6 +10,10 @@ import { RerunButton } from "@/components/rerun-button";
 import { RedoButton } from "@/components/redo-button";
 import { PairPlayer } from "@/components/pair-player";
 import { PrepRerunButton } from "@/components/prep-rerun-button";
+import { GradeHero } from "@/components/grade-hero";
+import { ScoreBars } from "@/components/score-bars";
+import { RewriteCards } from "@/components/rewrite-cards";
+import { ReceptivityChart } from "@/components/receptivity-chart";
 
 export const dynamic = "force-dynamic";
 
@@ -33,8 +38,10 @@ export default async function ScorecardPage({ params }: { params: Promise<{ id: 
         <div className="microlabel">Redo the moment</div>
         <div className="flex flex-1 flex-col items-center justify-center pb-16 text-center">
           <div
-            className={`stamp-in display border-[3px] px-4 py-2 text-[20px] tracking-wide ${
-              result.handledBetter ? "border-mint text-mint" : "border-red text-red"
+            className={`stamp-in display rounded-xl border-[3px] px-5 py-2.5 text-[22px] tracking-tight ${
+              result.handledBetter
+                ? "border-[#2ec4a5] text-[#1d8f77]"
+                : "border-danger text-danger"
             }`}
           >
             {result.handledBetter ? "Handled better" : "Same trap"}
@@ -46,14 +53,14 @@ export default async function ScorecardPage({ params }: { params: Promise<{ id: 
           {parentId && (
             <Link
               href={`/scorecard/${parentId}`}
-              className="display w-full rounded-card border border-line py-3 text-center text-[13px] tracking-wide text-ink"
+              className="display w-full rounded-card border border-line py-3 text-center text-[14px] tracking-tight text-ink"
             >
               Back to the scorecard
             </Link>
           )}
           <Link
             href="/home"
-            className="block w-full py-2.5 text-center font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-muted"
+            className="block w-full py-2.5 text-center text-[11px] font-semibold uppercase tracking-[0.14em] text-muted"
           >
             Stations
           </Link>
@@ -72,219 +79,116 @@ export default async function ScorecardPage({ params }: { params: Promise<{ id: 
     day: "numeric",
     year: "numeric",
   });
+  const labels = rubricLabelsFor(scenario?.role);
+  const receptivitySeries = encounter.transcript
+    .filter((m) => m.role === "patient" && typeof m.receptivity === "number")
+    .map((m) => m.receptivity as number);
 
   return (
     <main className="mx-auto w-full max-w-md px-4 pb-10 pt-[calc(env(safe-area-inset-top)+1rem)]">
-      {/* dark desk margin */}
       <div className="microlabel flex items-baseline justify-between">
         <span>{scenario?.title ?? "Scorecard"}</span>
-        <span>{encounter.difficulty}</span>
+        <span>Encounter report</span>
       </div>
 
-      {/* the printed chart — one paper document slid across the desk */}
-      <div className="mt-3 border-2 border-paper-ink bg-paper px-4 pb-5 pt-3.5 text-paper-ink">
-        {/* letterhead */}
-        <div className="flex items-baseline justify-between gap-3 border-b-2 border-paper-ink pb-2">
-          <span className="whitespace-nowrap font-mono text-[10px] font-bold uppercase tracking-[0.14em]">
-            Closer Clinic
-          </span>
-          <span className="whitespace-nowrap font-mono text-[10px] uppercase tracking-[0.14em] text-paper-ink/65">
-            Encounter report
-          </span>
+      {/* the grade moment */}
+      <section className="mt-3 rounded-xl border border-line bg-bg p-6 shadow-sm">
+        <GradeHero
+          letter={letterFor(grade.total)}
+          total={grade.total}
+          closed={grade.closed}
+          meta={`${encounter.persona.name} · ${encounter.difficulty} · ${reportDate}`}
+          encounterId={encounter.id}
+        />
+      </section>
+
+      {/* sub-scores */}
+      <section className="mt-3 rounded-xl border border-line bg-bg p-6 shadow-sm">
+        <ScoreBars
+          bars={RUBRIC_KEYS.map((key) => ({
+            key,
+            label: labels[key],
+            score: grade.scores[key],
+          }))}
+        />
+      </section>
+
+      {/* receptivity timeline */}
+      {receptivitySeries.length >= 2 && (
+        <section className="mt-3 rounded-xl border border-line bg-bg p-6 pb-3 shadow-sm">
+          <div className="flex items-baseline justify-between">
+            <div className="microlabel">Patient receptivity</div>
+            <div className="text-[10px] font-medium uppercase tracking-[0.1em] text-danger">
+              Sharpest dips marked
+            </div>
+          </div>
+          <div className="mt-2">
+            <ReceptivityChart values={receptivitySeries} />
+          </div>
+        </section>
+      )}
+
+      {/* the moment */}
+      <section className="mt-3 rounded-xl border border-line bg-card p-6">
+        <div className="microlabel">The moment</div>
+        <p className="mt-1.5 text-[14px] leading-relaxed text-ink">{grade.moment}</p>
+      </section>
+
+      {/* what you should've said */}
+      {grade.rewrite && (
+        <section className="mt-3">
+          <RewriteCards youSaid={grade.rewrite.youSaid} better={grade.rewrite.better} />
+          <div className="mt-2.5">
+            <RedoButton encounterId={encounter.id} paper />
+          </div>
+          <PairPlayer endpoint="/api/audio/replay" fetchBody={{ encounterId: encounter.id }} paper />
+        </section>
+      )}
+
+      {/* debrief */}
+      <section className="mt-3 rounded-xl border border-line bg-bg p-6 shadow-sm">
+        <div className="microlabel text-[#1d8f77]">What worked</div>
+        <ul className="mt-1.5 flex flex-col gap-1.5">
+          {grade.worked.map((w, i) => (
+            <li key={i} className="flex gap-2 text-[14px] leading-snug text-ink">
+              <span className="font-semibold text-[#1d8f77]">+</span> {w}
+            </li>
+          ))}
+        </ul>
+        <div className="microlabel mt-5 text-[#a3831c]">Fix this</div>
+        <ul className="mt-1.5 flex flex-col gap-1.5">
+          {grade.fixes.map((f, i) => (
+            <li key={i} className="flex gap-2 text-[14px] leading-snug text-ink">
+              <ChevronRight className="mt-0.5 h-4 w-4 shrink-0 text-[#a3831c]" strokeWidth={2} />
+              {f}
+            </li>
+          ))}
+        </ul>
+        <div className="mt-5 border-t border-line pt-4">
+          <div className="microlabel">Next-rep drill</div>
+          <p className="mt-1 text-[14px] font-semibold leading-relaxed text-ink">{grade.drill}</p>
         </div>
-
-        {/* hero letter grade + verdict stamp */}
-        <div className="flex items-start justify-between gap-3 pt-4">
-          <div className="flex items-end gap-2.5">
-            <div className="display text-[96px] leading-[0.82]">{letterFor(grade.total)}</div>
-            <div className="pb-1.5 font-mono text-[15px] font-semibold tabular-nums text-paper-ink/65">
-              {grade.total}
-              <span className="text-[11px] font-normal">/100</span>
-            </div>
-          </div>
-          <div
-            className={`stamp-in display mt-3 shrink-0 border-[3px] px-3 py-1.5 text-[17px] tracking-wide opacity-85 mix-blend-multiply ${
-              grade.closed
-                ? "border-paper-mint text-paper-mint"
-                : "border-paper-red text-paper-red"
-            }`}
-          >
-            {grade.closed ? "Closed ✓" : "No close"}
-          </div>
-        </div>
-        <div className="mt-2.5 truncate font-mono text-[10px] font-semibold uppercase tracking-[0.13em] text-paper-ink/65">
-          {encounter.persona.name} · {encounter.difficulty} · {reportDate}
-        </div>
-
-        {/* rubric — ink tracks, mint/amber/red fills */}
-        <section className="mt-5 flex flex-col gap-2.5 border-t border-paper-ink/15 pt-4">
-          {RUBRIC_KEYS.map((key, i) => {
-            const score = grade.scores[key];
-            const pct = (score / 20) * 100;
-            return (
-              <div key={key}>
-                <div className="flex items-baseline justify-between">
-                  <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-paper-ink/65">
-                    {rubricLabelsFor(scenario?.role)[key]}
-                  </span>
-                  <span className="font-mono text-[13px] font-semibold tabular-nums">
-                    {score}
-                    <span className="text-paper-ink/65">/20</span>
-                  </span>
-                </div>
-                <div className="mt-1 h-1.5 bg-paper-ink/10">
-                  <div
-                    className={`bar-fill h-full ${
-                      score >= 14 ? "bg-paper-mint" : score >= 8 ? "bg-paper-amber" : "bg-paper-red"
-                    }`}
-                    style={{ width: `${pct}%`, animationDelay: `${120 + i * 70}ms` }}
-                  />
-                </div>
-              </div>
-            );
-          })}
-        </section>
-
-        {/* receptivity trace — post-hoc for every difficulty */}
-        {(() => {
-          const pts = encounter.transcript
-            .filter((m) => m.role === "patient" && typeof m.receptivity === "number")
-            .map((m) => m.receptivity as number);
-          if (pts.length < 2) return null;
-          const W = 300;
-          const H = 56;
-          const x = (i: number) => (pts.length === 1 ? W / 2 : (i / (pts.length - 1)) * W);
-          const y = (v: number) => 4 + (1 - v / 100) * (H - 8);
-          // Mark the two biggest swings — these usually coincide with The Moment.
-          const deltas = pts.map((v, i) => (i === 0 ? 0 : Math.abs(v - pts[i - 1])));
-          const marked = [...deltas.keys()].sort((a, b) => deltas[b] - deltas[a]).slice(0, 2);
-          return (
-            <section className="mt-4 border-t border-paper-ink/15 pt-3.5">
-              <div className="flex items-baseline justify-between">
-                <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.13em] text-paper-ink/65">
-                  Patient receptivity
-                </div>
-                <div className="font-mono text-[9px] uppercase tracking-[0.1em] text-paper-ink/65">
-                  ● biggest swings
-                </div>
-              </div>
-              <svg viewBox={`0 0 ${W} ${H}`} className="mt-2 w-full">
-                {[0, 50, 100].map((v) => (
-                  <line key={v} x1={0} x2={W} y1={y(v)} y2={y(v)} stroke="var(--color-paper-ink)" strokeOpacity="0.12" strokeWidth="1" />
-                ))}
-                <polyline
-                  points={pts.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" ")}
-                  fill="none"
-                  stroke="var(--color-paper-ink)"
-                  strokeWidth="1.8"
-                  strokeLinejoin="round"
-                  strokeLinecap="round"
-                />
-                {pts.map((v, i) => (
-                  <circle
-                    key={i}
-                    cx={x(i)}
-                    cy={y(v)}
-                    r={marked.includes(i) && i > 0 ? 3.4 : 1.8}
-                    fill={
-                      marked.includes(i) && i > 0
-                        ? v > pts[i - 1]
-                          ? "var(--color-paper-mint)"
-                          : "var(--color-paper-red)"
-                        : "var(--color-paper-ink)"
-                    }
-                  />
-                ))}
-              </svg>
-            </section>
-          );
-        })()}
-
-        {/* debrief */}
-        <section className="mt-4 border-t border-paper-ink/15 pt-3.5">
-          <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.13em] text-paper-ink/65">
-            The moment
-          </div>
-          <p className="mt-1 text-[14px] leading-relaxed">{grade.moment}</p>
-        </section>
-
-        {/* what you should've said */}
-        {grade.rewrite && (
-          <section className="mt-3.5 border-t border-paper-ink/15 pt-3.5">
-            <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.13em] text-paper-ink/65">
-              What you said
-            </div>
-            <p className="mt-1 text-[13.5px] italic leading-snug text-paper-ink/65">
-              &ldquo;{grade.rewrite.youSaid}&rdquo;
-            </p>
-            <div className="mt-3 font-mono text-[10px] font-semibold uppercase tracking-[0.13em] text-paper-ink/65">
-              The better line
-            </div>
-            <div className="mt-1 border-l-2 border-l-paper-mint pl-3">
-              <p className="text-[14px] font-semibold leading-snug">
-                &ldquo;{grade.rewrite.better}&rdquo;
-              </p>
-            </div>
-            <div className="mt-3.5">
-              <RedoButton encounterId={encounter.id} paper />
-            </div>
-            <PairPlayer endpoint="/api/audio/replay" fetchBody={{ encounterId: encounter.id }} paper />
-          </section>
-        )}
-
-        <section className="mt-3.5 border-t border-paper-ink/15 pt-3.5">
-          <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.13em] text-paper-ink/65">
-            What worked
-          </div>
-          <ul className="mt-1 flex flex-col gap-1.5">
-            {grade.worked.map((w, i) => (
-              <li key={i} className="flex gap-2 text-[14px] leading-snug">
-                <span className="font-mono font-bold text-paper-mint">+</span> {w}
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        <section className="mt-3.5 border-t border-paper-ink/15 pt-3.5">
-          <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.13em] text-paper-ink/65">
-            Fix this
-          </div>
-          <ul className="mt-1 flex flex-col gap-1.5">
-            {grade.fixes.map((f, i) => (
-              <li key={i} className="flex gap-2 text-[14px] leading-snug">
-                <span className="font-mono font-bold text-paper-amber">→</span> {f}
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        <section className="mt-3.5 border-t-2 border-paper-ink pt-3">
-          <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.13em] text-paper-ink/65">
-            Next-rep drill
-          </div>
-          <p className="mt-1 text-[14px] font-semibold leading-relaxed">{grade.drill}</p>
-        </section>
-      </div>
+      </section>
 
       {/* test-out verdict */}
       {encounter.kind === "test_out" && (
         <div
-          className={`mt-4 border-l-2 py-1 pl-3 text-[13.5px] leading-snug ${
-            grade.total >= TEST_OUT_PASS_TOTAL ? "border-l-mint" : "border-l-amber"
+          className={`mt-4 rounded-lg border-l-2 py-1.5 pl-3 text-[13.5px] leading-snug ${
+            grade.total >= TEST_OUT_PASS_TOTAL ? "border-l-[#2ec4a5]" : "border-l-amber"
           }`}
         >
           {grade.total >= TEST_OUT_PASS_TOTAL ? (
-            <span className="font-semibold text-mint">
+            <span className="font-semibold text-[#1d8f77]">
               Test-out passed — all stations are unlocked.
             </span>
           ) : (
             <span className="text-dim">
               Test-out needs {TEST_OUT_PASS_TOTAL}+.{" "}
-              <Link href="/train" className="font-semibold text-bone underline">
+              <Link href="/train" className="font-semibold text-teal underline">
                 Train the gaps
               </Link>{" "}
               or{" "}
-              <Link href="/test-out" className="font-semibold text-bone underline">
+              <Link href="/test-out" className="font-semibold text-teal underline">
                 run it again
               </Link>
               .
@@ -295,8 +199,7 @@ export default async function ScorecardPage({ params }: { params: Promise<{ id: 
 
       {/* lowest-scoring dimension → the exact module section to review */}
       {(() => {
-        const keys = ["rapport", "framing", "price", "objections", "close"] as const;
-        const lowest = keys.reduce((min, k) => (grade.scores[k] < grade.scores[min] ? k : min));
+        const lowest = RUBRIC_KEYS.reduce((min, k) => (grade.scores[k] < grade.scores[min] ? k : min));
         const rec = recommendSection(
           lowest,
           `${grade.moment} ${grade.fixes.join(" ")} ${grade.rewrite?.youSaid ?? ""}`
@@ -305,19 +208,19 @@ export default async function ScorecardPage({ params }: { params: Promise<{ id: 
         return (
           <Link
             href={`/train/module/${rec.moduleSlug}#${rec.sectionId}`}
-            className="mt-4 flex items-center gap-3 border-l-2 border-l-amber py-1.5 pl-3 transition-opacity active:opacity-70"
+            className="mt-4 flex items-center gap-3 rounded-lg border-l-2 border-l-amber py-1.5 pl-3 transition-opacity duration-150 active:opacity-70"
           >
             <span className="min-w-0 flex-1 text-[13px] leading-snug text-dim">
-              Weakest here: <span className="font-semibold text-ink">{rubricLabelsFor(scenario?.role)[lowest]}</span>{" "}
-              <span className="font-mono text-[12px] tabular-nums text-amber">{grade.scores[lowest]}/20</span>
+              Weakest here: <span className="font-semibold text-ink">{labels[lowest]}</span>{" "}
+              <span className="font-mono text-[12px] tabular-nums text-[#a3831c]">
+                {grade.scores[lowest]}/20
+              </span>
               {" — "}review{" "}
-              <span className="font-semibold text-bone underline">
+              <span className="font-semibold text-teal underline">
                 Module {mod}: {rec.sectionTitle}
               </span>
             </span>
-            <svg viewBox="0 0 20 20" className="h-3.5 w-3.5 shrink-0 text-muted" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="m8 5 5 5-5 5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+            <ChevronRight className="h-5 w-5 shrink-0 text-muted" strokeWidth={1.5} />
           </Link>
         );
       })()}
@@ -327,13 +230,13 @@ export default async function ScorecardPage({ params }: { params: Promise<{ id: 
         {profile && !profile.onboarded && (
           <Link
             href="/onboarding"
-            className="display w-full rounded-card bg-mint py-3.5 text-center text-[15px] tracking-wide text-mint-ink"
+            className="display w-full rounded-card bg-teal py-3.5 text-center text-[15px] tracking-tight text-white"
           >
             That was rep one — set up your clinic
           </Link>
         )}
         {grade.rewrite ? (
-          // The redo action lives on the paper, right under "The better line".
+          // The redo action lives right under the rewrite cards.
           <RerunButton scenarioSlug={encounter.scenarioSlug} difficulty={encounter.difficulty} />
         ) : grade.closed ? (
           <>
@@ -348,7 +251,7 @@ export default async function ScorecardPage({ params }: { params: Promise<{ id: 
         )}
         <Link
           href="/home"
-          className="display w-full rounded-card border border-line bg-panel py-3 text-center text-[13px] tracking-wide text-ink"
+          className="display w-full rounded-card border border-line bg-card py-3 text-center text-[14px] tracking-tight text-ink"
         >
           Change scenario
         </Link>
