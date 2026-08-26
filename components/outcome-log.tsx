@@ -1,6 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export interface LogService {
   slug: string;
@@ -105,26 +108,30 @@ export function OutcomeLog({ services, weekPresented, weekClosed, title = "Today
       </div>
       <div className="mt-1.5 flex items-center gap-2">
         <span className="shrink-0 text-[13px] text-dim">Presented</span>
-        <select
+        <Select
           value={slug}
-          onChange={(e) => {
-            setSlug(e.target.value);
+          onValueChange={(v) => {
+            setSlug(v);
             setConfirmingClose(false);
           }}
-          className="min-w-0 flex-1 border border-line bg-panel px-2 py-1.5 text-[13px] text-ink focus:border-primary focus:outline-none"
         >
-          {services.map((s) => (
-            <option key={s.slug} value={s.slug}>
-              {s.title}
-            </option>
-          ))}
-        </select>
+          <SelectTrigger className="h-9 min-w-0 flex-1 text-[13px]">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {services.map((s) => (
+              <SelectItem key={s.slug} value={s.slug}>
+                {s.title}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         <span className="shrink-0 text-[13px] text-dim">?</span>
       </div>
       {confirmingClose ? (
         <div className="mt-2 flex items-center gap-2">
           <span className="shrink-0 font-mono text-[13px] text-success">$</span>
-          <input
+          <Input
             inputMode="numeric"
             value={amount}
             onChange={(e) => {
@@ -132,46 +139,55 @@ export function OutcomeLog({ services, weekPresented, weekClosed, title = "Today
               setAmountDirty(true);
             }}
             aria-label="Amount closed, dollars"
-            className="min-w-0 flex-1 border border-success/60 bg-panel px-2 py-1.5 font-mono text-[14px] tabular-nums text-ink focus:border-primary focus:outline-none"
+            className="h-9 min-w-0 flex-1 border-success/60 font-mono text-[14px] tabular-nums"
           />
-          <button
+          <Button
+            size="sm"
             onClick={confirmClose}
             disabled={busy}
-            className="shrink-0 rounded-card bg-success px-4 py-2 font-mono text-[11px] font-semibold uppercase tracking-[0.1em] text-white disabled:opacity-50"
+            className="shrink-0 bg-success font-mono text-[11px] font-semibold uppercase tracking-[0.1em] hover:bg-success/85 active:bg-success/85"
           >
             Log close
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={() => setConfirmingClose(false)}
             aria-label="Cancel"
-            className="shrink-0 px-1 font-mono text-[11px] uppercase text-muted"
+            className="shrink-0 px-2 text-muted"
           >
-            ✕
-          </button>
+            Cancel
+          </Button>
         </div>
       ) : (
         <div className="mt-2 flex gap-2">
-          <button
+          <Button
+            variant="outline"
+            size="sm"
             onClick={startClose}
             disabled={busy}
-            className="flex-1 rounded-card border border-success/60 py-2 font-mono text-[11px] font-semibold uppercase tracking-[0.1em] text-success disabled:opacity-50"
+            className="flex-1 border-success/60 font-mono text-[11px] font-semibold uppercase tracking-[0.1em] text-success hover:bg-success/10 active:bg-success/10"
           >
             Closed
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
             onClick={() => log(true, false)}
             disabled={busy}
-            className="flex-1 rounded-card border border-line-strong py-2 font-mono text-[11px] font-semibold uppercase tracking-[0.1em] text-dim disabled:opacity-50"
+            className="flex-1 font-mono text-[11px] font-semibold uppercase tracking-[0.1em] text-dim"
           >
             No close
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
             onClick={() => log(false, false)}
             disabled={busy}
-            className="flex-1 rounded-card border border-line py-2 font-mono text-[11px] font-semibold uppercase tracking-[0.1em] text-muted disabled:opacity-50"
+            className="flex-1 border-line font-mono text-[11px] font-semibold uppercase tracking-[0.1em] text-muted"
           >
             Didn&apos;t present
-          </button>
+          </Button>
         </div>
       )}
     </section>

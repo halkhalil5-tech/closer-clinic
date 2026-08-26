@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 /** Settings: enter a vendor code, unlock a station pack. */
 export function RedeemPack() {
@@ -41,20 +43,16 @@ export function RedeemPack() {
         Vendor station packs unlock with a code.
       </span>
       <div className="mt-2 flex gap-2">
-        <input
+        <Input
           value={code}
           onChange={(e) => setCode(e.target.value)}
           placeholder="PACK-CODE"
           autoCapitalize="characters"
-          className="min-w-0 flex-1 border border-line bg-panel px-2 py-2 font-mono text-[13px] uppercase tracking-wide text-ink placeholder:text-muted focus:border-primary focus:outline-none"
+          className="min-w-0 flex-1 font-mono text-[13px] uppercase tracking-wide"
         />
-        <button
-          onClick={redeem}
-          disabled={busy || !code.trim()}
-          className="shrink-0 rounded-card border border-line-strong px-4 py-2 font-mono text-[11px] font-semibold uppercase tracking-[0.1em] text-bone disabled:opacity-50"
-        >
+        <Button variant="outline" onClick={redeem} disabled={busy || !code.trim()} className="shrink-0">
           Unlock
-        </button>
+        </Button>
       </div>
       {message && (
         <p className={`mt-1.5 text-[12px] ${message.ok ? "text-success" : "text-red"}`}>

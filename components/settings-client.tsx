@@ -3,7 +3,10 @@
 import { RedeemPack } from "@/components/redeem-pack";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { ChevronRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 
 const VOICE_PREF_KEY = "closer-clinic:patient-voice";
 
@@ -70,32 +73,19 @@ export function SettingsClient({
 
   return (
     <main className="mt-4 flex flex-col gap-3 px-4">
-      <section className="border border-line bg-panel">
+      <section className="rounded-xl border border-line bg-panel">
         <div className="flex items-center justify-between p-3">
           <div>
             <div className="text-[14px] font-semibold">Patient voice</div>
             <div className="mt-0.5 text-[12px] text-muted">Speak replies out loud by default</div>
           </div>
-          <button
-            onClick={toggleVoice}
-            role="switch"
-            aria-checked={voiceOn}
-            className={`relative h-6 w-11 border transition-colors ${
-              voiceOn ? "border-primary bg-primary" : "border-line bg-panel-2"
-            }`}
-          >
-            <span
-              className={`absolute top-0.5 h-[18px] w-[18px] transition-all ${
-                voiceOn ? "left-[calc(100%-1.375rem)] bg-white" : "left-0.5 bg-muted"
-              }`}
-            />
-          </button>
+          <Switch checked={voiceOn} onCheckedChange={toggleVoice} aria-label="Patient voice" />
         </div>
       </section>
 
-      <section className="border border-line bg-panel p-3">
+      <section className="rounded-xl border border-line bg-panel p-3">
         <div className="microlabel">Specialty</div>
-        <div className="mt-2 border border-line">
+        <div className="mt-2 overflow-hidden rounded-lg border border-line">
           {SPECIALTIES.map((s, i) => (
             <button
               key={s.id}
@@ -121,7 +111,7 @@ export function SettingsClient({
 
       <a
         href="/import"
-        className="flex items-center justify-between border border-line bg-panel p-3"
+        className="card-lift flex items-center justify-between rounded-xl border border-line bg-panel p-3"
       >
         <span>
           <span className="block text-[14px] font-semibold">Import from my website</span>
@@ -129,12 +119,12 @@ export function SettingsClient({
             Read your services and pricing pages into training stations.
           </span>
         </span>
-        <span className="font-mono text-[12px] text-muted">→</span>
+        <ChevronRight className="h-5 w-5 shrink-0 text-muted" strokeWidth={1.5} />
       </a>
 
       <a
         href="/admin/training"
-        className="flex items-center justify-between border border-line bg-panel p-3"
+        className="card-lift flex items-center justify-between rounded-xl border border-line bg-panel p-3"
       >
         <span>
           <span className="block text-[14px] font-semibold">Team training</span>
@@ -142,21 +132,21 @@ export function SettingsClient({
             Seat progress, quiz scores, and the curriculum-before-reps policy.
           </span>
         </span>
-        <span className="font-mono text-[12px] text-muted">→</span>
+        <ChevronRight className="h-5 w-5 shrink-0 text-muted" strokeWidth={1.5} />
       </a>
 
-      <section className="border border-line bg-panel p-3">
+      <section className="rounded-xl border border-line bg-panel p-3">
         <RedeemPack />
       </section>
 
-      <section className="border border-line bg-panel p-3">
+      <section className="rounded-xl border border-line bg-panel p-3">
         <div className="text-[14px] font-semibold">Subscription</div>
         <p className="mt-1 text-[12px] leading-relaxed text-muted">
           Billing arrives with clinic accounts in Phase 2. Right now every account has full access.
         </p>
       </section>
 
-      <section className="border border-line bg-panel p-3">
+      <section className="rounded-xl border border-line bg-panel p-3">
         <div className="text-[14px] font-semibold">Privacy</div>
         <p className="mt-1 text-[12px] leading-relaxed text-muted">
           Every patient in Closer Clinic is fictional — an AI character. Transcripts contain no
@@ -165,12 +155,9 @@ export function SettingsClient({
         </p>
       </section>
 
-      <button
-        onClick={signOut}
-        className="display border border-line bg-panel py-3 text-[13px] tracking-wide text-red"
-      >
+      <Button variant="outline" onClick={signOut} className="text-danger">
         Sign out
-      </button>
+      </Button>
     </main>
   );
 }

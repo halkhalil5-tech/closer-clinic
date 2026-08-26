@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { StationRole } from "@/lib/types";
+import { Button } from "@/components/ui/button";
 
 /** Clinic admin: flip a seat between provider and front-desk training. */
 export function SeatRoleToggle({
@@ -33,15 +34,17 @@ export function SeatRoleToggle({
   }
 
   return (
-    <button
+    <Button
+      variant="outline"
+      size="sm"
       onClick={flip}
       disabled={busy || self}
       title={self ? "Your own seat stays provider" : "Tap to switch this seat's role"}
-      className={`shrink-0 rounded-card border px-2 py-1 font-mono text-[9px] font-bold uppercase tracking-[0.14em] disabled:opacity-60 ${
-        role === "front_desk" ? "border-amber/60 text-amber" : "border-line-strong text-dim"
+      className={`h-7 shrink-0 px-2 font-mono text-[9px] font-bold uppercase tracking-[0.14em] ${
+        role === "front_desk" ? "border-amber/60 text-amber" : "text-dim"
       }`}
     >
       {role === "front_desk" ? "Front desk" : "Provider"}
-    </button>
+    </Button>
   );
 }
