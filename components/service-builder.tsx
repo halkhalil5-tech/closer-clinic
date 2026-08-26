@@ -1,5 +1,8 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -27,7 +30,7 @@ export interface ScenarioDraft {
 /* ------------------------------ review form ------------------------------ */
 
 const areaCls =
-  "mt-1 w-full resize-none border border-line bg-bg px-3 py-2.5 text-[13.5px] leading-snug text-ink placeholder:text-muted focus:border-primary focus:outline-none";
+  "mt-1 resize-none text-[13.5px] leading-snug placeholder:text-muted focus:border-primary focus:outline-none";
 
 export function ScenarioReviewForm({
   value,
@@ -46,7 +49,7 @@ export function ScenarioReviewForm({
       <div className="flex gap-3">
         <label className="w-32">
           <span className="microlabel">Price shown</span>
-          <input
+          <Input
             value={value.priceDisplay}
             onChange={(e) => set({ priceDisplay: e.target.value })}
             className={`${areaCls} font-mono tabular-nums text-bone`}
@@ -54,7 +57,7 @@ export function ScenarioReviewForm({
         </label>
         <label className="flex-1">
           <span className="microlabel">Price structure</span>
-          <input
+          <Input
             value={value.priceStructure}
             onChange={(e) => set({ priceStructure: e.target.value })}
             className={areaCls}
@@ -71,7 +74,7 @@ export function ScenarioReviewForm({
       </label>
       <label>
         <span className="microlabel">Chart you know walking in</span>
-        <textarea
+        <Textarea
           rows={4}
           value={value.clinicalContext}
           onChange={(e) => set({ clinicalContext: e.target.value })}
@@ -87,7 +90,7 @@ export function ScenarioReviewForm({
           <span className="microlabel">New objection cards (from your objections)</span>
           {value.cards.map((c, i) => (
             <div key={i} className="mt-2 border-l-2 border-l-bone pl-3">
-              <input
+              <Input
                 value={c.front}
                 onChange={(e) => {
                   const cards = [...value.cards!];
@@ -97,7 +100,7 @@ export function ScenarioReviewForm({
                 className={areaCls}
               />
               {(["isolate", "reframe", "close"] as const).map((k) => (
-                <input
+                <Input
                   key={k}
                   value={c[k]}
                   placeholder={k}
@@ -117,7 +120,7 @@ export function ScenarioReviewForm({
       <div>
         <span className="microlabel">Objection seeds (yours first)</span>
         {value.objectionSeeds.map((o, i) => (
-          <input
+          <Input
             key={i}
             value={o}
             onChange={(e) => {
@@ -253,12 +256,12 @@ export function ServiceBuilder() {
 
       <div className="mt-4 flex flex-1 flex-col">
         {step === 0 && (
-          <input
+          <Input
             autoFocus
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="e.g. PRP injection series"
-            className="w-full border border-line bg-bg px-3 py-3 text-[16px] text-ink placeholder:text-muted focus:border-primary focus:outline-none"
+            className="h-13 text-[16px]"
           />
         )}
 
@@ -282,25 +285,25 @@ export function ServiceBuilder() {
         )}
 
         {step === 2 && (
-          <textarea
+          <Textarea
             autoFocus
             rows={3}
             value={condition}
             onChange={(e) => setCondition(e.target.value)}
             placeholder="e.g. chronic Achilles tendinopathy that hasn't responded to rest and PT"
-            className="w-full resize-none border border-line bg-bg px-3 py-3 text-[15px] leading-snug text-ink placeholder:text-muted focus:border-primary focus:outline-none"
+            className="resize-none py-3 text-[15px] leading-snug"
           />
         )}
 
         {step === 3 && (
           <div>
-            <textarea
+            <Textarea
               autoFocus
               rows={3}
               value={typicalPatient}
               onChange={(e) => setTypicalPatient(e.target.value)}
               placeholder="e.g. an active adult in their 50s who runs or works on their feet (optional)"
-              className="w-full resize-none border border-line bg-bg px-3 py-3 text-[15px] leading-snug text-ink placeholder:text-muted focus:border-primary focus:outline-none"
+              className="resize-none py-3 text-[15px] leading-snug"
             />
             <p className="mt-2 text-[12px] leading-snug text-muted">
               Describe a <span className="text-dim">type</span> of patient, never a real one — no
@@ -315,13 +318,13 @@ export function ServiceBuilder() {
               [obj1, setObj1, "e.g. “My insurance should cover this”"],
               [obj2, setObj2, "e.g. “My buddy said it didn't work for him”"],
             ].map(([val, set, ph], i) => (
-              <input
+              <Input
                 key={i}
                 autoFocus={i === 0}
                 value={val as string}
                 onChange={(e) => (set as (v: string) => void)(e.target.value)}
                 placeholder={ph as string}
-                className="w-full border border-line bg-bg px-3 py-3 text-[15px] text-ink placeholder:text-muted focus:border-primary focus:outline-none"
+                className="h-13 text-[15px]"
               />
             ))}
             <p className="text-[12px] leading-snug text-muted">
@@ -344,7 +347,8 @@ export function ServiceBuilder() {
 
         <div className="mt-auto flex flex-col gap-2 pt-6">
           {step < 4 && (
-            <button
+            <Button
+              size="lg"
               onClick={() => {
                 setError(null);
                 if (step === 2 && !localScrub(condition)) return;
@@ -352,45 +356,44 @@ export function ServiceBuilder() {
                 setStep((step + 1) as Step);
               }}
               disabled={!canNext}
-              className="display w-full rounded-card bg-primary py-3.5 text-[15px] tracking-wide text-white disabled:opacity-40"
+              className="display w-full tracking-tight"
             >
               Next
-            </button>
+            </Button>
           )}
           {step === 4 && (
-            <button
+            <Button size="lg"
               onClick={generate}
-              disabled={busy}
-              className="display w-full rounded-card bg-primary py-3.5 text-[15px] tracking-wide text-white disabled:opacity-60"
-            >
-              {busy ? "Writing your station" : "Build the station"}
-            </button>
+              disabled={busy} className="display w-full tracking-tight">
+                {busy ? "Writing your station" : "Build the station"}
+              </Button>
           )}
           {step === 5 && (
             <>
-              <button
+              <Button size="lg"
                 onClick={save}
-                disabled={busy}
-                className="display w-full rounded-card bg-primary py-3.5 text-[15px] tracking-wide text-white disabled:opacity-60"
-              >
-                {busy ? "Saving" : "Save to your services"}
-              </button>
-              <button
+                disabled={busy} className="display w-full tracking-tight">
+                  {busy ? "Saving" : "Save to your services"}
+                </Button>
+              <Button
+                variant="outline"
                 onClick={generate}
                 disabled={busy}
-                className="display w-full rounded-card border border-line-strong py-3 text-[13px] tracking-wide text-bone disabled:opacity-60"
+                className="display w-full tracking-tight"
               >
                 Regenerate
-              </button>
+              </Button>
             </>
           )}
           {step > 0 && step < 5 && (
-            <button
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={() => setStep((step - 1) as Step)}
-              className="w-full py-2 text-center font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-muted"
+              className="w-full font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-muted"
             >
               Back
-            </button>
+            </Button>
           )}
         </div>
       </div>

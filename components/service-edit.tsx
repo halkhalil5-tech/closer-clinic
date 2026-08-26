@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ScenarioReviewForm, type ScenarioDraft } from "@/components/service-builder";
@@ -56,20 +57,19 @@ export function ServiceEdit({ slug, initial }: { slug: string; initial: Scenario
       </div>
       {error && <p className="mt-3 text-sm text-red">{error}</p>}
       <div className="mt-6 flex flex-col gap-2">
-        <button
+        <Button size="lg"
           onClick={save}
-          disabled={busy}
-          className="display w-full rounded-card bg-primary py-3.5 text-[15px] tracking-wide text-white disabled:opacity-60"
-        >
+          disabled={busy} className="display w-full tracking-tight">
           {busy ? "Saving" : "Save changes"}
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="outline"
           onClick={retire}
           disabled={busy}
-          className="display w-full rounded-card border border-red/50 py-3 text-[13px] tracking-wide text-red disabled:opacity-60"
+          className="display w-full border-danger/50 tracking-tight text-danger hover:bg-danger/5 active:bg-danger/5"
         >
           Retire this service
-        </button>
+        </Button>
         <p className="text-center text-[11px] text-muted">
           Retiring removes it from the roster — past reps and stats stay intact.
         </p>

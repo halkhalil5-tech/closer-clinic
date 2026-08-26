@@ -1,5 +1,7 @@
 "use client";
 
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { PriceConfig, PriceKind } from "@/lib/types";
 
 /** String-typed form state for price editing (shared by the edit sheet and builder). */
@@ -37,8 +39,7 @@ const KINDS: { id: PriceKind; label: string }[] = [
   { id: "program", label: "Program" },
 ];
 
-const inputCls =
-  "w-full border border-line bg-bg px-3 py-2.5 font-mono text-[15px] tabular-nums text-bone placeholder:text-muted focus:border-primary focus:outline-none";
+const inputCls = "font-mono text-[15px] tabular-nums text-bone";
 
 export function PriceFields({
   value,
@@ -50,26 +51,20 @@ export function PriceFields({
   const set = (patch: Partial<PriceFormState>) => onChange({ ...value, ...patch });
   return (
     <>
-      <div className="flex border-b border-hairline">
-        {KINDS.map((k) => (
-          <button
-            key={k.id}
-            type="button"
-            onClick={() => set({ kind: k.id })}
-            className={`display relative flex-1 pb-2 pt-1.5 text-[12px] transition-colors ${
-              value.kind === k.id ? "text-primary" : "text-muted"
-            }`}
-          >
-            {k.label}
-            {value.kind === k.id && <span className="absolute inset-x-0 -bottom-px h-0.5 bg-primary" />}
-          </button>
-        ))}
-      </div>
+      <Tabs value={value.kind} onValueChange={(v) => set({ kind: v as PriceFormState["kind"] })}>
+        <TabsList className="h-9">
+          {KINDS.map((k) => (
+            <TabsTrigger key={k.id} value={k.id} className="display text-[12px] tracking-normal">
+              {k.label}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </Tabs>
 
       <div className="mt-3 flex gap-3">
         <label className="flex-1">
           <span className="microlabel">Total price $</span>
-          <input
+          <Input
             inputMode="numeric"
             value={value.amount}
             onChange={(e) => set({ amount: e.target.value.replace(/\D/g, "") })}
@@ -80,7 +75,7 @@ export function PriceFields({
         {value.kind !== "single" && (
           <label className="w-24">
             <span className="microlabel">Sessions</span>
-            <input
+            <Input
               inputMode="numeric"
               value={value.sessions}
               onChange={(e) => set({ sessions: e.target.value.replace(/\D/g, "") })}
@@ -94,7 +89,7 @@ export function PriceFields({
       {value.kind === "program" && (
         <label className="mt-3 block">
           <span className="microlabel">Interval</span>
-          <input
+          <Input
             value={value.interval}
             onChange={(e) => set({ interval: e.target.value })}
             placeholder="every 2 months"
@@ -106,7 +101,7 @@ export function PriceFields({
       {value.kind !== "single" && (
         <label className="mt-3 block">
           <span className="microlabel">Single-session anchor $ (optional)</span>
-          <input
+          <Input
             inputMode="numeric"
             value={value.anchor}
             onChange={(e) => set({ anchor: e.target.value.replace(/\D/g, "") })}

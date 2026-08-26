@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { primeAudio } from "@/lib/voice/elevenlabs-client";
+import { Button } from "@/components/ui/button";
 
 export function FirstRepStart({ scenarioSlug, label }: { scenarioSlug: string; label?: string }) {
   const router = useRouter();
@@ -32,13 +33,9 @@ export function FirstRepStart({ scenarioSlug, label }: { scenarioSlug: string; l
   return (
     <>
       {error && <p className="mb-2 text-sm text-red">{error}</p>}
-      <button
-        onClick={start}
-        disabled={busy}
-        className="display w-full rounded-card bg-primary py-4 text-[16px] tracking-wide text-white disabled:opacity-60"
-      >
+      <Button size="lg" onClick={start} disabled={busy} className="display h-13 w-full text-[16px] tracking-tight">
         {busy ? "Opening the door" : (label ?? "Walk into the room")}
-      </button>
+      </Button>
     </>
   );
 }

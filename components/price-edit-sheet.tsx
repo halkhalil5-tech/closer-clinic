@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { PriceConfig } from "@/lib/types";
@@ -100,13 +101,9 @@ export function PriceEditSheet({ slug, title, initial, hasOverride, onClose }: P
         </div>
 
         {error && <p className="mt-2 text-sm text-red">{error}</p>}
-        <button
+        <Button size="lg"
           onClick={save}
-          disabled={busy || !preview}
-          className="display mt-4 w-full rounded-card bg-primary py-3.5 text-[15px] tracking-wide text-white disabled:opacity-40"
-        >
-          {busy ? "Saving" : "Save pricing"}
-        </button>
+          disabled={busy || !preview} className="display mt-4 w-full tracking-tight">{busy ? "Saving" : "Save pricing"}</Button>
       </div>
     </div>
   );
