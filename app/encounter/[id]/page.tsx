@@ -27,6 +27,7 @@ export default async function EncounterPage({ params }: { params: Promise<{ id: 
   return (
     <EncounterClient
       encounterId={encounter.id}
+      startedAt={encounter.startedAt}
       persona={encounter.persona}
       scenario={{
         title: scenario.title,

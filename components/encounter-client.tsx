@@ -17,6 +17,8 @@ interface ChatMessage {
 
 interface Props {
   encounterId: string;
+  /** ISO UTC creation time from the encounter record; missing → mount-time clock. */
+  startedAt?: string;
   persona: PersonaSnapshot;
   scenario: {
     title: string;
@@ -45,6 +47,7 @@ type MicState = "idle" | "recording" | "transcribing";
 
 export function EncounterClient({
   encounterId,
+  startedAt,
   persona,
   scenario,
   difficulty,
@@ -70,8 +73,16 @@ export function EncounterClient({
   const [sttSupported, setSttSupported] = useState(true);
   // Visual-only: is the patient's voice currently playing?
   const [speaking, setSpeaking] = useState(false);
-  // Visual-only: session clock.
-  const [elapsed, setElapsed] = useState(0);
+  // Visual-only: session clock, anchored to the encounter's real start time
+  // so a refresh mid-session keeps true elapsed time. Encounters without a
+  // parseable startedAt fall back to counting from mount.
+  const [clockAnchor] = useState(() => {
+    const t = startedAt ? Date.parse(startedAt) : NaN;
+    return Number.isFinite(t) ? t : Date.now();
+  });
+  const [elapsed, setElapsed] = useState(() =>
+    Math.max(0, Math.floor((Date.now() - clockAnchor) / 1000))
+  );
 
   const engine = useMemo(
     () => buildVoiceEngine(encounterId, voiceCaps),
@@ -94,9 +105,12 @@ export function EncounterClient({
   }, [engine]);
 
   useEffect(() => {
-    const t = setInterval(() => setElapsed((e) => e + 1), 1000);
+    const t = setInterval(
+      () => setElapsed(Math.max(0, Math.floor((Date.now() - clockAnchor) / 1000))),
+      1000
+    );
     return () => clearInterval(t);
-  }, []);
+  }, [clockAnchor]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
@@ -288,7 +302,7 @@ export function EncounterClient({
         <div className="flex items-center justify-between gap-3 px-4 pt-3">
           <div className="min-w-0">
             <div className="truncate text-[12.5px] font-medium text-muted">{scenario.title}</div>
-            <div className="font-mono text-[11px] tabular-nums text-faint">
+            <div className="font-mono text-[11px] tabular-nums text-faint" suppressHydrationWarning>
               {clock} · <span className={DIFF_COLOR[difficulty]}>{difficulty}</span>
             </div>
           </div>
