@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 /** Plain admin forms: create packs, attach stations, mint codes. No design work. */
 
@@ -54,14 +55,18 @@ export function PackCreateForm() {
       <input className={input} placeholder="Vendor" value={vendor} onChange={(e) => setVendor(e.target.value)} />
       <div className="flex gap-2">
         <input className={input} placeholder="#accent" value={accent} onChange={(e) => setAccent(e.target.value)} />
-        <select
-          className={input}
+        <Select
           value={distribution}
-          onChange={(e) => setDistribution(e.target.value as "code" | "public")}
+          onValueChange={(v) => setDistribution(v as "code" | "public")}
         >
-          <option value="code">code</option>
-          <option value="public">public</option>
-        </select>
+          <SelectTrigger className="h-9 text-[13px]">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="code">code</SelectItem>
+            <SelectItem value="public">public</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
       <button className={btn} disabled={busy || !name || !vendor} onClick={submit}>
         Create pack
