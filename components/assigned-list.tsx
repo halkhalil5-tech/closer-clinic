@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { CheckCircle2, Circle, CircleDot } from "lucide-react";
 
 export interface AssignedItem {
   id: string;
@@ -68,16 +69,11 @@ export function AssignedList({ items }: { items: AssignedItem[] }) {
             className="flex w-full items-center gap-3 py-3 text-left transition-colors hover:bg-raised active:bg-raised disabled:opacity-100"
           >
             {a.state === "done" ? (
-              <svg viewBox="0 0 20 20" className="h-4.5 w-4.5 shrink-0 text-mint" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="10" cy="10" r="8.25" />
-                <path d="m6.5 10.5 2.3 2.3 4.7-5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
+              <CheckCircle2 className="h-5 w-5 shrink-0 text-[#2ec4a5]" strokeWidth={1.5} />
+            ) : a.state === "in_progress" ? (
+              <CircleDot className="h-5 w-5 shrink-0 text-teal" strokeWidth={1.5} />
             ) : (
-              <span
-                className={`h-1.5 w-1.5 shrink-0 rounded-full ${
-                  a.state === "in_progress" ? "bg-bone" : "bg-faint"
-                }`}
-              />
+              <Circle className="h-5 w-5 shrink-0 text-faint" strokeWidth={1.5} />
             )}
             <span className="min-w-0 flex-1">
               <span className="block truncate text-[13.5px] font-semibold text-ink">{a.title}</span>
@@ -88,8 +84,8 @@ export function AssignedList({ items }: { items: AssignedItem[] }) {
               </span>
             </span>
             <span
-              className={`shrink-0 border px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-[0.12em] ${
-                a.state === "done" ? "border-mint/50 text-mint" : TONE_CLS[a.tone]
+              className={`shrink-0 rounded-md border px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-[0.12em] ${
+                a.state === "done" ? "border-[#2ec4a5]/50 text-[#1d8f77]" : TONE_CLS[a.tone]
               }`}
             >
               {a.state === "done" ? "done" : busy === a.id ? "…" : a.dueLabel}

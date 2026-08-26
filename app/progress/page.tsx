@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Stethoscope } from "lucide-react";
 import { redirect } from "next/navigation";
 import { getAuthedUser } from "@/lib/auth";
 import { getStore, listRosterForUser } from "@/lib/store";
@@ -388,11 +389,15 @@ export default async function ProgressPage({
         <section className="mt-4">
           <div className="microlabel">Recent reps</div>
           {recent.length === 0 ? (
-            <div className="mt-2 border border-line bg-panel p-5 text-center text-sm text-dim">
-              No graded encounters in this window.{" "}
-              <Link href="/home" className="font-semibold text-mint">
-                Walk into a room →
-              </Link>
+            <div className="mt-2 flex flex-col items-center gap-2 rounded-xl border border-line bg-panel p-8 text-center">
+              <Stethoscope className="h-5 w-5 text-faint" strokeWidth={1.5} />
+              <p className="text-sm text-muted">
+                No graded reps in this window —{" "}
+                <Link href="/home" className="font-semibold text-teal">
+                  walk into a room
+                </Link>
+                .
+              </p>
             </div>
           ) : (
             <div className="mt-1.5 border border-line">

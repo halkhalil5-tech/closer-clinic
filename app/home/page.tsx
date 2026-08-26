@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Zap } from "lucide-react";
+import { Flame, Zap } from "lucide-react";
 import { redirect } from "next/navigation";
 import { getAuthedUser } from "@/lib/auth";
 import { getStore, listRosterForUser } from "@/lib/store";
@@ -119,9 +119,7 @@ export default async function HomePage({
           </span>
           <span className="microlabel">7d</span>
           <span className="flex items-center gap-1">
-            <svg viewBox="0 0 20 20" className="h-3.5 w-3.5 text-amber" fill="currentColor" aria-hidden="true">
-              <path d="M10 1.8c.6 2.6-.5 4-1.7 5.3C7 8.5 5.7 9.9 5.7 12.4a4.8 4.8 0 0 0 9.6 0c0-1.5-.5-2.6-1.1-3.7-.3.7-.8 1.2-1.4 1.5.3-2.7-.7-6.2-2.8-8.4Z" />
-            </svg>
+            <Flame className="h-3.5 w-3.5 text-amber" strokeWidth={1.5} aria-hidden="true" />
             <span className="font-mono text-[13px] font-semibold tabular-nums text-dim">
               {stats.streakDays}
             </span>

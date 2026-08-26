@@ -57,10 +57,15 @@ export function ObjectionDeck({ cards, shuffled }: { cards: ObjectionCard[]; shu
             <button
               key={c.id}
               onClick={() => setFlipped((f) => ({ ...f, [i]: !f[i] }))}
-              className="flex w-full shrink-0 snap-center flex-col justify-center px-6 text-left"
+              className="flex w-full shrink-0 snap-center px-4 py-2 text-left"
+              style={{ perspective: "1200px" }}
             >
-              {!isFlipped ? (
-                <>
+              <div
+                className={`relative h-full w-full transition-transform duration-300 [transform-style:preserve-3d] ${
+                  isFlipped ? "[transform:rotateY(180deg)]" : ""
+                }`}
+              >
+                <div className="absolute inset-0 flex flex-col justify-center rounded-xl border border-line bg-bg p-6 shadow-sm [backface-visibility:hidden]">
                   <div className="flex items-center gap-2">
                     <span className={`font-mono text-[10px] font-bold uppercase tracking-[0.16em] ${DIFF_COLOR[c.difficulty]}`}>
                       {c.difficulty}
@@ -77,9 +82,8 @@ export function ObjectionDeck({ cards, shuffled }: { cards: ObjectionCard[]; shu
                   <div className="mt-6 font-mono text-[10px] uppercase tracking-[0.2em] text-muted">
                     Tap for the play
                   </div>
-                </>
-              ) : (
-                <>
+                </div>
+                <div className="absolute inset-0 flex flex-col justify-center overflow-y-auto rounded-xl border border-line bg-card p-6 [transform:rotateY(180deg)] [backface-visibility:hidden]">
                   <div className="text-[13px] italic leading-snug text-ink/60">&ldquo;{c.front}&rdquo;</div>
                   <div className="mt-5 flex flex-col gap-4">
                     <div>
@@ -95,8 +99,8 @@ export function ObjectionDeck({ cards, shuffled }: { cards: ObjectionCard[]; shu
                       <p className="mt-1 text-[15px] leading-snug text-ink">{c.back.close}</p>
                     </div>
                   </div>
-                </>
-              )}
+                </div>
+              </div>
             </button>
           );
         })}

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { LayoutGrid } from "lucide-react";
 import type { Difficulty, PriceConfig, Scenario } from "@/lib/types";
 import type { UnlockedPack } from "@/lib/packs";
 import { guessConfigFromScenario } from "@/lib/pricing";
@@ -63,10 +64,10 @@ export function HomeClient({
     const price = splitPrice(s.priceDisplay);
     const isEdited = edited.has(s.slug);
     return (
-      <div className="relative">
+      <div className="card-lift relative mb-2 overflow-hidden rounded-xl border border-line bg-bg shadow-sm">
         <button
           onClick={() => setLaunching(s)}
-          className="group relative block min-h-[44px] w-full py-3.5 pl-3.5 pr-9 text-left transition-colors hover:bg-raised active:bg-raised"
+          className="group relative block min-h-[44px] w-full py-3.5 pl-4 pr-10 text-left"
         >
           <span
             className={`absolute inset-y-0 left-0 w-[3px] transition-all group-hover:w-[5px] group-active:w-[5px] ${
@@ -199,7 +200,7 @@ export function HomeClient({
             <div className="microlabel">Your services</div>
             <div className="text-xs text-muted">{customScenarios.length}</div>
           </div>
-          <div className="mt-1 divide-y divide-hairline">
+          <div className="mt-2">
             {customScenarios.map((s) => (
               <StationRow key={s.slug} s={s} />
             ))}
@@ -251,11 +252,12 @@ export function HomeClient({
         )}
 
         {visibleScenarios.length === 0 ? (
-          <p className="mt-3 py-6 text-center text-sm text-dim">
-            No scenarios for your specialty yet. More are on the way.
-          </p>
+          <div className="mt-3 flex flex-col items-center gap-2 py-8 text-center">
+            <LayoutGrid className="h-5 w-5 text-faint" strokeWidth={1.5} />
+            <p className="text-sm text-muted">No stations here yet.</p>
+          </div>
         ) : (
-          <div className="divide-y divide-hairline">
+          <div className="mt-2">
             {visibleScenarios.map((s) => (
               <StationRow key={s.slug} s={s} />
             ))}
@@ -287,12 +289,12 @@ export function HomeClient({
               </div>
               <div className="text-xs text-muted">{pack.vendor}</div>
             </div>
-            <div className="mt-1 divide-y divide-hairline">
+            <div className="mt-2">
               {stations.map((s) => (
-                <div key={s.slug} className="relative">
+                <div key={s.slug} className="card-lift relative mb-2 overflow-hidden rounded-xl border border-line bg-bg shadow-sm">
                   <button
                     onClick={() => setLaunching(s)}
-                    className="group relative block min-h-[44px] w-full py-3.5 pl-3.5 pr-3 text-left transition-colors hover:bg-raised active:bg-raised"
+                    className="group relative block min-h-[44px] w-full py-3.5 pl-4 pr-4 text-left"
                   >
                     <span
                       className="absolute inset-y-0 left-0 w-[3px] transition-all group-hover:w-[5px]"
