@@ -1,5 +1,7 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -50,7 +52,7 @@ export function AssignmentCreate({ stations }: { stations: StationOpt[] }) {
   }
 
   const selectCls =
-    "mt-1 w-full border border-line bg-panel px-2.5 py-2 text-[13px] text-ink focus:border-primary focus:outline-none";
+    "mt-1 h-9 bg-panel text-[13px]";
 
   return (
     <div className="raised mt-2 rounded-card px-3.5 pb-3.5 pt-3">
@@ -70,11 +72,11 @@ export function AssignmentCreate({ stations }: { stations: StationOpt[] }) {
       <div className="mt-2.5 flex gap-2.5">
         <label className="flex-1">
           <span className="text-[11px] text-muted">Due</span>
-          <input type="date" value={dueAt} onChange={(e) => setDueAt(e.target.value)} className={selectCls} />
+          <Input type="date" value={dueAt} onChange={(e) => setDueAt(e.target.value)} className={selectCls} />
         </label>
         <label className="w-16">
           <span className="text-[11px] text-muted">Reps</span>
-          <input
+          <Input
             inputMode="numeric"
             value={reps}
             onChange={(e) => setReps(e.target.value.replace(/\D/g, ""))}
@@ -98,13 +100,12 @@ export function AssignmentCreate({ stations }: { stations: StationOpt[] }) {
         </label>
       </div>
       {error && <p className="mt-2 text-sm text-red">{error}</p>}
-      <button
+      <Button size="lg"
         onClick={create}
         disabled={busy}
-        className="display mt-3 w-full rounded-card bg-primary py-2.5 text-[13px] tracking-wide text-white disabled:opacity-60"
-      >
-        {busy ? "Assigning" : "Assign to team"}
-      </button>
+        className="display w-full tracking-tight">
+          {busy ? "Assigning" : "Assign to team"}
+        </Button>
     </div>
   );
 }
@@ -113,7 +114,9 @@ export function AssignmentRetire({ id }: { id: string }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   return (
-    <button
+    <Button
+      variant="ghost"
+      size="sm"
       onClick={async () => {
         setBusy(true);
         await fetch("/api/assignments", {
@@ -127,6 +130,6 @@ export function AssignmentRetire({ id }: { id: string }) {
       className="shrink-0 font-mono text-[9px] font-semibold uppercase tracking-[0.12em] text-muted underline disabled:opacity-50"
     >
       retire
-    </button>
+    </Button>
   );
 }

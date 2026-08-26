@@ -1,5 +1,7 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -145,13 +147,13 @@ export function SiteImport() {
             services and prices only, never testimonials or anything
             patient-shaped — and turn them into training stations.
           </p>
-          <input
+          <Input
             value={url}
             onChange={(e) => setUrl(e.target.value)}
             placeholder="yourpractice.com"
             inputMode="url"
             autoCapitalize="none"
-            className="mt-5 w-full border border-line bg-bg px-3 py-3 font-mono text-[15px] text-ink placeholder:text-muted focus:border-primary focus:outline-none"
+            className="mt-5 h-13 font-mono text-[15px]"
           />
           {error && (
             <p className="mt-3 text-sm text-red">
@@ -164,13 +166,12 @@ export function SiteImport() {
             </p>
           )}
           <div className="mt-auto pt-6">
-            <button
+            <Button size="lg"
               onClick={scan}
               disabled={busy || url.trim().length < 4}
-              className="display w-full rounded-card bg-primary py-3.5 text-[15px] tracking-wide text-white disabled:opacity-40"
-            >
-              {busy ? "Reading your site" : "Scan my website"}
-            </button>
+              className="display w-full tracking-tight">
+                {busy ? "Reading your site" : "Scan my website"}
+              </Button>
             <p className="mt-2 text-center text-[11px] text-muted">Up to 10 pages · 3 imports per day</p>
           </div>
         </>
@@ -201,7 +202,7 @@ export function SiteImport() {
                   </svg>
                 </button>
                 <div className={`min-w-0 flex-1 ${s.include ? "" : "opacity-40"}`}>
-                  <input
+                  <Input
                     value={s.name}
                     onChange={(e) =>
                       setFound((f) => f.map((x, j) => (j === i ? { ...x, name: e.target.value } : x)))
@@ -212,13 +213,13 @@ export function SiteImport() {
                     <p className="mt-0.5 truncate text-[11.5px] text-muted">{s.description}</p>
                   )}
                 </div>
-                <input
+                <Input
                   value={s.price ?? ""}
                   placeholder="$—"
                   onChange={(e) =>
                     setFound((f) => f.map((x, j) => (j === i ? { ...x, price: e.target.value } : x)))
                   }
-                  className={`w-20 shrink-0 border border-line bg-bg px-2 py-1.5 text-right font-mono text-[13px] tabular-nums focus:border-primary focus:outline-none ${
+                  className={`h-8 w-20 shrink-0 px-2 text-right font-mono text-[13px] tabular-nums focus:border-primary focus:outline-none ${
                     parseAmount(s.price) > 0 ? "text-bone" : "text-amber"
                   }`}
                 />
@@ -227,15 +228,16 @@ export function SiteImport() {
           </div>
           {error && <p className="mt-3 text-sm text-red">{error}</p>}
           <div className="mt-auto pt-5">
-            <button
+            <Button
+              size="lg"
               onClick={confirmChecklist}
               disabled={busy || found.every((s) => !s.include)}
-              className="display w-full rounded-card bg-primary py-3.5 text-[15px] tracking-wide text-white disabled:opacity-40"
+              className="display w-full tracking-tight"
             >
               {busy
                 ? "Writing your stations"
                 : `Build ${found.filter((s) => s.include).length} station${found.filter((s) => s.include).length === 1 ? "" : "s"}`}
-            </button>
+            </Button>
           </div>
         </>
       )}
@@ -253,20 +255,21 @@ export function SiteImport() {
           </div>
           {error && <p className="mt-3 text-sm text-red">{error}</p>}
           <div className="mt-6 flex flex-col gap-2">
-            <button
+            <Button size="lg"
               onClick={saveCurrent}
               disabled={busy}
-              className="display w-full rounded-card bg-primary py-3.5 text-[15px] tracking-wide text-white disabled:opacity-60"
-            >
-              {busy ? "Saving" : "Save & continue"}
-            </button>
-            <button
+              className="display w-full tracking-tight">
+                {busy ? "Saving" : "Save & continue"}
+              </Button>
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={() => generateNext(queue.slice(1))}
               disabled={busy}
-              className="w-full py-2 text-center font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-muted"
+              className="w-full font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-muted"
             >
               Skip this one
-            </button>
+            </Button>
           </div>
         </>
       )}
@@ -283,15 +286,16 @@ export function SiteImport() {
           <p className="mt-2 text-[13px] text-muted">
             They&apos;re live under &ldquo;Your services&rdquo; — with your real prices.
           </p>
-          <button
+          <Button
+            size="lg"
             onClick={() => {
               router.push("/home");
               router.refresh();
             }}
-            className="display mt-6 w-full rounded-card bg-primary py-3.5 text-[15px] tracking-wide text-white"
+            className="display mt-6 w-full tracking-tight"
           >
             See the roster
-          </button>
+          </Button>
         </div>
       )}
     </main>

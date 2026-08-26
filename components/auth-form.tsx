@@ -1,5 +1,7 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -26,12 +28,9 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
           Dev mode — Supabase isn&apos;t configured, so there&apos;s no real sign-in. You&apos;ll
           practice as a local dev user.
         </div>
-        <button
-          onClick={() => router.push("/home")}
-          className="display h-12 bg-primary text-[14px] tracking-wide text-white"
-        >
+        <Button size="lg" onClick={() => router.push("/home")} className="display tracking-tight">
           Continue in dev mode
-        </button>
+        </Button>
       </div>
     );
   }
@@ -81,12 +80,12 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
   }
 
   const inputCls =
-    "h-11 border border-line bg-panel px-3 text-[14px] text-ink placeholder:text-faint focus:border-primary focus:outline-none";
+    "bg-panel text-[14px]";
 
   return (
     <form onSubmit={submit} className="flex flex-col gap-2.5">
       {mode === "signup" && (
-        <input
+        <Input
           className={inputCls}
           placeholder="Your name"
           value={name}
@@ -94,7 +93,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
           autoComplete="name"
         />
       )}
-      <input
+      <Input
         className={inputCls}
         type="email"
         required
@@ -103,7 +102,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
         onChange={(e) => setEmail(e.target.value)}
         autoComplete="email"
       />
-      <input
+      <Input
         className={inputCls}
         type="password"
         required
@@ -121,13 +120,12 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
         <div className="border border-primary/50 bg-primary/10 p-2.5 text-[13px] text-primary">{notice}</div>
       )}
 
-      <button
+      <Button size="lg"
         type="submit"
         disabled={busy}
-        className="display h-12 bg-primary text-[14px] tracking-wide text-white disabled:opacity-50"
-      >
-        {busy ? "One sec" : mode === "signup" ? "Create account" : "Sign in"}
-      </button>
+        className="display tracking-tight">
+          {busy ? "One sec" : mode === "signup" ? "Create account" : "Sign in"}
+        </Button>
 
       <div className="my-0.5 flex items-center gap-3">
         <div className="h-px flex-1 bg-line" />
@@ -135,14 +133,16 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
         <div className="h-px flex-1 bg-line" />
       </div>
 
-      <button
+      <Button
         type="button"
+        variant="outline"
+        size="lg"
         onClick={signInWithGoogle}
         disabled={busy}
-        className="h-12 border border-line bg-panel text-[14px] font-medium text-ink disabled:opacity-50"
+        className="border-line bg-panel font-medium"
       >
         Continue with Google
-      </button>
+      </Button>
 
       <p className="mt-2 text-center text-[13px] text-muted">
         {mode === "signup" ? (

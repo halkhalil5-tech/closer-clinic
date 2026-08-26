@@ -1,5 +1,7 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -15,10 +17,8 @@ async function post(body: Record<string, unknown>) {
   return { ok: res.ok, data: await res.json().catch(() => ({})) };
 }
 
-const input =
-  "w-full border border-line bg-panel px-2 py-1.5 text-[13px] text-ink placeholder:text-muted focus:border-primary focus:outline-none";
-const btn =
-  "rounded-card border border-line-strong px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.1em] text-bone disabled:opacity-50";
+const input = "h-9 bg-panel text-[13px]";
+const btn = "h-8 px-3 font-mono text-[10px] font-semibold uppercase tracking-[0.1em]";
 
 export function PackCreateForm() {
   const router = useRouter();
@@ -51,10 +51,10 @@ export function PackCreateForm() {
 
   return (
     <div className="mt-2 flex flex-col gap-2">
-      <input className={input} placeholder="Pack name" value={name} onChange={(e) => setName(e.target.value)} />
-      <input className={input} placeholder="Vendor" value={vendor} onChange={(e) => setVendor(e.target.value)} />
+      <Input className={input} placeholder="Pack name" value={name} onChange={(e) => setName(e.target.value)} />
+      <Input className={input} placeholder="Vendor" value={vendor} onChange={(e) => setVendor(e.target.value)} />
       <div className="flex gap-2">
-        <input className={input} placeholder="#accent" value={accent} onChange={(e) => setAccent(e.target.value)} />
+        <Input className={input} placeholder="#accent" value={accent} onChange={(e) => setAccent(e.target.value)} />
         <Select
           value={distribution}
           onValueChange={(v) => setDistribution(v as "code" | "public")}
@@ -68,9 +68,9 @@ export function PackCreateForm() {
           </SelectContent>
         </Select>
       </div>
-      <button className={btn} disabled={busy || !name || !vendor} onClick={submit}>
+      <Button variant="outline" size="sm" className={btn} disabled={busy || !name || !vendor} onClick={submit}>
         Create pack
-      </button>
+      </Button>
       {msg && <p className="text-[12px] text-muted">{msg}</p>}
     </div>
   );
@@ -119,18 +119,18 @@ export function PackRow({
         codes: {pack.codes.length ? pack.codes.join(", ") : "none"}
       </div>
       <div className="mt-2 flex gap-2">
-        <input
+        <Input
           className={input}
           placeholder="slugs to attach (-slug detaches)"
           value={slugs}
           onChange={(e) => setSlugs(e.target.value)}
         />
-        <button className={btn} disabled={busy || !slugs} onClick={attach}>
+        <Button variant="outline" size="sm" className={btn} disabled={busy || !slugs} onClick={attach}>
           Attach
-        </button>
-        <button className={btn} disabled={busy} onClick={mint}>
+        </Button>
+        <Button variant="outline" size="sm" className={btn} disabled={busy} onClick={mint}>
           + Code
-        </button>
+        </Button>
       </div>
       {msg && <p className="mt-1 text-[12px] text-muted">{msg}</p>}
     </div>

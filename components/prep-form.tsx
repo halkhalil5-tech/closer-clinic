@@ -1,5 +1,8 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -77,7 +80,7 @@ export function PrepForm({ services, conditions, archetypes }: Props) {
   }
 
   const selectCls =
-    "mt-1 w-full border border-line bg-panel px-3 py-2.5 text-[14px] text-ink focus:border-primary focus:outline-none";
+    "mt-1 bg-panel text-[14px]";
 
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col px-4 pb-8 pt-[calc(env(safe-area-inset-top)+0.75rem)]">
@@ -120,12 +123,12 @@ export function PrepForm({ services, conditions, archetypes }: Props) {
           </label>
         </div>
         {condition === "__other" && (
-          <input
+          <Input
             value={otherCondition}
             onChange={(e) => setOtherCondition(e.target.value)}
             maxLength={120}
             placeholder="Name the condition"
-            className="w-full border border-line bg-bg px-3 py-2.5 text-[14px] text-ink placeholder:text-muted focus:border-primary focus:outline-none"
+            className="text-[14px]"
           />
         )}
 
@@ -175,11 +178,11 @@ export function PrepForm({ services, conditions, archetypes }: Props) {
               {worry.length}/{WORRY_MAX_CHARS}
             </span>
           </div>
-          <input
+          <Input
             value={worry}
             onChange={(e) => setWorry(e.target.value.slice(0, WORRY_MAX_CHARS))}
             placeholder="e.g. they think insurance should cover it"
-            className="mt-1 w-full border border-line bg-bg px-3 py-2.5 text-[14px] text-ink placeholder:text-muted focus:border-primary focus:outline-none"
+            className="mt-1 text-[14px]"
           />
           <span className="mt-1 block text-[11px] text-muted">
             No names, dates, or real patient details.
@@ -188,20 +191,15 @@ export function PrepForm({ services, conditions, archetypes }: Props) {
 
         <div>
           <span className="microlabel">Difficulty</span>
-          <div className="mt-1 flex border-b border-hairline">
-            {(["easy", "moderate", "hard"] as Difficulty[]).map((d) => (
-              <button
-                key={d}
-                onClick={() => setDifficulty(d)}
-                className={`display relative flex-1 pb-2 pt-1.5 text-[12px] capitalize transition-colors ${
-                  difficulty === d ? "text-primary" : "text-muted"
-                }`}
-              >
-                {d}
-                {difficulty === d && <span className="absolute inset-x-0 -bottom-px h-0.5 bg-primary" />}
-              </button>
-            ))}
-          </div>
+          <Tabs value={difficulty} onValueChange={(v) => setDifficulty(v as Difficulty)} className="mt-1">
+            <TabsList className="h-9">
+              {(["easy", "moderate", "hard"] as Difficulty[]).map((d) => (
+                <TabsTrigger key={d} value={d} className="display text-[12px] capitalize tracking-normal">
+                  {d}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
           <p className="mt-1 text-[11px] text-muted">
             Defaults to Hard — prep should be harder than the real thing.
           </p>
@@ -210,13 +208,12 @@ export function PrepForm({ services, conditions, archetypes }: Props) {
 
       {error && <p className="mt-3 text-sm text-red">{error}</p>}
       <div className="mt-auto pt-6">
-        <button
+        <Button size="lg"
           onClick={start}
           disabled={busy}
-          className="display w-full rounded-card bg-primary py-3.5 text-[15px] tracking-wide text-white disabled:opacity-60"
-        >
-          {busy ? "Building the sim" : "Walk into the prep room"}
-        </button>
+          className="display w-full tracking-tight">
+            {busy ? "Building the sim" : "Walk into the prep room"}
+          </Button>
       </div>
     </main>
   );
