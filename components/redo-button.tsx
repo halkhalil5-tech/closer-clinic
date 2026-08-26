@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
 export function RedoButton({
   encounterId,
@@ -34,19 +35,17 @@ export function RedoButton({
 
   return (
     <div className="flex flex-col gap-2">
-      <button
+      <Button
+        variant={paper || !primary ? "outline" : "default"}
+        size="lg"
         onClick={redo}
         disabled={busy}
-        className={`display w-full transition-opacity disabled:opacity-60 ${
-          paper
-            ? "border-2 border-paper-ink py-2.5 text-[13px] tracking-wide text-paper-ink"
-            : primary
-              ? "rounded-card bg-primary py-3.5 text-[15px] tracking-wide text-white"
-              : "rounded-card border border-line-strong py-3.5 text-[15px] tracking-wide text-bone"
+        className={`display w-full tracking-tight ${
+          paper ? "rounded-xl border-2 border-paper-ink text-paper-ink hover:bg-paper-ink/5 active:bg-paper-ink/5" : ""
         }`}
       >
         {busy ? "Rewinding the room" : "Redo the moment"}
-      </button>
+      </Button>
       {error && <div className="text-center text-sm text-red">{error}</div>}
     </div>
   );

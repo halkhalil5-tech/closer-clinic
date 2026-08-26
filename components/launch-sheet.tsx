@@ -4,6 +4,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { primeAudio } from "@/lib/voice/elevenlabs-client";
 import { PairPlayer } from "@/components/pair-player";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { Difficulty, Scenario } from "@/lib/types";
 
 const DIFFICULTIES: { id: Difficulty; label: string; blurb: string }[] = [
@@ -66,22 +69,19 @@ export function LaunchSheet({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60" onClick={onClose}>
-      <div
-        className="raised w-full max-w-md rounded-t-xl px-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-3"
-        onClick={(e) => e.stopPropagation()}
-      >
+    <Dialog open onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="bottom-0 top-auto max-w-md translate-y-0 rounded-b-none rounded-t-xl border-b-0 p-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-3 data-[state=closed]:zoom-out-100 data-[state=open]:zoom-in-100 data-[state=closed]:slide-out-to-bottom-4 data-[state=open]:slide-in-from-bottom-4">
         <div className="mx-auto h-1 w-9 rounded-full bg-line" />
 
-        <div className="mt-3 flex items-baseline justify-between gap-3">
-          <span className="display-title min-w-0 flex-1 text-[19px] text-bone">
+        <div className="mt-1 flex items-baseline justify-between gap-3 pr-8">
+          <DialogTitle className="display-title min-w-0 flex-1 text-[19px] font-semibold tracking-normal text-bone">
             {scenario.title}
             {scenario.isCustom && (
               <span className="ml-2 align-middle font-mono text-[8px] font-bold uppercase tracking-[0.16em] text-muted">
                 Custom
               </span>
             )}
-          </span>
+          </DialogTitle>
           <span className="shrink-0 font-mono text-[16px] font-semibold tabular-nums text-bone">
             {scenario.priceDisplay}
           </span>
@@ -90,24 +90,16 @@ export function LaunchSheet({
           &ldquo;{scenario.patientCc}&rdquo;
         </p>
 
-        <div className="mt-4 microlabel">Difficulty</div>
-        <div className="mt-1 flex border-b border-hairline">
-          {DIFFICULTIES.map((d) => {
-            const on = difficulty === d.id;
-            return (
-              <button
-                key={d.id}
-                onClick={() => setDifficulty(d.id)}
-                className={`display relative min-h-[44px] flex-1 pb-2.5 pt-2 text-[13px] transition-colors active:text-ink ${
-                  on ? "text-primary" : "text-muted"
-                }`}
-              >
+        <div className="microlabel mt-2">Difficulty</div>
+        <Tabs value={difficulty} onValueChange={(v) => setDifficulty(v as Difficulty)} className="mt-1">
+          <TabsList>
+            {DIFFICULTIES.map((d) => (
+              <TabsTrigger key={d.id} value={d.id} className="display text-[13px] tracking-normal">
                 {d.label}
-                {on && <span className="absolute inset-x-0 -bottom-px h-0.5 bg-primary" />}
-              </button>
-            );
-          })}
-        </div>
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
         <p className="mt-1.5 min-h-4 text-xs text-muted">
           {DIFFICULTIES.find((d) => d.id === difficulty)?.blurb}
         </p>
@@ -124,14 +116,10 @@ export function LaunchSheet({
         </a>
 
         {error && <p className="mt-2 text-sm text-red">{error}</p>}
-        <button
-          onClick={start}
-          disabled={starting}
-          className="display mt-4 w-full rounded-card bg-primary py-3.5 text-[15px] tracking-wide text-white transition-opacity disabled:opacity-70"
-        >
+        <Button size="lg" onClick={start} disabled={starting} className="display mt-2 w-full tracking-tight">
           {starting ? "Prepping the room" : "Start rep"}
-        </button>
-      </div>
-    </div>
+        </Button>
+      </DialogContent>
+    </Dialog>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
 export function PrepRerunButton({ encounterId }: { encounterId: string }) {
   const router = useRouter();
@@ -29,13 +30,9 @@ export function PrepRerunButton({ encounterId }: { encounterId: string }) {
 
   return (
     <div className="flex flex-col gap-2">
-      <button
-        onClick={rerun}
-        disabled={busy}
-        className="display w-full rounded-card bg-primary py-3.5 text-[15px] tracking-wide text-white disabled:opacity-60"
-      >
+      <Button size="lg" onClick={rerun} disabled={busy} className="display w-full tracking-tight">
         {busy ? "Re-rolling the patient" : "Again, different personality"}
-      </button>
+      </Button>
       {error && <div className="text-center text-sm text-red">{error}</div>}
     </div>
   );

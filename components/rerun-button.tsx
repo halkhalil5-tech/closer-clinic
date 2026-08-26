@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Difficulty } from "@/lib/types";
+import { Button } from "@/components/ui/button";
 
 export function RerunButton({
   scenarioSlug,
@@ -38,17 +39,15 @@ export function RerunButton({
 
   return (
     <div className="flex flex-col gap-2">
-      <button
+      <Button
+        variant={secondary ? "outline" : "default"}
+        size="lg"
         onClick={rerun}
         disabled={busy}
-        className={`display w-full py-3.5 text-[15px] tracking-wide transition-opacity disabled:opacity-60 ${
-          secondary
-            ? "rounded-card border border-line-strong text-bone"
-            : "rounded-card bg-primary text-white"
-        }`}
+        className="display w-full tracking-tight"
       >
         {busy ? "Prepping the room" : "Same station, new patient"}
-      </button>
+      </Button>
       {error && <div className="text-center text-sm text-red">{error}</div>}
     </div>
   );

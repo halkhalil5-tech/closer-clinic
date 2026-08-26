@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
 export function TestOutStart() {
   const router = useRouter();
@@ -26,13 +27,9 @@ export function TestOutStart() {
   return (
     <>
       {error && <p className="mb-2 text-sm text-red">{error}</p>}
-      <button
-        onClick={start}
-        disabled={busy}
-        className="display w-full rounded-card bg-primary py-3.5 text-[15px] tracking-wide text-white disabled:opacity-60"
-      >
+      <Button size="lg" onClick={start} disabled={busy} className="display w-full tracking-tight">
         {busy ? "Prepping the room" : "Start the challenge rep"}
-      </button>
+      </Button>
     </>
   );
 }
