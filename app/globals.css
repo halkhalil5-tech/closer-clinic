@@ -59,7 +59,7 @@
   --color-warn: #c9a227;
 
   /* ---- type: two families only ---- */
-  --font-display: var(--font-general-sans), "General Sans", system-ui, sans-serif;
+  --font-display: var(--font-cabinet-grotesk), "Cabinet Grotesk", "Avenir Next", "Helvetica Neue", Arial, sans-serif;
   --font-body: var(--font-inter), "Inter", system-ui, sans-serif;
   /* numerals & labels: same body family, tabular — no third family */
   --font-mono: var(--font-inter), "Inter", system-ui, sans-serif;

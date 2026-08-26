@@ -6,15 +6,18 @@ import { RegisterSW } from "@/components/register-sw";
 import { AudioUnlock } from "@/components/audio-unlock";
 import { Toaster } from "sonner";
 
-// Headings: General Sans (Fontshare), 700, tight tracking.
-const generalSans = localFont({
+// Headings: Cabinet Grotesk (Fontshare/ITF license), self-hosted woff2.
+// next/font/local generates a size-adjusted local fallback automatically,
+// so swapped-in headings don't shift layout.
+const cabinetGrotesk = localFont({
   src: [
-    { path: "./fonts/general-sans-500.woff2", weight: "500", style: "normal" },
-    { path: "./fonts/general-sans-600.woff2", weight: "600", style: "normal" },
-    { path: "./fonts/general-sans-700.woff2", weight: "700", style: "normal" },
+    { path: "./fonts/cabinet-grotesk-500.woff2", weight: "500", style: "normal" },
+    { path: "./fonts/cabinet-grotesk-700.woff2", weight: "700", style: "normal" },
+    { path: "./fonts/cabinet-grotesk-800.woff2", weight: "800", style: "normal" },
   ],
-  variable: "--font-general-sans",
+  variable: "--font-cabinet-grotesk",
   display: "swap",
+  fallback: ["Avenir Next", "Helvetica Neue", "Arial", "sans-serif"],
 });
 
 // Body/UI: Inter 400/500. Numerals ride the same family with tabular-nums.
@@ -51,7 +54,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${generalSans.variable} ${inter.variable}`}>
+    <html lang="en" className={`${cabinetGrotesk.variable} ${inter.variable}`}>
       <body>
         {children}
         <RegisterSW />
