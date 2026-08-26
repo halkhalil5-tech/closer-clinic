@@ -3,7 +3,7 @@ import Link from "next/link";
 export default function NotFound() {
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col justify-center px-5">
-      <div className="microlabel text-mint">404</div>
+      <div className="microlabel text-primary">404</div>
       <h1 className="display mt-3 text-[32px] text-ink">
         That room
         <br />
@@ -15,7 +15,7 @@ export default function NotFound() {
       </p>
       <Link
         href="/home"
-        className="display mt-6 inline-block w-fit bg-mint px-6 py-3 text-[14px] tracking-wide text-mint-ink"
+        className="display mt-6 inline-block w-fit bg-primary px-6 py-3 text-[14px] tracking-wide text-white"
       >
         Back to stations
       </Link>

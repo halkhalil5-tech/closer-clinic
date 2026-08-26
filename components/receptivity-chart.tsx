@@ -65,9 +65,9 @@ export function ReceptivityChart({ values }: { values: number[] }) {
           <Area
             type="monotone"
             dataKey="value"
-            stroke="#10707f"
+            stroke="var(--color-primary)"
             strokeWidth={2}
-            fill="#2ec4a5"
+            fill="var(--color-success)"
             fillOpacity={0.12}
             dot={(props) => {
               const { key, payload, cx, cy } = props as {
@@ -82,7 +82,7 @@ export function ReceptivityChart({ values }: { values: number[] }) {
                   cx={cx}
                   cy={cy}
                   r={payload.dip ? 4 : 2}
-                  fill={payload.dip ? "#b0483a" : "#10707f"}
+                  fill={payload.dip ? "var(--color-danger)" : "var(--color-primary)"}
                   stroke="#ffffff"
                   strokeWidth={payload.dip ? 1.5 : 0}
                 />

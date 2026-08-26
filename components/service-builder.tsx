@@ -27,7 +27,7 @@ export interface ScenarioDraft {
 /* ------------------------------ review form ------------------------------ */
 
 const areaCls =
-  "mt-1 w-full resize-none border border-line bg-bg px-3 py-2.5 text-[13.5px] leading-snug text-ink placeholder:text-muted focus:border-mint focus:outline-none";
+  "mt-1 w-full resize-none border border-line bg-bg px-3 py-2.5 text-[13.5px] leading-snug text-ink placeholder:text-muted focus:border-primary focus:outline-none";
 
 export function ScenarioReviewForm({
   value,
@@ -245,7 +245,7 @@ export function ServiceBuilder() {
       {/* step rail */}
       <div className="mt-3 flex gap-1">
         {[0, 1, 2, 3, 4, 5].map((s) => (
-          <div key={s} className={`h-0.5 flex-1 ${s < step ? "bg-mint" : s === step ? "bg-bone" : "bg-line"}`} />
+          <div key={s} className={`h-0.5 flex-1 ${s < step ? "bg-primary" : s === step ? "bg-bone" : "bg-line"}`} />
         ))}
       </div>
 
@@ -258,7 +258,7 @@ export function ServiceBuilder() {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="e.g. PRP injection series"
-            className="w-full border border-line bg-bg px-3 py-3 text-[16px] text-ink placeholder:text-muted focus:border-mint focus:outline-none"
+            className="w-full border border-line bg-bg px-3 py-3 text-[16px] text-ink placeholder:text-muted focus:border-primary focus:outline-none"
           />
         )}
 
@@ -288,7 +288,7 @@ export function ServiceBuilder() {
             value={condition}
             onChange={(e) => setCondition(e.target.value)}
             placeholder="e.g. chronic Achilles tendinopathy that hasn't responded to rest and PT"
-            className="w-full resize-none border border-line bg-bg px-3 py-3 text-[15px] leading-snug text-ink placeholder:text-muted focus:border-mint focus:outline-none"
+            className="w-full resize-none border border-line bg-bg px-3 py-3 text-[15px] leading-snug text-ink placeholder:text-muted focus:border-primary focus:outline-none"
           />
         )}
 
@@ -300,7 +300,7 @@ export function ServiceBuilder() {
               value={typicalPatient}
               onChange={(e) => setTypicalPatient(e.target.value)}
               placeholder="e.g. an active adult in their 50s who runs or works on their feet (optional)"
-              className="w-full resize-none border border-line bg-bg px-3 py-3 text-[15px] leading-snug text-ink placeholder:text-muted focus:border-mint focus:outline-none"
+              className="w-full resize-none border border-line bg-bg px-3 py-3 text-[15px] leading-snug text-ink placeholder:text-muted focus:border-primary focus:outline-none"
             />
             <p className="mt-2 text-[12px] leading-snug text-muted">
               Describe a <span className="text-dim">type</span> of patient, never a real one — no
@@ -321,7 +321,7 @@ export function ServiceBuilder() {
                 value={val as string}
                 onChange={(e) => (set as (v: string) => void)(e.target.value)}
                 placeholder={ph as string}
-                className="w-full border border-line bg-bg px-3 py-3 text-[15px] text-ink placeholder:text-muted focus:border-mint focus:outline-none"
+                className="w-full border border-line bg-bg px-3 py-3 text-[15px] text-ink placeholder:text-muted focus:border-primary focus:outline-none"
               />
             ))}
             <p className="text-[12px] leading-snug text-muted">
@@ -352,7 +352,7 @@ export function ServiceBuilder() {
                 setStep((step + 1) as Step);
               }}
               disabled={!canNext}
-              className="display w-full rounded-card bg-mint py-3.5 text-[15px] tracking-wide text-mint-ink disabled:opacity-40"
+              className="display w-full rounded-card bg-primary py-3.5 text-[15px] tracking-wide text-white disabled:opacity-40"
             >
               Next
             </button>
@@ -361,7 +361,7 @@ export function ServiceBuilder() {
             <button
               onClick={generate}
               disabled={busy}
-              className="display w-full rounded-card bg-mint py-3.5 text-[15px] tracking-wide text-mint-ink disabled:opacity-60"
+              className="display w-full rounded-card bg-primary py-3.5 text-[15px] tracking-wide text-white disabled:opacity-60"
             >
               {busy ? "Writing your station" : "Build the station"}
             </button>
@@ -371,7 +371,7 @@ export function ServiceBuilder() {
               <button
                 onClick={save}
                 disabled={busy}
-                className="display w-full rounded-card bg-mint py-3.5 text-[15px] tracking-wide text-mint-ink disabled:opacity-60"
+                className="display w-full rounded-card bg-primary py-3.5 text-[15px] tracking-wide text-white disabled:opacity-60"
               >
                 {busy ? "Saving" : "Save to your services"}
               </button>

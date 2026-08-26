@@ -9,7 +9,7 @@ import type { DayPoint, ScenarioAgg } from "@/lib/stats";
  * recessive grid, tap/hover tooltip. Numbers are always also readable as text.
  */
 
-const MINT = "var(--color-mint)";
+const PRIMARY = "var(--color-primary)";
 const GRID = "var(--color-line)";
 
 /* ------------------------------ close rate line ------------------------------ */
@@ -101,7 +101,7 @@ export function CloseRateChart({ byDay, windowDays }: { byDay: DayPoint[]; windo
           </g>
         ))}
         {segments.map((d, i) => (
-          <path key={i} d={d} fill="none" stroke={MINT} strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
+          <path key={i} d={d} fill="none" stroke={PRIMARY} strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
         ))}
         {series.map((p, i) =>
           p.closeRate === null ? null : (
@@ -110,7 +110,7 @@ export function CloseRateChart({ byDay, windowDays }: { byDay: DayPoint[]; windo
                 cx={x(i)}
                 cy={y(p.closeRate)}
                 r={active === i ? 5 : 3.5}
-                fill={MINT}
+                fill={PRIMARY}
                 stroke="var(--color-navy-850)"
                 strokeWidth="2"
               />
@@ -268,7 +268,7 @@ export function SimVsRealChart({
           </g>
         ))}
         {simSegs.map((d, i) => (
-          <path key={`s${i}`} d={d} fill="none" stroke={MINT} strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
+          <path key={`s${i}`} d={d} fill="none" stroke={PRIMARY} strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
         ))}
         {realSegs.map((d, i) => (
           <path key={`r${i}`} d={d} fill="none" stroke="var(--color-bone)" strokeWidth="2" strokeDasharray="1 4" strokeLinejoin="round" strokeLinecap="round" />
@@ -278,7 +278,7 @@ export function SimVsRealChart({
           const r = realRate(date);
           return (
             <g key={date}>
-              {s !== null && <circle cx={x(i)} cy={y(s)} r="3" fill={MINT} stroke="var(--color-panel)" strokeWidth="1.5" />}
+              {s !== null && <circle cx={x(i)} cy={y(s)} r="3" fill={PRIMARY} stroke="var(--color-panel)" strokeWidth="1.5" />}
               {r !== null && <circle cx={x(i)} cy={y(r)} r="3" fill="var(--color-bone)" stroke="var(--color-panel)" strokeWidth="1.5" />}
             </g>
           );
@@ -302,7 +302,7 @@ export function SimVsRealChart({
       </svg>
       <div className="mt-1 flex gap-4">
         <span className="flex items-center gap-1.5 font-mono text-[9px] font-semibold uppercase tracking-[0.12em] text-muted">
-          <span className="h-0.5 w-4 bg-mint" /> Sim reps
+          <span className="h-0.5 w-4 bg-primary" /> Sim reps
         </span>
         <span className="flex items-center gap-1.5 font-mono text-[9px] font-semibold uppercase tracking-[0.12em] text-muted">
           <span className="h-0.5 w-4 bg-bone" /> Real world
@@ -349,7 +349,7 @@ export function ScenarioBars({
           </div>
           <div className="mt-1 h-1.5 bg-panel-2">
             <div
-              className="bar-fill h-full bg-mint"
+              className="bar-fill h-full bg-primary"
               style={{ width: `${Math.min(100, s.avgTotal)}%` }}
             />
           </div>

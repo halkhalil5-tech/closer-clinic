@@ -52,7 +52,7 @@ export default function OnboardingPage() {
 
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col px-5 py-8">
-      <div className="microlabel text-mint">Closer Clinic</div>
+      <div className="microlabel text-primary">Closer Clinic</div>
 
       {step === 0 ? (
         <div className="flex flex-1 flex-col">
@@ -72,14 +72,14 @@ export default function OnboardingPage() {
                   i > 0 ? "border-t border-t-line" : ""
                 } ${
                   specialty === s.id
-                    ? "border-l-mint bg-panel-2"
+                    ? "border-l-primary bg-panel-2"
                     : "border-l-transparent bg-panel"
                 } ${!s.available ? "opacity-45" : ""}`}
               >
                 <span className="display text-[15px] text-ink">{s.label}</span>
                 <span
                   className={`font-mono text-[10px] uppercase tracking-[0.12em] ${
-                    specialty === s.id ? "text-mint" : "text-muted"
+                    specialty === s.id ? "text-primary" : "text-muted"
                   }`}
                 >
                   {s.note}
@@ -90,7 +90,7 @@ export default function OnboardingPage() {
           <div className="flex-1" />
           <button
             onClick={() => setStep(1)}
-            className="display mt-8 bg-mint py-3.5 text-[15px] tracking-wide text-mint-ink"
+            className="display mt-8 bg-primary py-3.5 text-[15px] tracking-wide text-white"
           >
             Continue
           </button>
@@ -99,10 +99,10 @@ export default function OnboardingPage() {
         <div className="flex flex-1 flex-col">
           <div className="mt-5 flex gap-1">
             {STEPS.map((_, i) => (
-              <div key={i} className={`h-0.5 flex-1 ${i < step ? "bg-mint" : "bg-line"}`} />
+              <div key={i} className={`h-0.5 flex-1 ${i < step ? "bg-primary" : "bg-line"}`} />
             ))}
           </div>
-          <div className="mt-8 font-mono text-[11px] font-semibold tracking-[0.2em] text-mint">
+          <div className="mt-8 font-mono text-[11px] font-semibold tracking-[0.2em] text-primary">
             {String(step).padStart(2, "0")} / 03
           </div>
           <h1 className="display mt-2 text-[32px] text-ink">{STEPS[step - 1].title}</h1>
@@ -114,7 +114,7 @@ export default function OnboardingPage() {
           <button
             onClick={() => (step < 3 ? setStep(step + 1) : finish())}
             disabled={busy}
-            className="display mt-8 bg-mint py-3.5 text-[15px] tracking-wide text-mint-ink disabled:opacity-50"
+            className="display mt-8 bg-primary py-3.5 text-[15px] tracking-wide text-white disabled:opacity-50"
           >
             {step < 3 ? "Next" : busy ? "Setting up" : "Walk into your first room"}
           </button>

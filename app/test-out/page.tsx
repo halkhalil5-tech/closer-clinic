@@ -41,7 +41,7 @@ export default async function TestOutPage() {
         </div>
         <div className="flex items-baseline justify-between py-3">
           <span className="text-[13px] text-dim">On pass</span>
-          <span className="text-[13px] text-mint">All stations unlock immediately</span>
+          <span className="text-[13px] text-success">All stations unlock immediately</span>
         </div>
         <div className="flex items-baseline justify-between py-3">
           <span className="text-[13px] text-dim">On miss</span>

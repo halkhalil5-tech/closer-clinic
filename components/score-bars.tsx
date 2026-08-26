@@ -15,7 +15,12 @@ export function ScoreBars({ bars }: { bars: ScoreBar[] }) {
     <div className="flex flex-col gap-3">
       {bars.map((b, i) => {
         const pct = (b.score / 20) * 100;
-        const color = b.score >= 14 ? "#2ec4a5" : b.score >= 8 ? "#c9a227" : "#b0483a";
+        const color =
+          b.score >= 14
+            ? "var(--color-success)"
+            : b.score >= 8
+              ? "var(--color-amber)"
+              : "var(--color-danger)";
         return (
           <div key={b.key}>
             <div className="flex items-baseline justify-between">

@@ -15,7 +15,7 @@ async function post(body: Record<string, unknown>) {
 }
 
 const input =
-  "w-full border border-line bg-panel px-2 py-1.5 text-[13px] text-ink placeholder:text-muted focus:border-mint focus:outline-none";
+  "w-full border border-line bg-panel px-2 py-1.5 text-[13px] text-ink placeholder:text-muted focus:border-primary focus:outline-none";
 const btn =
   "rounded-card border border-line-strong px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.1em] text-bone disabled:opacity-50";
 

@@ -46,7 +46,7 @@ export function RedeemPack() {
           onChange={(e) => setCode(e.target.value)}
           placeholder="PACK-CODE"
           autoCapitalize="characters"
-          className="min-w-0 flex-1 border border-line bg-panel px-2 py-2 font-mono text-[13px] uppercase tracking-wide text-ink placeholder:text-muted focus:border-mint focus:outline-none"
+          className="min-w-0 flex-1 border border-line bg-panel px-2 py-2 font-mono text-[13px] uppercase tracking-wide text-ink placeholder:text-muted focus:border-primary focus:outline-none"
         />
         <button
           onClick={redeem}
@@ -57,7 +57,7 @@ export function RedeemPack() {
         </button>
       </div>
       {message && (
-        <p className={`mt-1.5 text-[12px] ${message.ok ? "text-mint" : "text-red"}`}>
+        <p className={`mt-1.5 text-[12px] ${message.ok ? "text-success" : "text-red"}`}>
           {message.text}
         </p>
       )}

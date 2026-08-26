@@ -32,7 +32,7 @@ export function ReceptivityGauge({ value }: { value: number }) {
           className="h-full rounded-full"
           style={{
             width,
-            backgroundColor: falling ? "rgba(176, 72, 58, 0.75)" : "#2ec4a5",
+            backgroundColor: falling ? "rgba(176, 72, 58, 0.75)" : "var(--color-success)",
             transition: "background-color 300ms ease",
           }}
         />

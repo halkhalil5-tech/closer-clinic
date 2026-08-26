@@ -15,7 +15,7 @@ export interface LadderModule {
 
 function CheckIcon() {
   return (
-    <svg viewBox="0 0 20 20" className="h-5 w-5 text-mint" fill="none" stroke="currentColor" strokeWidth="2">
+    <svg viewBox="0 0 20 20" className="h-5 w-5 text-success" fill="none" stroke="currentColor" strokeWidth="2">
       <circle cx="10" cy="10" r="8.25" />
       <path d="m6.5 10.5 2.3 2.3 4.7-5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
@@ -68,9 +68,9 @@ export function TrainLadder({ modules }: { modules: LadderModule[] }) {
                     {m.subtitle}
                   </span>
                   <span className="shrink-0 font-mono text-[9px] uppercase tracking-wide">
-                    <span className={m.checkDone ? "text-mint" : "text-muted"}>check</span>
+                    <span className={m.checkDone ? "text-success" : "text-muted"}>check</span>
                     {m.drill !== "none" && (
-                      <span className={m.drill === "passed" ? "text-mint" : "text-muted"}> · drill</span>
+                      <span className={m.drill === "passed" ? "text-success" : "text-muted"}> · drill</span>
                     )}
                   </span>
                 </span>
@@ -91,7 +91,7 @@ export function TrainLadder({ modules }: { modules: LadderModule[] }) {
               className="group relative block transition-colors hover:bg-raised active:bg-raised"
             >
               {m.status === "current" && <span className="absolute inset-y-0 left-0 w-[3px] bg-bone" />}
-              {m.status === "completed" && <span className="absolute inset-y-0 left-0 w-[3px] bg-mint" />}
+              {m.status === "completed" && <span className="absolute inset-y-0 left-0 w-[3px] bg-success" />}
               {row}
             </Link>
           );

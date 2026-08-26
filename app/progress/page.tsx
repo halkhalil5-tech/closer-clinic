@@ -127,7 +127,7 @@ export default async function ProgressPage({
                   href={`/progress?window=${w}`}
                   className={`px-3 py-1.5 font-mono text-[11px] font-semibold ${
                     i > 0 ? "border-l border-line" : ""
-                  } ${windowDays === w ? "bg-mint text-mint-ink" : "bg-panel text-muted"}`}
+                  } ${windowDays === w ? "bg-primary text-white" : "bg-panel text-muted"}`}
                 >
                   {w}D
                 </Link>
@@ -143,11 +143,11 @@ export default async function ProgressPage({
               key={t}
               href={t === "reps" ? "/progress" : "/progress?tab=training"}
               className={`display relative flex-1 pb-2.5 pt-1 text-center text-[13px] transition-colors ${
-                tab === t ? "text-mint" : "text-muted"
+                tab === t ? "text-primary" : "text-muted"
               }`}
             >
               {t === "reps" ? "Reps" : "Training"}
-              {tab === t && <span className="absolute inset-x-0 -bottom-px h-0.5 bg-mint" />}
+              {tab === t && <span className="absolute inset-x-0 -bottom-px h-0.5 bg-primary" />}
             </Link>
           ))}
         </div>
@@ -205,7 +205,7 @@ export default async function ProgressPage({
                     <span
                       className={`h-1.5 w-1.5 shrink-0 rounded-full ${
                         m.status === "completed"
-                          ? "bg-mint"
+                          ? "bg-success"
                           : m.status === "current"
                             ? "bg-bone"
                             : "bg-faint"
@@ -268,7 +268,7 @@ export default async function ProgressPage({
                 {delta?.kind === "delta" ? (
                   <>
                     vs. your first 30 days:{" "}
-                    <span className={`font-mono font-semibold tabular-nums ${delta.cents >= 0 ? "text-mint" : "text-red"}`}>
+                    <span className={`font-mono font-semibold tabular-nums ${delta.cents >= 0 ? "text-success" : "text-red"}`}>
                       {delta.cents >= 0 ? "+" : ""}
                       {formatCents(delta.cents)}
                     </span>
@@ -281,7 +281,7 @@ export default async function ProgressPage({
               {monthRevenue.cents > 0 && (
                 <div className="mt-2 border-t border-hairline pt-2 text-[12px] text-dim">
                   This month&apos;s closes ={" "}
-                  <span className="font-mono font-semibold tabular-nums text-mint">{payback}×</span>{" "}
+                  <span className="font-mono font-semibold tabular-nums text-success">{payback}×</span>{" "}
                   your subscription.
                 </div>
               )}
@@ -358,7 +358,7 @@ export default async function ProgressPage({
               {pastLetter && pastLetter !== currentLetter ? (
                 <>
                   <span className="text-dim">{pastLetter}</span>
-                  <svg viewBox="0 0 24 24" className="h-5 w-5 text-mint" fill="none" stroke="currentColor" strokeWidth="2.4">
+                  <svg viewBox="0 0 24 24" className="h-5 w-5 text-success" fill="none" stroke="currentColor" strokeWidth="2.4">
                     <path d="M4 12h15m-5-6 6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                   <span>{currentLetter}</span>
@@ -393,7 +393,7 @@ export default async function ProgressPage({
               <Stethoscope className="h-5 w-5 text-faint" strokeWidth={1.5} />
               <p className="text-sm text-muted">
                 No graded reps in this window —{" "}
-                <Link href="/home" className="font-semibold text-teal">
+                <Link href="/home" className="font-semibold text-primary">
                   walk into a room
                 </Link>
                 .
@@ -431,7 +431,7 @@ export default async function ProgressPage({
                   <div className="flex shrink-0 items-center gap-2.5">
                     <span
                       className={`font-mono text-[9px] font-bold uppercase tracking-[0.14em] ${
-                        grade!.closed ? "text-mint" : "text-red"
+                        grade!.closed ? "text-success" : "text-red"
                       }`}
                     >
                       {grade!.closed ? "Closed" : "No close"}

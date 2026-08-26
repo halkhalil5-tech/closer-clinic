@@ -76,7 +76,7 @@ export default async function TrainPage() {
           </div>
           <div className="mt-2.5 border-t border-hairline pt-2 text-[12px] leading-snug">
             {unlockedVia ? (
-              <span className="text-mint">
+              <span className="text-success">
                 ✓ Stations unlocked{unlockedVia === "test_out" ? " · test-out" : unlockedVia === "curriculum" ? " · curriculum complete" : ""}
               </span>
             ) : (

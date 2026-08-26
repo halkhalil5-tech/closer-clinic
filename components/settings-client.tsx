@@ -81,12 +81,12 @@ export function SettingsClient({
             role="switch"
             aria-checked={voiceOn}
             className={`relative h-6 w-11 border transition-colors ${
-              voiceOn ? "border-mint bg-mint" : "border-line bg-panel-2"
+              voiceOn ? "border-primary bg-primary" : "border-line bg-panel-2"
             }`}
           >
             <span
               className={`absolute top-0.5 h-[18px] w-[18px] transition-all ${
-                voiceOn ? "left-[calc(100%-1.375rem)] bg-mint-ink" : "left-0.5 bg-muted"
+                voiceOn ? "left-[calc(100%-1.375rem)] bg-white" : "left-0.5 bg-muted"
               }`}
             />
           </button>
@@ -105,13 +105,13 @@ export function SettingsClient({
                 i > 0 ? "border-t border-t-line" : ""
               } ${
                 specialty === s.id
-                  ? "border-l-mint bg-panel-2 font-semibold text-ink"
+                  ? "border-l-primary bg-panel-2 font-semibold text-ink"
                   : "border-l-transparent bg-panel text-dim"
               } ${!s.available ? "opacity-45" : ""}`}
             >
               <span>{s.label}</span>
               <span className="font-mono text-[9px] font-bold uppercase tracking-[0.14em] text-muted">
-                {!s.available ? "Soon" : specialty === s.id ? <span className="text-mint">Active</span> : ""}
+                {!s.available ? "Soon" : specialty === s.id ? <span className="text-primary">Active</span> : ""}
               </span>
             </button>
           ))}

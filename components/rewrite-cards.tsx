@@ -25,13 +25,13 @@ export function RewriteCards({ youSaid, better }: { youSaid: string; better: str
           &ldquo;{youSaid}&rdquo;
         </p>
       </div>
-      <div className="relative rounded-xl border border-[#2ec4a5]/45 bg-[#2ec4a5]/8 p-4">
+      <div className="relative rounded-xl border border-success/45 bg-success/8 p-4">
         <div className="flex items-start justify-between gap-2">
-          <div className="microlabel text-[#1d8f77]">The better line</div>
+          <div className="microlabel text-success">The better line</div>
           <button
             onClick={copy}
             aria-label="Copy the better line"
-            className="-mr-1 -mt-1 rounded-md p-1.5 text-[#1d8f77] transition-colors duration-150 hover:bg-[#2ec4a5]/15"
+            className="-mr-1 -mt-1 rounded-md p-1.5 text-success transition-colors duration-150 hover:bg-success/15"
           >
             <Copy className="h-5 w-5" strokeWidth={1.5} />
           </button>

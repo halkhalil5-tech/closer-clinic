@@ -103,7 +103,7 @@ export function PriceEditSheet({ slug, title, initial, hasOverride, onClose }: P
         <button
           onClick={save}
           disabled={busy || !preview}
-          className="display mt-4 w-full rounded-card bg-mint py-3.5 text-[15px] tracking-wide text-mint-ink disabled:opacity-40"
+          className="display mt-4 w-full rounded-card bg-primary py-3.5 text-[15px] tracking-wide text-white disabled:opacity-40"
         >
           {busy ? "Saving" : "Save pricing"}
         </button>

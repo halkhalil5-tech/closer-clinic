@@ -77,7 +77,7 @@ export function PrepForm({ services, conditions, archetypes }: Props) {
   }
 
   const selectCls =
-    "mt-1 w-full border border-line bg-panel px-3 py-2.5 text-[14px] text-ink focus:border-mint focus:outline-none";
+    "mt-1 w-full border border-line bg-panel px-3 py-2.5 text-[14px] text-ink focus:border-primary focus:outline-none";
 
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col px-4 pb-8 pt-[calc(env(safe-area-inset-top)+0.75rem)]">
@@ -125,7 +125,7 @@ export function PrepForm({ services, conditions, archetypes }: Props) {
             onChange={(e) => setOtherCondition(e.target.value)}
             maxLength={120}
             placeholder="Name the condition"
-            className="w-full border border-line bg-bg px-3 py-2.5 text-[14px] text-ink placeholder:text-muted focus:border-mint focus:outline-none"
+            className="w-full border border-line bg-bg px-3 py-2.5 text-[14px] text-ink placeholder:text-muted focus:border-primary focus:outline-none"
           />
         )}
 
@@ -157,7 +157,7 @@ export function PrepForm({ services, conditions, archetypes }: Props) {
                   onClick={() => toggleArchetype(a.id)}
                   className={`rounded-full border px-2.5 py-1 text-[11px] leading-tight transition-colors ${
                     on
-                      ? "border-mint text-mint"
+                      ? "border-primary text-primary"
                       : "border-line text-dim active:border-line-strong"
                   }`}
                 >
@@ -179,7 +179,7 @@ export function PrepForm({ services, conditions, archetypes }: Props) {
             value={worry}
             onChange={(e) => setWorry(e.target.value.slice(0, WORRY_MAX_CHARS))}
             placeholder="e.g. they think insurance should cover it"
-            className="mt-1 w-full border border-line bg-bg px-3 py-2.5 text-[14px] text-ink placeholder:text-muted focus:border-mint focus:outline-none"
+            className="mt-1 w-full border border-line bg-bg px-3 py-2.5 text-[14px] text-ink placeholder:text-muted focus:border-primary focus:outline-none"
           />
           <span className="mt-1 block text-[11px] text-muted">
             No names, dates, or real patient details.
@@ -194,11 +194,11 @@ export function PrepForm({ services, conditions, archetypes }: Props) {
                 key={d}
                 onClick={() => setDifficulty(d)}
                 className={`display relative flex-1 pb-2 pt-1.5 text-[12px] capitalize transition-colors ${
-                  difficulty === d ? "text-mint" : "text-muted"
+                  difficulty === d ? "text-primary" : "text-muted"
                 }`}
               >
                 {d}
-                {difficulty === d && <span className="absolute inset-x-0 -bottom-px h-0.5 bg-mint" />}
+                {difficulty === d && <span className="absolute inset-x-0 -bottom-px h-0.5 bg-primary" />}
               </button>
             ))}
           </div>
@@ -213,7 +213,7 @@ export function PrepForm({ services, conditions, archetypes }: Props) {
         <button
           onClick={start}
           disabled={busy}
-          className="display w-full rounded-card bg-mint py-3.5 text-[15px] tracking-wide text-mint-ink disabled:opacity-60"
+          className="display w-full rounded-card bg-primary py-3.5 text-[15px] tracking-wide text-white disabled:opacity-60"
         >
           {busy ? "Building the sim" : "Walk into the prep room"}
         </button>

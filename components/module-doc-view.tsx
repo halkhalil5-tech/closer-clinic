@@ -188,8 +188,8 @@ export function ModuleDocView({ doc, lesson, moduleTitle, initial, next, voiceCa
                   <p className="mt-1 text-[13px] italic leading-snug text-ink/60">&ldquo;{unquote(d.weak)}&rdquo;</p>
                 </div>
                 <div className="mt-3">
-                  <div className="font-mono text-[9px] font-bold uppercase tracking-[0.14em] text-mint">Strong</div>
-                  <p className="mt-1 border-l-2 border-l-mint pl-3 text-[13.5px] leading-snug text-ink">
+                  <div className="font-mono text-[9px] font-bold uppercase tracking-[0.14em] text-success">Strong</div>
+                  <p className="mt-1 border-l-2 border-l-success pl-3 text-[13.5px] leading-snug text-ink">
                     &ldquo;{unquote(d.strong)}&rdquo;
                   </p>
                 </div>
@@ -220,7 +220,7 @@ export function ModuleDocView({ doc, lesson, moduleTitle, initial, next, voiceCa
               <p className="border-l-2 border-l-red pl-3 text-[13px] italic leading-snug text-ink/60">
                 &ldquo;{unquote(m.wrong)}&rdquo;
               </p>
-              <p className="mt-2 border-l-2 border-l-mint pl-3 text-[13.5px] leading-snug text-ink">
+              <p className="mt-2 border-l-2 border-l-success pl-3 text-[13.5px] leading-snug text-ink">
                 &ldquo;{unquote(m.right)}&rdquo;
               </p>
               <p className="mt-1.5 text-[12px] leading-snug text-muted">{m.note}</p>
@@ -234,7 +234,7 @@ export function ModuleDocView({ doc, lesson, moduleTitle, initial, next, voiceCa
         <div className="flex items-baseline justify-between">
           <SectionLabel>Knowledge check</SectionLabel>
           {checkPassed && (
-            <span className="font-mono text-[10px] font-semibold uppercase tracking-wide text-mint">
+            <span className="font-mono text-[10px] font-semibold uppercase tracking-wide text-success">
               Passed · {initial.quizScore}
             </span>
           )}
@@ -248,7 +248,7 @@ export function ModuleDocView({ doc, lesson, moduleTitle, initial, next, voiceCa
           <div className="flex items-baseline justify-between">
             <SectionLabel>Live micro-drill</SectionLabel>
             {initial.drillPassed && (
-              <span className="font-mono text-[10px] font-semibold uppercase tracking-wide text-mint">Passed</span>
+              <span className="font-mono text-[10px] font-semibold uppercase tracking-wide text-success">Passed</span>
             )}
           </div>
           <DrillBlock lesson={lesson} voiceCaps={voiceCaps} onRefresh={() => router.refresh()} />
@@ -262,7 +262,7 @@ export function ModuleDocView({ doc, lesson, moduleTitle, initial, next, voiceCa
           {next ? (
             <Link
               href={`/train/module/${next.slug}`}
-              className="display mt-2 flex w-full items-center justify-between rounded-card border border-mint/60 px-4 py-3.5 text-[15px] tracking-wide text-mint"
+              className="display mt-2 flex w-full items-center justify-between rounded-card border border-primary/60 px-4 py-3.5 text-[15px] tracking-wide text-primary"
             >
               <span>
                 Next · Module {next.order} — {next.title}
@@ -272,7 +272,7 @@ export function ModuleDocView({ doc, lesson, moduleTitle, initial, next, voiceCa
           ) : (
             <Link
               href="/train"
-              className="display mt-2 flex w-full items-center justify-between rounded-card border border-mint/60 px-4 py-3.5 text-[15px] tracking-wide text-mint"
+              className="display mt-2 flex w-full items-center justify-between rounded-card border border-primary/60 px-4 py-3.5 text-[15px] tracking-wide text-primary"
             >
               <span>Curriculum complete — back to the ladder</span>
               <span aria-hidden>→</span>
@@ -286,7 +286,7 @@ export function ModuleDocView({ doc, lesson, moduleTitle, initial, next, voiceCa
         <SectionLabel>Try it in a rep</SectionLabel>
         <Link
           href={`/home?launch=${doc.repCta.stationSlug}&difficulty=${doc.repCta.difficulty}`}
-          className="display mt-2 block w-full rounded-card bg-mint py-3.5 text-center text-[15px] tracking-wide text-mint-ink"
+          className="display mt-2 block w-full rounded-card bg-primary py-3.5 text-center text-[15px] tracking-wide text-white"
         >
           {doc.repCta.label}
         </Link>
@@ -376,7 +376,7 @@ function CheckBlock({
           {result.score}
           <span className="text-lg font-normal text-dim">%</span>
         </div>
-        <div className={`display mt-1.5 text-[15px] ${result.passed ? "text-mint" : "text-red"}`}>
+        <div className={`display mt-1.5 text-[15px] ${result.passed ? "text-success" : "text-red"}`}>
           {result.passed ? "Passed" : `${QUIZ_PASS_PCT} to pass`}
         </div>
         <button
@@ -407,7 +407,7 @@ function CheckBlock({
           const isCorrect = i === q.answer;
           const isPicked = i === picked;
           let cls = "text-dim";
-          if (answered && isCorrect) cls = "text-mint";
+          if (answered && isCorrect) cls = "text-success";
           else if (answered && isPicked && !isCorrect) cls = "text-red";
           return (
             <button
@@ -420,7 +420,7 @@ function CheckBlock({
             >
               <span
                 className={`mt-0.5 font-mono text-[11px] font-semibold ${
-                  answered && isCorrect ? "text-mint" : answered && isPicked ? "text-red" : "text-muted"
+                  answered && isCorrect ? "text-success" : answered && isPicked ? "text-red" : "text-muted"
                 }`}
               >
                 {answered && isCorrect ? "✓" : answered && isPicked ? "✗" : String.fromCharCode(65 + i)}
@@ -436,7 +436,7 @@ function CheckBlock({
       <button
         onClick={next}
         disabled={!answered || busy}
-        className="display mt-3 w-full rounded-card bg-mint py-3 text-[13px] tracking-wide text-mint-ink disabled:opacity-40"
+        className="display mt-3 w-full rounded-card bg-primary py-3 text-[13px] tracking-wide text-white disabled:opacity-40"
       >
         {qi + 1 < lesson.quiz.length ? "Next" : busy ? "Scoring" : "See my score"}
       </button>
@@ -581,7 +581,7 @@ function DrillBlock({
       <div className="mt-3 text-center">
         <div
           className={`stamp-in display inline-block border-[3px] px-3.5 py-1.5 text-[16px] tracking-wide ${
-            verdict.passed ? "border-mint text-mint" : "border-red text-red"
+            verdict.passed ? "border-success text-success" : "border-red text-red"
           }`}
         >
           {verdict.passed ? "Pass" : "Not yet"}
@@ -672,13 +672,13 @@ function DrillBlock({
           }}
           rows={1}
           placeholder={micState === "recording" ? "Speak — tap mic to stop" : "Speak or type your line..."}
-          className="max-h-24 min-h-11 flex-1 resize-none border border-line bg-bg px-3 py-2.5 text-[14px] text-ink placeholder:text-muted focus:border-mint focus:outline-none"
+          className="max-h-24 min-h-11 flex-1 resize-none border border-line bg-bg px-3 py-2.5 text-[14px] text-ink placeholder:text-muted focus:border-primary focus:outline-none"
         />
         <button
           onClick={() => void send()}
           disabled={busy || !draft.trim()}
           aria-label="Send"
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-mint text-mint-ink disabled:opacity-40"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary text-white disabled:opacity-40"
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className="h-5 w-5">
             <path d="M5 12h13M13 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />

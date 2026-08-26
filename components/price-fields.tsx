@@ -38,7 +38,7 @@ const KINDS: { id: PriceKind; label: string }[] = [
 ];
 
 const inputCls =
-  "w-full border border-line bg-bg px-3 py-2.5 font-mono text-[15px] tabular-nums text-bone placeholder:text-muted focus:border-mint focus:outline-none";
+  "w-full border border-line bg-bg px-3 py-2.5 font-mono text-[15px] tabular-nums text-bone placeholder:text-muted focus:border-primary focus:outline-none";
 
 export function PriceFields({
   value,
@@ -57,11 +57,11 @@ export function PriceFields({
             type="button"
             onClick={() => set({ kind: k.id })}
             className={`display relative flex-1 pb-2 pt-1.5 text-[12px] transition-colors ${
-              value.kind === k.id ? "text-mint" : "text-muted"
+              value.kind === k.id ? "text-primary" : "text-muted"
             }`}
           >
             {k.label}
-            {value.kind === k.id && <span className="absolute inset-x-0 -bottom-px h-0.5 bg-mint" />}
+            {value.kind === k.id && <span className="absolute inset-x-0 -bottom-px h-0.5 bg-primary" />}
           </button>
         ))}
       </div>

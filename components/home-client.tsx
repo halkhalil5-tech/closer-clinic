@@ -98,7 +98,7 @@ export function HomeClient({
                 </span>
               )}
               {isEdited && (
-                <span className="block font-mono text-[8px] uppercase tracking-[0.14em] text-mint">
+                <span className="block font-mono text-[8px] uppercase tracking-[0.14em] text-primary">
                   edited
                 </span>
               )}
@@ -148,7 +148,7 @@ export function HomeClient({
           <div className="mt-4 flex flex-col gap-2">
             <a
               href="/train"
-              className="display block w-full rounded-card bg-mint py-3.5 text-center text-[15px] tracking-wide text-mint-ink"
+              className="display block w-full rounded-card bg-primary py-3.5 text-center text-[15px] tracking-wide text-white"
             >
               Start training
             </a>
@@ -226,7 +226,7 @@ export function HomeClient({
                 roleTab === r
                   ? r === "front_desk"
                     ? "bg-amber text-bg"
-                    : "bg-mint text-mint-ink"
+                    : "bg-primary text-white"
                   : "bg-panel text-muted"
               }`}
             >

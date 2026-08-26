@@ -69,9 +69,9 @@ export function AssignedList({ items }: { items: AssignedItem[] }) {
             className="flex w-full items-center gap-3 py-3 text-left transition-colors hover:bg-raised active:bg-raised disabled:opacity-100"
           >
             {a.state === "done" ? (
-              <CheckCircle2 className="h-5 w-5 shrink-0 text-[#2ec4a5]" strokeWidth={1.5} />
+              <CheckCircle2 className="h-5 w-5 shrink-0 text-success" strokeWidth={1.5} />
             ) : a.state === "in_progress" ? (
-              <CircleDot className="h-5 w-5 shrink-0 text-teal" strokeWidth={1.5} />
+              <CircleDot className="h-5 w-5 shrink-0 text-primary" strokeWidth={1.5} />
             ) : (
               <Circle className="h-5 w-5 shrink-0 text-faint" strokeWidth={1.5} />
             )}
@@ -85,7 +85,7 @@ export function AssignedList({ items }: { items: AssignedItem[] }) {
             </span>
             <span
               className={`shrink-0 rounded-md border px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-[0.12em] ${
-                a.state === "done" ? "border-[#2ec4a5]/50 text-[#1d8f77]" : TONE_CLS[a.tone]
+                a.state === "done" ? "border-success/50 text-success" : TONE_CLS[a.tone]
               }`}
             >
               {a.state === "done" ? "done" : busy === a.id ? "…" : a.dueLabel}

@@ -42,7 +42,7 @@ export function RequireCurriculumToggle({ initial }: { initial: boolean }) {
       </span>
       <span
         className={`relative h-6 w-11 shrink-0 rounded-full transition-colors ${
-          on ? "bg-mint" : "bg-line"
+          on ? "bg-primary" : "bg-line"
         }`}
       >
         <span

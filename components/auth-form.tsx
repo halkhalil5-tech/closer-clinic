@@ -28,7 +28,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
         </div>
         <button
           onClick={() => router.push("/home")}
-          className="display h-12 bg-mint text-[14px] tracking-wide text-mint-ink"
+          className="display h-12 bg-primary text-[14px] tracking-wide text-white"
         >
           Continue in dev mode
         </button>
@@ -81,7 +81,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
   }
 
   const inputCls =
-    "h-11 border border-line bg-panel px-3 text-[14px] text-ink placeholder:text-faint focus:border-mint focus:outline-none";
+    "h-11 border border-line bg-panel px-3 text-[14px] text-ink placeholder:text-faint focus:border-primary focus:outline-none";
 
   return (
     <form onSubmit={submit} className="flex flex-col gap-2.5">
@@ -118,13 +118,13 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
         <div className="border border-red/50 bg-red/10 p-2.5 text-[13px] text-red">{error}</div>
       )}
       {notice && (
-        <div className="border border-mint/50 bg-mint/10 p-2.5 text-[13px] text-mint">{notice}</div>
+        <div className="border border-primary/50 bg-primary/10 p-2.5 text-[13px] text-primary">{notice}</div>
       )}
 
       <button
         type="submit"
         disabled={busy}
-        className="display h-12 bg-mint text-[14px] tracking-wide text-mint-ink disabled:opacity-50"
+        className="display h-12 bg-primary text-[14px] tracking-wide text-white disabled:opacity-50"
       >
         {busy ? "One sec" : mode === "signup" ? "Create account" : "Sign in"}
       </button>
@@ -148,14 +148,14 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
         {mode === "signup" ? (
           <>
             Already have an account?{" "}
-            <Link href="/login" className="font-semibold text-mint">
+            <Link href="/login" className="font-semibold text-primary">
               Sign in
             </Link>
           </>
         ) : (
           <>
             New here?{" "}
-            <Link href="/signup" className="font-semibold text-mint">
+            <Link href="/signup" className="font-semibold text-primary">
               Create an account
             </Link>
           </>

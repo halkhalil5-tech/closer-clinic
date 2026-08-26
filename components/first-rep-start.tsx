@@ -35,7 +35,7 @@ export function FirstRepStart({ scenarioSlug, label }: { scenarioSlug: string; l
       <button
         onClick={start}
         disabled={busy}
-        className="display w-full rounded-card bg-mint py-4 text-[16px] tracking-wide text-mint-ink disabled:opacity-60"
+        className="display w-full rounded-card bg-primary py-4 text-[16px] tracking-wide text-white disabled:opacity-60"
       >
         {busy ? "Opening the door" : (label ?? "Walk into the room")}
       </button>

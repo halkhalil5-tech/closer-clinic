@@ -297,7 +297,7 @@ export function EncounterClient({
               onClick={toggleVoice}
               aria-label={voiceOn ? "Turn patient voice off" : "Turn patient voice on"}
               className={`rounded-lg border p-2 transition-colors duration-150 ${
-                voiceOn ? "border-white/20 text-[#2ec4a5]" : "border-white/10 text-faint"
+                voiceOn ? "border-white/20 text-success" : "border-white/10 text-faint"
               }`}
             >
               {voiceOn ? (
@@ -361,7 +361,7 @@ export function EncounterClient({
       <div className="relative h-24 shrink-0">
         <SessionVisualizer mode={mode} />
         {(recording || speaking) && (
-          <span className="absolute bottom-1 left-1/2 -translate-x-1/2 font-mono text-[9px] font-semibold uppercase tracking-[0.24em] text-[#2ec4a5]">
+          <span className="absolute bottom-1 left-1/2 -translate-x-1/2 font-mono text-[9px] font-semibold uppercase tracking-[0.24em] text-success">
             {recording ? "Listening" : "Patient speaking"}
           </span>
         )}
@@ -415,7 +415,7 @@ export function EncounterClient({
       <div className="border-t border-white/10 px-4 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] pt-2.5">
         {(interim || recording || transcribing) && (
           <div className="mb-1.5 flex min-h-4 items-center gap-2">
-            {recording && <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#2ec4a5]" />}
+            {recording && <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-success" />}
             <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-muted">
               {transcribing ? "Transcribing" : interim || "Listening — tap again to send"}
             </span>
@@ -434,14 +434,14 @@ export function EncounterClient({
             placeholder={capReached ? "The visit is over." : "Talk to your patient…"}
             rows={1}
             disabled={capReached || grading || transcribing}
-            className="max-h-28 min-h-12 flex-1 resize-none rounded-xl border border-white/15 bg-white/5 px-3.5 py-3 text-[14px] text-ink placeholder:text-faint focus:border-[#2ec4a5]/60 focus:outline-none disabled:opacity-50"
+            className="max-h-28 min-h-12 flex-1 resize-none rounded-xl border border-white/15 bg-white/5 px-3.5 py-3 text-[14px] text-ink placeholder:text-faint focus:border-success/60 focus:outline-none disabled:opacity-50"
           />
           {sttSupported && !capReached ? (
             recording ? (
               <button
                 onClick={stopAndSend}
                 aria-label="Stop and send"
-                className="mic-live flex h-13 w-13 shrink-0 items-center justify-center rounded-full bg-[#2ec4a5] text-[#06282e]"
+                className="mic-live flex h-13 w-13 shrink-0 items-center justify-center rounded-full bg-success text-[#06282e]"
               >
                 <Square className="h-5 w-5" strokeWidth={1.5} fill="currentColor" />
               </button>
@@ -459,7 +459,7 @@ export function EncounterClient({
                 onClick={startListening}
                 disabled={sending || grading || transcribing}
                 aria-label="Tap to talk"
-                className="flex h-13 w-13 shrink-0 items-center justify-center rounded-full border-2 border-[#2ec4a5] text-[#2ec4a5] disabled:opacity-50"
+                className="flex h-13 w-13 shrink-0 items-center justify-center rounded-full border-2 border-success text-success disabled:opacity-50"
               >
                 <Mic className="h-6 w-6" strokeWidth={1.5} />
               </button>

@@ -200,7 +200,7 @@ export function DriveClient({
           <select
             value={scenario}
             onChange={(e) => setScenario(e.target.value)}
-            className="mt-1.5 w-full border border-line bg-panel px-3 py-2.5 text-[14px] text-ink focus:border-mint focus:outline-none"
+            className="mt-1.5 w-full border border-line bg-panel px-3 py-2.5 text-[14px] text-ink focus:border-primary focus:outline-none"
           >
             {scenarios.map((s) => (
               <option key={s.slug} value={s.slug}>
@@ -214,7 +214,7 @@ export function DriveClient({
         <div className="mt-auto pt-6">
           <button
             onClick={start}
-            className="display w-full rounded-card bg-mint py-4 text-[16px] tracking-wide text-mint-ink"
+            className="display w-full rounded-card bg-primary py-4 text-[16px] tracking-wide text-white"
           >
             Start voice rep
           </button>
@@ -233,14 +233,14 @@ export function DriveClient({
         <div className="mt-4 font-mono text-[72px] font-semibold leading-none tabular-nums text-bone">
           {summary.total}
         </div>
-        <div className={`display mt-2 text-[18px] ${summary.closed ? "text-mint" : "text-red"}`}>
+        <div className={`display mt-2 text-[18px] ${summary.closed ? "text-success" : "text-red"}`}>
           {summary.closed ? "Closed ✓" : "No close"}
         </div>
         <p className="mt-3 max-w-[36ch] text-[13.5px] leading-relaxed text-dim">{summary.drill}</p>
         <div className="mt-8 flex w-full flex-col gap-2">
           <Link
             href={`/scorecard/${encounterId}`}
-            className="display w-full rounded-card bg-mint py-3.5 text-center text-[15px] tracking-wide text-mint-ink"
+            className="display w-full rounded-card bg-primary py-3.5 text-center text-[15px] tracking-wide text-white"
           >
             View the full chart
           </Link>
@@ -292,7 +292,7 @@ export function DriveClient({
         <div
           className={`flex h-40 w-40 items-center justify-center rounded-full border-2 ${
             phase === "listen"
-              ? "mic-live border-mint text-mint"
+              ? "mic-live border-success text-success"
               : phase === "patient"
                 ? "border-bone text-bone"
                 : "border-line-strong text-muted"

@@ -23,10 +23,10 @@ export function AppNav() {
               key={href}
               href={href}
               className={`relative flex flex-1 flex-col items-center gap-1 pb-2 pt-2.5 transition-colors duration-150 ${
-                active ? "text-teal" : "text-muted active:text-dim"
+                active ? "text-primary" : "text-muted active:text-dim"
               }`}
             >
-              {active && <span className="absolute inset-x-7 top-0 h-0.5 rounded-full bg-teal" />}
+              {active && <span className="absolute inset-x-7 top-0 h-0.5 rounded-full bg-primary" />}
               <Icon className="h-5 w-5" strokeWidth={active ? 2 : 1.5} />
               <span className="text-[10px] font-medium tracking-[0.08em]">{label}</span>
             </Link>

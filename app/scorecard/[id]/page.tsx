@@ -40,7 +40,7 @@ export default async function ScorecardPage({ params }: { params: Promise<{ id: 
           <div
             className={`stamp-in display rounded-xl border-[3px] px-5 py-2.5 text-[22px] tracking-tight ${
               result.handledBetter
-                ? "border-[#2ec4a5] text-[#1d8f77]"
+                ? "border-success text-success"
                 : "border-danger text-danger"
             }`}
           >
@@ -147,11 +147,11 @@ export default async function ScorecardPage({ params }: { params: Promise<{ id: 
 
       {/* debrief */}
       <section className="mt-3 rounded-xl border border-line bg-bg p-6 shadow-sm">
-        <div className="microlabel text-[#1d8f77]">What worked</div>
+        <div className="microlabel text-success">What worked</div>
         <ul className="mt-1.5 flex flex-col gap-1.5">
           {grade.worked.map((w, i) => (
             <li key={i} className="flex gap-2 text-[14px] leading-snug text-ink">
-              <span className="font-semibold text-[#1d8f77]">+</span> {w}
+              <span className="font-semibold text-success">+</span> {w}
             </li>
           ))}
         </ul>
@@ -174,21 +174,21 @@ export default async function ScorecardPage({ params }: { params: Promise<{ id: 
       {encounter.kind === "test_out" && (
         <div
           className={`mt-4 rounded-lg border-l-2 py-1.5 pl-3 text-[13.5px] leading-snug ${
-            grade.total >= TEST_OUT_PASS_TOTAL ? "border-l-[#2ec4a5]" : "border-l-amber"
+            grade.total >= TEST_OUT_PASS_TOTAL ? "border-l-success" : "border-l-amber"
           }`}
         >
           {grade.total >= TEST_OUT_PASS_TOTAL ? (
-            <span className="font-semibold text-[#1d8f77]">
+            <span className="font-semibold text-success">
               Test-out passed — all stations are unlocked.
             </span>
           ) : (
             <span className="text-dim">
               Test-out needs {TEST_OUT_PASS_TOTAL}+.{" "}
-              <Link href="/train" className="font-semibold text-teal underline">
+              <Link href="/train" className="font-semibold text-primary underline">
                 Train the gaps
               </Link>{" "}
               or{" "}
-              <Link href="/test-out" className="font-semibold text-teal underline">
+              <Link href="/test-out" className="font-semibold text-primary underline">
                 run it again
               </Link>
               .
@@ -216,7 +216,7 @@ export default async function ScorecardPage({ params }: { params: Promise<{ id: 
                 {grade.scores[lowest]}/20
               </span>
               {" — "}review{" "}
-              <span className="font-semibold text-teal underline">
+              <span className="font-semibold text-primary underline">
                 Module {mod}: {rec.sectionTitle}
               </span>
             </span>
@@ -230,7 +230,7 @@ export default async function ScorecardPage({ params }: { params: Promise<{ id: 
         {profile && !profile.onboarded && (
           <Link
             href="/onboarding"
-            className="display w-full rounded-card bg-teal py-3.5 text-center text-[15px] tracking-tight text-white"
+            className="display w-full rounded-card bg-primary py-3.5 text-center text-[15px] tracking-tight text-white"
           >
             That was rep one — set up your clinic
           </Link>

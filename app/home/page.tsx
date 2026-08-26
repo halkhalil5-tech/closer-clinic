@@ -152,7 +152,7 @@ export default async function HomePage({
               href="/train/cards?shuffle=5"
               className="flex items-center gap-1 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-bone"
             >
-              <Zap className="h-3.5 w-3.5 text-teal" strokeWidth={1.5} /> Warmup
+              <Zap className="h-3.5 w-3.5 text-primary" strokeWidth={1.5} /> Warmup
             </Link>
             <Link
               href="/prep"

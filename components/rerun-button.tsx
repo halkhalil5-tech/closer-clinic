@@ -44,7 +44,7 @@ export function RerunButton({
         className={`display w-full py-3.5 text-[15px] tracking-wide transition-opacity disabled:opacity-60 ${
           secondary
             ? "rounded-card border border-line-strong text-bone"
-            : "rounded-card bg-mint text-mint-ink"
+            : "rounded-card bg-primary text-white"
         }`}
       >
         {busy ? "Prepping the room" : "Same station, new patient"}

@@ -6,10 +6,10 @@ import confetti from "canvas-confetti";
 import { Check } from "lucide-react";
 
 export function letterColor(letter: string): string {
-  if (letter.startsWith("A")) return "#2ec4a5";
-  if (letter.startsWith("B")) return "#10707f";
-  if (letter.startsWith("C")) return "#c9a227";
-  return "#b0483a";
+  if (letter.startsWith("A")) return "var(--color-grade-a)";
+  if (letter.startsWith("B")) return "var(--color-grade-b)";
+  if (letter.startsWith("C")) return "var(--color-grade-c)";
+  return "var(--color-grade-d)";
 }
 
 /**
@@ -63,6 +63,7 @@ export function GradeHero({
         spread: 60,
         startVelocity: 28,
         origin: { y: 0.3 },
+        // literals: canvas-confetti cannot resolve CSS variables (success/primary/ink)
         colors: ["#2ec4a5", "#10707f", "#0a3540"],
         disableForReducedMotion: true,
       });
@@ -95,7 +96,7 @@ export function GradeHero({
           animate={{ opacity: 1, scale: 1, rotate: -3 }}
           transition={{ duration: 0.25, delay: 0.15 }}
           className={`mt-3 flex shrink-0 items-center gap-1 rounded-lg border-2 px-3 py-1.5 text-[15px] font-semibold ${
-            closed ? "border-[#2ec4a5] text-[#1d8f77]" : "border-danger text-danger"
+            closed ? "border-success text-success" : "border-danger text-danger"
           }`}
         >
           {closed && <Check className="h-5 w-5" strokeWidth={2} />}

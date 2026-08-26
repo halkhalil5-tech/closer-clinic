@@ -163,7 +163,7 @@ export function PairPlayer({
                 active === t.take
                   ? paper
                     ? "bg-paper-ink text-paper"
-                    : "bg-mint text-mint-ink"
+                    : "bg-primary text-white"
                   : paper
                     ? "bg-paper text-paper-ink/55"
                     : "bg-bg text-muted"
@@ -179,7 +179,7 @@ export function PairPlayer({
         <button
           onClick={toggle}
           aria-label={playing ? "Pause" : "Play"}
-          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full ${paper ? "bg-paper-ink text-paper" : "bg-mint text-mint-ink"}`}
+          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full ${paper ? "bg-paper-ink text-paper" : "bg-primary text-white"}`}
         >
           {playing ? (
             <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor">
@@ -201,7 +201,7 @@ export function PairPlayer({
             value={Math.min(posMs, dur)}
             onChange={(e) => seek(Number(e.target.value))}
             aria-label="Scrub"
-            className="w-full accent-[var(--color-mint)]"
+            className="w-full accent-[var(--color-primary)]"
           />
           {/* beat pins — tappable, The fix only */}
           {beats.map((b, i) => (
@@ -212,10 +212,10 @@ export function PairPlayer({
                 setPin(b);
               }}
               aria-label={`Beat: ${b.beat}`}
-              className={`absolute -top-1 h-4 w-4 -translate-x-1/2 rounded-full border ${paper ? "border-paper-mint bg-paper" : "border-mint bg-panel"}`}
+              className={`absolute -top-1 h-4 w-4 -translate-x-1/2 rounded-full border ${paper ? "border-paper-mint bg-paper" : "border-primary bg-panel"}`}
               style={{ left: `${(((b.startMs ?? 0) / dur) * 100).toFixed(1)}%` }}
             >
-              <span className={`absolute inset-1 rounded-full ${paper ? "bg-paper-mint" : "bg-mint"}`} />
+              <span className={`absolute inset-1 rounded-full ${paper ? "bg-paper-mint" : "bg-primary"}`} />
             </button>
           ))}
         </div>
@@ -226,8 +226,8 @@ export function PairPlayer({
       </div>
 
       {pin && (
-        <div className={`mt-2.5 border-l-2 px-2.5 py-2 ${paper ? "border-paper-mint bg-paper-ink/5" : "border-mint bg-bg"}`}>
-          <div className={`microlabel ${paper ? "text-paper-mint" : "text-mint"}`}>Beat</div>
+        <div className={`mt-2.5 border-l-2 px-2.5 py-2 ${paper ? "border-paper-mint bg-paper-ink/5" : "border-primary bg-bg"}`}>
+          <div className={`microlabel ${paper ? "text-paper-mint" : "text-primary"}`}>Beat</div>
           <div className={`mt-0.5 text-[13px] ${paper ? "text-paper-ink" : "text-ink"}`}>{pin.beat}</div>
           <div className={`mt-1 text-[12px] italic ${paper ? "text-paper-ink/60" : "text-dim"}`}>&ldquo;{pin.text}&rdquo;</div>
         </div>

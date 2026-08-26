@@ -151,7 +151,7 @@ export function SiteImport() {
             placeholder="yourpractice.com"
             inputMode="url"
             autoCapitalize="none"
-            className="mt-5 w-full border border-line bg-bg px-3 py-3 font-mono text-[15px] text-ink placeholder:text-muted focus:border-mint focus:outline-none"
+            className="mt-5 w-full border border-line bg-bg px-3 py-3 font-mono text-[15px] text-ink placeholder:text-muted focus:border-primary focus:outline-none"
           />
           {error && (
             <p className="mt-3 text-sm text-red">
@@ -167,7 +167,7 @@ export function SiteImport() {
             <button
               onClick={scan}
               disabled={busy || url.trim().length < 4}
-              className="display w-full rounded-card bg-mint py-3.5 text-[15px] tracking-wide text-mint-ink disabled:opacity-40"
+              className="display w-full rounded-card bg-primary py-3.5 text-[15px] tracking-wide text-white disabled:opacity-40"
             >
               {busy ? "Reading your site" : "Scan my website"}
             </button>
@@ -193,7 +193,7 @@ export function SiteImport() {
                   }
                   aria-label={s.include ? "Exclude" : "Include"}
                   className={`mt-1.5 flex h-5 w-5 shrink-0 items-center justify-center border ${
-                    s.include ? "border-mint text-mint" : "border-line text-transparent"
+                    s.include ? "border-primary text-primary" : "border-line text-transparent"
                   }`}
                 >
                   <svg viewBox="0 0 16 16" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth="2.4">
@@ -206,7 +206,7 @@ export function SiteImport() {
                     onChange={(e) =>
                       setFound((f) => f.map((x, j) => (j === i ? { ...x, name: e.target.value } : x)))
                     }
-                    className="w-full border-b border-transparent bg-transparent text-[14px] font-semibold text-ink focus:border-mint focus:outline-none"
+                    className="w-full border-b border-transparent bg-transparent text-[14px] font-semibold text-ink focus:border-primary focus:outline-none"
                   />
                   {s.description && (
                     <p className="mt-0.5 truncate text-[11.5px] text-muted">{s.description}</p>
@@ -218,7 +218,7 @@ export function SiteImport() {
                   onChange={(e) =>
                     setFound((f) => f.map((x, j) => (j === i ? { ...x, price: e.target.value } : x)))
                   }
-                  className={`w-20 shrink-0 border border-line bg-bg px-2 py-1.5 text-right font-mono text-[13px] tabular-nums focus:border-mint focus:outline-none ${
+                  className={`w-20 shrink-0 border border-line bg-bg px-2 py-1.5 text-right font-mono text-[13px] tabular-nums focus:border-primary focus:outline-none ${
                     parseAmount(s.price) > 0 ? "text-bone" : "text-amber"
                   }`}
                 />
@@ -230,7 +230,7 @@ export function SiteImport() {
             <button
               onClick={confirmChecklist}
               disabled={busy || found.every((s) => !s.include)}
-              className="display w-full rounded-card bg-mint py-3.5 text-[15px] tracking-wide text-mint-ink disabled:opacity-40"
+              className="display w-full rounded-card bg-primary py-3.5 text-[15px] tracking-wide text-white disabled:opacity-40"
             >
               {busy
                 ? "Writing your stations"
@@ -256,7 +256,7 @@ export function SiteImport() {
             <button
               onClick={saveCurrent}
               disabled={busy}
-              className="display w-full rounded-card bg-mint py-3.5 text-[15px] tracking-wide text-mint-ink disabled:opacity-60"
+              className="display w-full rounded-card bg-primary py-3.5 text-[15px] tracking-wide text-white disabled:opacity-60"
             >
               {busy ? "Saving" : "Save & continue"}
             </button>
@@ -273,7 +273,7 @@ export function SiteImport() {
 
       {phase === "done" && (
         <div className="flex flex-1 flex-col items-center justify-center pb-16 text-center">
-          <svg viewBox="0 0 48 48" className="h-14 w-14 text-mint" fill="none" stroke="currentColor" strokeWidth="2.5">
+          <svg viewBox="0 0 48 48" className="h-14 w-14 text-success" fill="none" stroke="currentColor" strokeWidth="2.5">
             <circle cx="24" cy="24" r="20" />
             <path d="m15 25 6 6 12-13" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
@@ -288,7 +288,7 @@ export function SiteImport() {
               router.push("/home");
               router.refresh();
             }}
-            className="display mt-6 w-full rounded-card bg-mint py-3.5 text-[15px] tracking-wide text-mint-ink"
+            className="display mt-6 w-full rounded-card bg-primary py-3.5 text-[15px] tracking-wide text-white"
           >
             See the roster
           </button>

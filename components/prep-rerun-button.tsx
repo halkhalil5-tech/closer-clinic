@@ -32,7 +32,7 @@ export function PrepRerunButton({ encounterId }: { encounterId: string }) {
       <button
         onClick={rerun}
         disabled={busy}
-        className="display w-full rounded-card bg-mint py-3.5 text-[15px] tracking-wide text-mint-ink disabled:opacity-60"
+        className="display w-full rounded-card bg-primary py-3.5 text-[15px] tracking-wide text-white disabled:opacity-60"
       >
         {busy ? "Re-rolling the patient" : "Again, different personality"}
       </button>

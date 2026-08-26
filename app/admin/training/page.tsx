@@ -91,7 +91,7 @@ export default async function AdminTrainingPage() {
                   <div className="mt-1 flex items-center gap-2">
                     <div className="h-1 flex-1 bg-panel-2">
                       <div
-                        className={`h-full ${m.coreComplete ? "bg-mint" : "bg-bone/60"}`}
+                        className={`h-full ${m.coreComplete ? "bg-success" : "bg-bone/60"}`}
                         style={{ width: `${pct}%` }}
                       />
                     </div>
@@ -153,7 +153,7 @@ export default async function AdminTrainingPage() {
                   <span
                     className={`h-1.5 w-1.5 shrink-0 rounded-full ${
                       status.state === "done"
-                        ? "bg-mint"
+                        ? "bg-success"
                         : status.state === "in_progress"
                           ? "bg-bone"
                           : "bg-faint"

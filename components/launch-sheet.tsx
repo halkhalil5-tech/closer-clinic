@@ -99,11 +99,11 @@ export function LaunchSheet({
                 key={d.id}
                 onClick={() => setDifficulty(d.id)}
                 className={`display relative min-h-[44px] flex-1 pb-2.5 pt-2 text-[13px] transition-colors active:text-ink ${
-                  on ? "text-mint" : "text-muted"
+                  on ? "text-primary" : "text-muted"
                 }`}
               >
                 {d.label}
-                {on && <span className="absolute inset-x-0 -bottom-px h-0.5 bg-mint" />}
+                {on && <span className="absolute inset-x-0 -bottom-px h-0.5 bg-primary" />}
               </button>
             );
           })}
@@ -127,7 +127,7 @@ export function LaunchSheet({
         <button
           onClick={start}
           disabled={starting}
-          className="display mt-4 w-full rounded-card bg-mint py-3.5 text-[15px] tracking-wide text-mint-ink transition-opacity disabled:opacity-70"
+          className="display mt-4 w-full rounded-card bg-primary py-3.5 text-[15px] tracking-wide text-white transition-opacity disabled:opacity-70"
         >
           {starting ? "Prepping the room" : "Start rep"}
         </button>

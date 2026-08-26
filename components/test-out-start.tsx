@@ -29,7 +29,7 @@ export function TestOutStart() {
       <button
         onClick={start}
         disabled={busy}
-        className="display w-full rounded-card bg-mint py-3.5 text-[15px] tracking-wide text-mint-ink disabled:opacity-60"
+        className="display w-full rounded-card bg-primary py-3.5 text-[15px] tracking-wide text-white disabled:opacity-60"
       >
         {busy ? "Prepping the room" : "Start the challenge rep"}
       </button>

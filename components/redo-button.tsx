@@ -41,7 +41,7 @@ export function RedoButton({
           paper
             ? "border-2 border-paper-ink py-2.5 text-[13px] tracking-wide text-paper-ink"
             : primary
-              ? "rounded-card bg-mint py-3.5 text-[15px] tracking-wide text-mint-ink"
+              ? "rounded-card bg-primary py-3.5 text-[15px] tracking-wide text-white"
               : "rounded-card border border-line-strong py-3.5 text-[15px] tracking-wide text-bone"
         }`}
       >

@@ -40,7 +40,7 @@ export default async function FounderPage() {
 
   return (
     <main className="mx-auto w-full max-w-md px-4 pb-10 pt-[calc(env(safe-area-inset-top)+0.75rem)]">
-      <div className="microlabel text-mint">Founder</div>
+      <div className="microlabel text-primary">Founder</div>
       <h1 className="display mt-2 text-[28px] text-ink">Unit costs</h1>
       <p className="mt-1 text-[12px] text-muted">
         Last 90 days · {rows.length} encounters · estimates from lib/costs.ts
@@ -57,7 +57,7 @@ export default async function FounderPage() {
         ).map(([label, v]) => (
           <div key={label} className="px-2 py-2.5">
             <div className="microlabel">{label}</div>
-            <div className={`mt-0.5 font-mono text-[15px] font-semibold tabular-nums ${label === "Total" ? "text-mint" : "text-ink"}`}>
+            <div className={`mt-0.5 font-mono text-[15px] font-semibold tabular-nums ${label === "Total" ? "text-primary" : "text-ink"}`}>
               {money(v)}
             </div>
           </div>

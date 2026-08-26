@@ -50,7 +50,7 @@ export function AssignmentCreate({ stations }: { stations: StationOpt[] }) {
   }
 
   const selectCls =
-    "mt-1 w-full border border-line bg-panel px-2.5 py-2 text-[13px] text-ink focus:border-mint focus:outline-none";
+    "mt-1 w-full border border-line bg-panel px-2.5 py-2 text-[13px] text-ink focus:border-primary focus:outline-none";
 
   return (
     <div className="raised mt-2 rounded-card px-3.5 pb-3.5 pt-3">
@@ -101,7 +101,7 @@ export function AssignmentCreate({ stations }: { stations: StationOpt[] }) {
       <button
         onClick={create}
         disabled={busy}
-        className="display mt-3 w-full rounded-card bg-mint py-2.5 text-[13px] tracking-wide text-mint-ink disabled:opacity-60"
+        className="display mt-3 w-full rounded-card bg-primary py-2.5 text-[13px] tracking-wide text-white disabled:opacity-60"
       >
         {busy ? "Assigning" : "Assign to team"}
       </button>

@@ -11,9 +11,9 @@
 
   /* ---- brief palette (the only colors in the app) ---- */
   --color-ink: #0a3540; /* deep teal-navy: dark surfaces, primary text on light */
-  --color-teal: #10707f; /* primary actions, links, active states */
-  --color-mint: #10707f; /* legacy alias: existing CTAs read as primary = teal */
-  --color-live: #2ec4a5; /* true mint — accent ONLY: success, live, highlights */
+  --color-primary: #10707f; /* teal: buttons, links, active states */
+  --color-success: #2ec4a5; /* mint: success, completed, live/recording, positive deltas */
+  --color-teal: #10707f; /* raw palette name; prefer --color-primary at call sites */
   --color-card: #eff6f5;
   --color-bg: #ffffff;
   --color-muted: #5b7278;
@@ -39,8 +39,6 @@
   --color-dim: #3f5a61;
   --color-faint: #8aa0a5;
   --color-bone: #0a3540; /* oversized numerals & display headers: deep ink */
-  --color-mint-deep: #0b5560;
-  --color-mint-ink: #ffffff; /* text on primary surfaces */
   --color-amber: #c9a227;
   --color-red: #b0483a;
 
@@ -59,8 +57,6 @@
   --color-navy-700: color-mix(in srgb, #0a3540 8%, transparent);
   --color-ink-dim: #3f5a61;
   --color-warn: #c9a227;
-  --color-mint-bright: #2ec4a5;
-  --color-mint-dim: #0b5560;
 
   /* ---- type: two families only ---- */
   --font-display: var(--font-general-sans), "General Sans", system-ui, sans-serif;
@@ -178,7 +174,6 @@ body {
   --color-line: rgb(255 255 255 / 0.12);
   --color-line-strong: rgb(255 255 255 / 0.22);
   --color-hairline: rgb(255 255 255 / 0.1);
-  --color-mint-ink: #06282e;
   background:
     /* the single allowed gradient: one subtle radial, session mode only */
     radial-gradient(120% 70% at 50% 0%, rgb(46 196 165 / 0.07), transparent 60%),

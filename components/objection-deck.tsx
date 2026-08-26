@@ -95,7 +95,7 @@ export function ObjectionDeck({ cards, shuffled }: { cards: ObjectionCard[]; shu
                       <p className="mt-1 text-[15px] leading-snug text-ink">{c.back.reframe}</p>
                     </div>
                     <div>
-                      <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-mint">Close</div>
+                      <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-success">Close</div>
                       <p className="mt-1 text-[15px] leading-snug text-ink">{c.back.close}</p>
                     </div>
                   </div>
