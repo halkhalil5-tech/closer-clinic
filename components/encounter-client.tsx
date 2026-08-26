@@ -2,10 +2,13 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { ChevronDown, Mic, Send, Square, Volume2, VolumeX } from "lucide-react";
 import type { Difficulty, PersonaSnapshot } from "@/lib/types";
 import { buildVoiceEngine, type VoiceCaps } from "@/lib/voice/engine";
 import { isAudioPrimed } from "@/lib/voice/elevenlabs-client";
 import type { SttSession } from "@/lib/voice/types";
+import { SessionVisualizer, type VisualizerMode } from "@/components/session-visualizer";
+import { ReceptivityGauge } from "@/components/receptivity-gauge";
 
 interface ChatMessage {
   role: "provider" | "patient";
@@ -65,6 +68,10 @@ export function EncounterClient({
   const [chartOpen, setChartOpen] = useState(false);
   const [voiceOn, setVoiceOn] = useState(true);
   const [sttSupported, setSttSupported] = useState(true);
+  // Visual-only: is the patient's voice currently playing?
+  const [speaking, setSpeaking] = useState(false);
+  // Visual-only: session clock.
+  const [elapsed, setElapsed] = useState(0);
 
   const engine = useMemo(
     () => buildVoiceEngine(encounterId, voiceCaps),
@@ -87,8 +94,24 @@ export function EncounterClient({
   }, [engine]);
 
   useEffect(() => {
+    const t = setInterval(() => setElapsed((e) => e + 1), 1000);
+    return () => clearInterval(t);
+  }, []);
+
+  useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages, sending, interim, micState]);
+
+  /** Speak a patient line while tracking the visual speaking state. */
+  const speakLine = useCallback(
+    (text: string) => {
+      setSpeaking(true);
+      engine.tts
+        .speak(text, { age: persona.age, name: persona.name })
+        .finally(() => setSpeaking(false));
+    },
+    [engine, persona.age, persona.name]
+  );
 
   // Browsers block audio until the page sees a real user gesture, so the
   // opener is spoken on the first pointer/key input — which also unlocks
@@ -107,7 +130,7 @@ export function EncounterClient({
       const msgs = messagesRef.current;
       if (msgs.length === 1 && msgs[0].role === "patient") {
         spokeOpener.current = true;
-        engine.tts.speak(msgs[0].text, { age: persona.age, name: persona.name });
+        speakLine(msgs[0].text);
       }
     };
     // Audio already unlocked by the "begin rep" tap (same document) — speak now.
@@ -126,7 +149,7 @@ export function EncounterClient({
       document.removeEventListener("pointerdown", unlock, true);
       document.removeEventListener("keydown", unlock, true);
     };
-  }, [engine, persona.age, persona.name]);
+  }, [engine, speakLine]);
 
   useEffect(() => {
     return () => {
@@ -139,7 +162,10 @@ export function EncounterClient({
     const next = !voiceOn;
     setVoiceOn(next);
     localStorage.setItem(VOICE_PREF_KEY, next ? "on" : "off");
-    if (!next) engine.tts.cancel();
+    if (!next) {
+      engine.tts.cancel();
+      setSpeaking(false);
+    }
   }
 
   const sendTurn = useCallback(
@@ -175,7 +201,7 @@ export function EncounterClient({
         setTurnsUsed(data.providerTurns);
         if (data.nudged) setNudged(true);
         if (voiceOn) {
-          engine.tts.speak(data.patient, { age: persona.age, name: persona.name });
+          speakLine(data.patient);
         }
       } catch {
         setMessages((m) => m.slice(0, -1));
@@ -185,12 +211,13 @@ export function EncounterClient({
         setSending(false);
       }
     },
-    [encounterId, sending, grading, voiceOn, persona.age, persona.name, maxTurns, engine]
+    [encounterId, sending, grading, voiceOn, speakLine, maxTurns, engine]
   );
 
   function startListening() {
     if (micState !== "idle" || sending) return;
     engine.tts.cancel();
+    setSpeaking(false);
     engine.tts.prime?.(); // unlock playback while we're in a user gesture
     setError(null);
     setMicState("recording");
@@ -232,6 +259,7 @@ export function EncounterClient({
     if (grading) return;
     sttRef.current?.cancel();
     engine.tts.cancel();
+    setSpeaking(false);
     setGrading(true);
     setError(null);
     try {
@@ -250,62 +278,63 @@ export function EncounterClient({
   const hasSpoken = messages.some((m) => m.role === "provider");
   const recording = micState === "recording";
   const transcribing = micState === "transcribing";
+  const mode: VisualizerMode = recording ? "listening" : speaking ? "patient" : "idle";
+  const clock = `${Math.floor(elapsed / 60)}:${String(elapsed % 60).padStart(2, "0")}`;
 
   return (
-    <div className="mx-auto flex h-dvh w-full max-w-md flex-col">
-      {/* EMR header strip: dense, monospace, color-coded fields */}
-      <header className="border-b border-line bg-panel pt-[env(safe-area-inset-top)]">
-        <div className="flex items-stretch justify-between gap-2 px-3 py-2">
-          <button onClick={() => setChartOpen((v) => !v)} className="min-w-0 text-left">
-            <div className="flex items-center gap-1.5 font-mono text-[13px] font-semibold text-ink">
-              <span className="truncate">
-                {persona.name.toUpperCase()}
-                <span className="text-muted"> · {persona.age}{persona.gender ? persona.gender.toUpperCase() : ""}</span>
-              </span>
-              <svg
-                viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"
-                className={`h-3.5 w-3.5 shrink-0 text-muted transition-transform ${chartOpen ? "rotate-180" : ""}`}
-              >
-                <path d="m6 9 6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
+    <div className="session-dark mx-auto flex h-dvh w-full max-w-md flex-col">
+      {/* session header: scenario + clock in quiet muted text, one End action */}
+      <header className="pt-[env(safe-area-inset-top)]">
+        <div className="flex items-center justify-between gap-3 px-4 pt-3">
+          <div className="min-w-0">
+            <div className="truncate text-[12.5px] font-medium text-muted">{scenario.title}</div>
+            <div className="font-mono text-[11px] tabular-nums text-faint">
+              {clock} · <span className={DIFF_COLOR[difficulty]}>{difficulty}</span>
             </div>
-            <div className="mt-0.5 flex flex-wrap gap-x-2.5 gap-y-0.5 font-mono text-[10px] tracking-tight text-muted">
-              <span>INS <span className="text-dim">{persona.insurance}</span></span>
-              <span>FEE <span className="text-bone">{scenario.priceDisplay}</span></span>
-              <span className={`font-semibold ${DIFF_COLOR[difficulty]}`}>{difficulty.toUpperCase()}</span>
-            </div>
-          </button>
-          <div className="flex shrink-0 items-center gap-1.5">
+          </div>
+          <div className="flex shrink-0 items-center gap-2">
             <button
               onClick={toggleVoice}
               aria-label={voiceOn ? "Turn patient voice off" : "Turn patient voice on"}
-              className={`border p-2 transition-colors ${
-                voiceOn ? "border-mint/60 text-mint" : "border-line text-faint"
+              className={`rounded-lg border p-2 transition-colors duration-150 ${
+                voiceOn ? "border-white/20 text-[#2ec4a5]" : "border-white/10 text-faint"
               }`}
             >
               {voiceOn ? (
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" className="h-4 w-4">
-                  <path d="M11 5 6 9H3v6h3l5 4V5Z" strokeLinejoin="round" />
-                  <path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 6a9 9 0 0 1 0 12" strokeLinecap="round" />
-                </svg>
+                <Volume2 className="h-5 w-5" strokeWidth={1.5} />
               ) : (
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" className="h-4 w-4">
-                  <path d="M11 5 6 9H3v6h3l5 4V5Z" strokeLinejoin="round" />
-                  <path d="m16 9 5 5m0-5-5 5" strokeLinecap="round" />
-                </svg>
+                <VolumeX className="h-5 w-5" strokeWidth={1.5} />
               )}
             </button>
             <button
               onClick={endAndGrade}
               disabled={grading || !hasSpoken}
-              className="display border border-line-strong bg-panel-2 px-3 py-2 text-[11px] tracking-wide text-ink transition-colors disabled:opacity-40"
+              className="rounded-lg border border-white/20 px-3.5 py-2 text-[13px] font-medium text-ink transition-colors duration-150 hover:bg-white/5 disabled:opacity-40"
             >
-              {grading ? "Grading" : "End & grade"}
+              {grading ? "Grading…" : "End session"}
             </button>
           </div>
         </div>
+
+        {/* patient chart strip */}
+        <button
+          onClick={() => setChartOpen((v) => !v)}
+          className="mt-2 flex w-full items-center justify-between gap-2 border-y border-white/10 px-4 py-2 text-left"
+        >
+          <span className="min-w-0 truncate">
+            <span className="display-title text-[15px] text-bone">{persona.name}</span>
+            <span className="text-[12.5px] text-muted">
+              {" "}· {persona.age}
+              {persona.gender ? persona.gender.toUpperCase() : ""} · {scenario.priceDisplay}
+            </span>
+          </span>
+          <ChevronDown
+            className={`h-5 w-5 shrink-0 text-muted transition-transform duration-150 ${chartOpen ? "rotate-180" : ""}`}
+            strokeWidth={1.5}
+          />
+        </button>
         {chartOpen && (
-          <div className="border-t border-line px-3 py-2.5 font-mono text-[12px] leading-snug">
+          <div className="border-b border-white/10 px-4 py-3 text-[13px] leading-snug">
             <div className="grid grid-cols-[52px_1fr] gap-x-2 gap-y-1.5">
               <span className="microlabel pt-0.5">PT</span>
               <span className="text-dim">{persona.occupation} · {persona.insurance}</span>
@@ -318,26 +347,43 @@ export function EncounterClient({
             </div>
           </div>
         )}
+
+        {/* receptivity — Easy/Moderate only; Hard makes you read the room */}
+        {difficulty !== "hard" && receptivity !== null && <ReceptivityGauge value={receptivity} />}
+        {difficulty === "hard" && (
+          <div className="px-4 py-1.5 text-right font-mono text-[9px] font-semibold uppercase tracking-[0.3em] text-faint">
+            Read the room
+          </div>
+        )}
       </header>
 
+      {/* the orb: live while either side is speaking, breathing when quiet */}
+      <div className="relative h-24 shrink-0">
+        <SessionVisualizer mode={mode} />
+        {(recording || speaking) && (
+          <span className="absolute bottom-1 left-1/2 -translate-x-1/2 font-mono text-[9px] font-semibold uppercase tracking-[0.24em] text-[#2ec4a5]">
+            {recording ? "Listening" : "Patient speaking"}
+          </span>
+        )}
+      </div>
+
       {/* Thread */}
-      <div className="relative flex min-h-0 flex-1">
-      <div ref={scrollRef} className="flex-1 overflow-y-auto px-3 py-3 pr-6">
-        <div className="flex flex-col gap-2">
+      <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto px-4 py-2">
+        <div className="flex flex-col gap-2.5">
           {messages.map((m, i) => (
             <div
               key={i}
-              className={`max-w-[88%] border px-3 py-2 text-[14px] leading-snug ${
+              className={`max-w-[88%] rounded-xl px-3.5 py-2.5 text-[14px] leading-snug ${
                 m.role === "provider"
-                  ? "raised self-end border-line-strong text-ink"
-                  : "self-start border-line bg-panel text-ink"
+                  ? "self-end bg-[#12454f] text-ink"
+                  : "self-start border border-white/10 text-ink"
               }`}
             >
               {m.text}
             </div>
           ))}
           {sending && (
-            <div className="flex items-center gap-2 self-start border border-line bg-panel px-3 py-2">
+            <div className="flex items-center gap-2 self-start rounded-xl border border-white/10 px-3.5 py-2.5">
               <span className="microlabel">Patient responding</span>
               <span className="flex gap-1">
                 <span className="respond-dot h-1 w-1 rounded-full bg-dim" />
@@ -347,59 +393,35 @@ export function EncounterClient({
             </div>
           )}
           {nudged && !capReached && (
-            <div className="self-center border border-amber/40 bg-amber/10 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.12em] text-amber">
+            <div className="self-center rounded-full border border-amber/40 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.12em] text-amber">
               Patient glances at the clock
             </div>
           )}
           {capReached && (
-            <div className="self-center border border-red/40 bg-red/5 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.12em] text-red">
+            <div className="self-center rounded-full border border-red/40 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.12em] text-red">
               Visit over — end &amp; grade
             </div>
           )}
         </div>
       </div>
 
-      {/* receptivity gauge — Easy/Moderate only; Hard makes you read the room */}
-      <div className="pointer-events-none absolute inset-y-0 right-1 flex items-center">
-        {difficulty === "hard" ? (
-          <span
-            className="font-mono text-[8px] font-semibold uppercase tracking-[0.3em] text-faint"
-            style={{ writingMode: "vertical-rl" }}
-          >
-            Read the room
-          </span>
-        ) : (
-          receptivity !== null && (
-            <div className="flex h-44 w-1 items-end overflow-hidden rounded-full bg-line/60">
-              <div
-                className={`w-full rounded-full transition-all duration-[400ms] ease-out ${
-                  receptivity > 70 ? "bg-mint" : receptivity < 35 ? "bg-amber" : "bg-bone"
-                }`}
-                style={{ height: `${receptivity}%` }}
-              />
-            </div>
-          )
-        )}
-      </div>
-      </div>
-
       {error && (
-        <div className="mx-3 mb-2 border border-red/50 bg-red/5 p-2.5 text-[13px] text-red">
+        <div className="mx-4 mb-2 rounded-lg border border-red/50 bg-red/10 p-2.5 text-[13px] text-ink">
           {error}
         </div>
       )}
 
-      {/* Composer */}
-      <div className="border-t border-line bg-panel px-3 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] pt-2.5">
+      {/* Composer — thumb-first: one large action on the right */}
+      <div className="border-t border-white/10 px-4 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] pt-2.5">
         {(interim || recording || transcribing) && (
           <div className="mb-1.5 flex min-h-4 items-center gap-2">
-            {recording && <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-red" />}
+            {recording && <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#2ec4a5]" />}
             <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-muted">
               {transcribing ? "Transcribing" : interim || "Listening — tap again to send"}
             </span>
           </div>
         )}
-        <div className="flex items-end gap-2">
+        <div className="flex items-end gap-2.5">
           <textarea
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
@@ -409,44 +431,37 @@ export function EncounterClient({
                 sendTurn(draft);
               }
             }}
-            placeholder={capReached ? "The visit is over." : "Talk to your patient..."}
+            placeholder={capReached ? "The visit is over." : "Talk to your patient…"}
             rows={1}
             disabled={capReached || grading || transcribing}
-            className="max-h-28 min-h-11 flex-1 resize-none border border-line bg-bg px-3 py-2.5 text-[14px] text-ink placeholder:text-muted focus:border-mint focus:outline-none disabled:opacity-50"
+            className="max-h-28 min-h-12 flex-1 resize-none rounded-xl border border-white/15 bg-white/5 px-3.5 py-3 text-[14px] text-ink placeholder:text-faint focus:border-[#2ec4a5]/60 focus:outline-none disabled:opacity-50"
           />
           {sttSupported && !capReached ? (
             recording ? (
               <button
                 onClick={stopAndSend}
                 aria-label="Stop and send"
-                className="mic-live flex h-13 w-13 shrink-0 items-center justify-center rounded-full bg-mint text-mint-ink"
+                className="mic-live flex h-13 w-13 shrink-0 items-center justify-center rounded-full bg-[#2ec4a5] text-[#06282e]"
               >
-                <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5">
-                  <rect x="6" y="6" width="12" height="12" rx="1" />
-                </svg>
+                <Square className="h-5 w-5" strokeWidth={1.5} fill="currentColor" />
               </button>
             ) : draft.trim() ? (
               <button
                 onClick={() => sendTurn(draft)}
                 disabled={sending || grading}
                 aria-label="Send"
-                className="flex h-13 w-13 shrink-0 items-center justify-center rounded-full bg-mint text-mint-ink disabled:opacity-50"
+                className="flex h-13 w-13 shrink-0 items-center justify-center rounded-full bg-white text-[#0a3540] disabled:opacity-50"
               >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className="h-5 w-5">
-                  <path d="M5 12h13M13 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
+                <Send className="h-5 w-5" strokeWidth={1.5} />
               </button>
             ) : (
               <button
                 onClick={startListening}
                 disabled={sending || grading || transcribing}
                 aria-label="Tap to talk"
-                className="flex h-13 w-13 shrink-0 items-center justify-center rounded-full border-2 border-mint bg-panel text-mint disabled:opacity-50"
+                className="flex h-13 w-13 shrink-0 items-center justify-center rounded-full border-2 border-[#2ec4a5] text-[#2ec4a5] disabled:opacity-50"
               >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" className="h-6 w-6">
-                  <rect x="9" y="3" width="6" height="11" rx="3" />
-                  <path d="M5 11a7 7 0 0 0 14 0M12 18v3" strokeLinecap="round" />
-                </svg>
+                <Mic className="h-6 w-6" strokeWidth={1.5} />
               </button>
             )
           ) : (
@@ -455,11 +470,9 @@ export function EncounterClient({
                 onClick={() => sendTurn(draft)}
                 disabled={sending || grading || !draft.trim()}
                 aria-label="Send"
-                className="flex h-13 w-13 shrink-0 items-center justify-center rounded-full bg-mint text-mint-ink disabled:opacity-40"
+                className="flex h-13 w-13 shrink-0 items-center justify-center rounded-full bg-white text-[#0a3540] disabled:opacity-40"
               >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className="h-5 w-5">
-                  <path d="M5 12h13M13 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
+                <Send className="h-5 w-5" strokeWidth={1.5} />
               </button>
             )
           )}
@@ -467,13 +480,13 @@ export function EncounterClient({
             <button
               onClick={endAndGrade}
               disabled={grading}
-              className="display h-11 shrink-0 bg-mint px-4 text-[13px] tracking-wide text-mint-ink disabled:opacity-60"
+              className="display h-12 shrink-0 rounded-xl bg-white px-4 text-[14px] tracking-tight text-[#0a3540] disabled:opacity-60"
             >
-              {grading ? "Grading" : "End & grade"}
+              {grading ? "Grading…" : "End & grade"}
             </button>
           )}
         </div>
-        <div className="mt-1.5 text-center font-mono text-[9px] uppercase tracking-[0.2em] text-muted">
+        <div className="mt-1.5 text-center font-mono text-[9px] uppercase tracking-[0.2em] text-faint">
           {capReached ? "Turn limit reached" : `${turnsLeft} turn${turnsLeft === 1 ? "" : "s"} left`}
         </div>
       </div>
