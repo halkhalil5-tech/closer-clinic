@@ -1,0 +1,56 @@
+[
+  {
+    "id": "01-hook",
+    "text": "Every week, a patient leaves your office without the treatment you know they need. Not because you were wrong. Because of how the conversation went.",
+    "file": "vo/01-hook.mp3",
+    "dur": 7.99
+  },
+  {
+    "id": "02-what",
+    "text": "Clozer Clinic is a flight simulator for that conversation.",
+    "file": "vo/02-what.mp3",
+    "dur": 3.2
+  },
+  {
+    "id": "03-stations",
+    "text": "Your stations. Shockwave, laser, orthotics — loaded with your services, at your prices.",
+    "file": "vo/03-stations.mp3",
+    "dur": 6.22
+  },
+  {
+    "id": "04-rep",
+    "text": "You walk into the room and talk to an A.I. patient who pushes back like a real one.",
+    "file": "vo/04-rep.mp3",
+    "dur": 4.32
+  },
+  {
+    "id": "05-listen",
+    "text": "Out loud. In real time.",
+    "file": "vo/05-listen.mp3",
+    "dur": 1.58
+  },
+  {
+    "id": "06-grade",
+    "text": "The moment you finish, you're graded on the five things that decide a case: rapport, clinical framing, price delivery, objections, and the close.",
+    "file": "vo/06-grade.mp3",
+    "dur": 9.38
+  },
+  {
+    "id": "07-rewrite",
+    "text": "Every rep shows you the exact line that cost you — and the line that would have won it.",
+    "file": "vo/07-rewrite.mp3",
+    "dur": 5.02
+  },
+  {
+    "id": "08-revenue",
+    "text": "Then it follows you into the real chair. Closed revenue. Where consults leak. What the training is actually worth.",
+    "file": "vo/08-revenue.mp3",
+    "dur": 6.27
+  },
+  {
+    "id": "09-close",
+    "text": "Clozer Clinic. Get the yes you already earned.",
+    "file": "vo/09-close.mp3",
+    "dur": 2.74
+  }
+]

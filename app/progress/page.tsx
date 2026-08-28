@@ -7,6 +7,7 @@ import { computeStats } from "@/lib/stats";
 import { computeTrainingStatus } from "@/lib/training";
 import { averageLetter, dimensionLetterFor, isoDaysAgo, letterColorFor } from "@/lib/letter-grades";
 import { AppNav } from "@/components/app-nav";
+import { SampleDataChip } from "@/components/sample-data-chip";
 import { SimVsRealChart, ScenarioBars, type RealDayPoint } from "@/components/charts";
 import { OutcomeLog, type LogService } from "@/components/outcome-log";
 import {
@@ -27,7 +28,7 @@ const WINDOWS = [7, 30, 90] as const;
 export default async function ProgressPage({
   searchParams,
 }: {
-  searchParams: Promise<{ window?: string; tab?: string }>;
+  searchParams: Promise<{ window?: string; tab?: string; demo?: string }>;
 }) {
   const user = await getAuthedUser();
   if (!user) redirect("/login");
@@ -452,6 +453,7 @@ export default async function ProgressPage({
       </main>
       )}
 
+      {sp.demo === "1" && <SampleDataChip />}
       <AppNav />
     </div>
   );
