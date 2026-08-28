@@ -9,6 +9,8 @@ import { splitReceptivity } from "@/lib/receptivity";
 import { computeTrainingStatus } from "@/lib/training";
 import { DAILY_ENCOUNTER_LIMIT, type TranscriptMessage } from "@/lib/types";
 
+export const maxDuration = 60;
+
 const CreateSchema = z.object({
   scenarioSlug: z.string().min(1),
   difficulty: z.enum(["easy", "moderate", "hard"]),

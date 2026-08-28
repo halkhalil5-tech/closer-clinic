@@ -12,6 +12,8 @@ import {
   type TranscriptMessage,
 } from "@/lib/types";
 
+export const maxDuration = 60;
+
 const TurnSchema = z.object({
   text: z.string().trim().min(1).max(2000),
 });

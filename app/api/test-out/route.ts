@@ -7,6 +7,8 @@ import { generatePatientReply } from "@/lib/anthropic";
 import { splitReceptivity } from "@/lib/receptivity";
 import { TEST_OUT_PASS_TOTAL, type TranscriptMessage } from "@/lib/types";
 
+export const maxDuration = 60;
+
 /**
  * The test-out challenge rep: one moderate-difficulty encounter on the
  * flagship station. Score 75+ and all base stations unlock immediately —

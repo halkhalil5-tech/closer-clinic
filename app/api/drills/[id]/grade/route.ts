@@ -6,6 +6,8 @@ import { buildDrillGraderPrompt } from "@/lib/prompts";
 import { generateGrade, hasModelAccess } from "@/lib/anthropic";
 import { settleLessonStatus, maybeUnlockCore } from "@/lib/training/server";
 
+export const maxDuration = 60;
+
 const ResultSchema = z.object({
   passed: z.boolean(),
   feedback: z.string().min(1),

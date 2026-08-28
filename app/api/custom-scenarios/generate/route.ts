@@ -8,6 +8,8 @@ import { derivePriceStrings } from "@/lib/pricing";
 import { scrubFreeText } from "@/lib/scrub";
 import { MAX_CUSTOM_SCENARIOS_USER } from "@/lib/types";
 
+export const maxDuration = 60;
+
 const Schema = z.object({
   title: z.string().trim().min(2).max(80),
   config: z.object({

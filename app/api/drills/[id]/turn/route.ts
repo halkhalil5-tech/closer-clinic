@@ -6,6 +6,8 @@ import { buildDrillPatientSystemPrompt } from "@/lib/prompts";
 import { generatePatientReply } from "@/lib/anthropic";
 import type { TranscriptMessage } from "@/lib/types";
 
+export const maxDuration = 60;
+
 const Schema = z.object({ text: z.string().trim().min(1).max(2000) });
 
 export async function POST(req: Request, ctx: { params: Promise<{ id: string }> }) {

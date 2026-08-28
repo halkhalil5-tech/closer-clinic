@@ -14,6 +14,8 @@ import { scrubFreeText } from "@/lib/scrub";
 import { agesFromBand, WORRY_MAX_CHARS } from "@/lib/prep";
 import type { Scenario, TranscriptMessage } from "@/lib/types";
 
+export const maxDuration = 60;
+
 const Schema = z.union([
   z.object({
     rerunOf: z.string().min(1),

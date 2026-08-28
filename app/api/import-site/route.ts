@@ -5,6 +5,8 @@ import { getStore } from "@/lib/store";
 import { crawlSite, heuristicExtract, buildSiteExtractionPrompt } from "@/lib/site-import";
 import { generateGrade, hasModelAccess } from "@/lib/anthropic";
 
+export const maxDuration = 60;
+
 const Schema = z.object({ url: z.string().trim().min(4).max(300) });
 
 const IMPORTS_PER_DAY = 3;

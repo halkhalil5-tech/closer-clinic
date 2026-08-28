@@ -7,6 +7,8 @@ import { generateGrade, hasModelAccess } from "@/lib/anthropic";
 import { parseGradeResult, type GradeResult } from "@/lib/grading";
 import { TEST_OUT_PASS_TOTAL } from "@/lib/types";
 
+export const maxDuration = 60;
+
 /** Read a stored grade (drive mode uses this for the spoken summary). */
 export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> }) {
   const user = await getAuthedUser();

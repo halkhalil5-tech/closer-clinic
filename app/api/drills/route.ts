@@ -7,6 +7,8 @@ import { buildDrillPatientSystemPrompt, DRILL_OPENING_INSTRUCTION } from "@/lib/
 import { generatePatientReply } from "@/lib/anthropic";
 import type { TranscriptMessage } from "@/lib/types";
 
+export const maxDuration = 60;
+
 const Schema = z.object({ lessonSlug: z.string().min(1) });
 
 /** Start a micro-drill: a 3-turn mini-rep against a narrowed patient. */
