@@ -513,10 +513,12 @@ export class SupabaseStore implements Store {
     }
     const { data, error } = await q;
     if (error) throw error;
-    return (data ?? []).map((r: any) => ({
-      encounter: mapEncounter(r),
-      grade: r.grades && r.grades.length > 0 ? mapGrade(r.grades[0]) : null,
-    }));
+    return (data ?? []).map((r: any) => {
+      // grades.encounter_id is unique, so PostgREST embeds a to-one OBJECT
+      // (an array only appears without the unique constraint) — accept both.
+      const g = Array.isArray(r.grades) ? r.grades[0] : r.grades;
+      return { encounter: mapEncounter(r), grade: g ? mapGrade(g) : null };
+    });
   }
 
   /* ------------------------------ training ------------------------------ */
