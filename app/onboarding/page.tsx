@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 const SPECIALTIES = [
   { id: "podiatry", label: "Podiatry", note: "8 stations live", available: true },
+  { id: "regen", label: "Regenerative medicine", note: "10 stations live", available: true },
   { id: "dental", label: "Dental", note: "Coming soon", available: false },
   { id: "medspa", label: "Med spa / plastics", note: "Coming soon", available: false },
 ] as const;

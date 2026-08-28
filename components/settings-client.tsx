@@ -12,6 +12,7 @@ const VOICE_PREF_KEY = "closer-clinic:patient-voice";
 
 const SPECIALTIES = [
   { id: "podiatry", label: "Podiatry", available: true },
+  { id: "regen", label: "Regenerative medicine", available: true },
   { id: "dental", label: "Dental", available: false },
   { id: "medspa", label: "Med spa / plastics", available: false },
 ] as const;

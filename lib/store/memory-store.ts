@@ -22,9 +22,24 @@ import { addUsage } from "../costs";
 import type { EncounterWithGrade, Store, TeamTrainingRow } from "./index";
 import { listScenarios as codeScenarios, getScenario as codeScenario } from "../scenarios";
 import { PODIATRY_MODULES, PODIATRY_LESSONS } from "../training/podiatry-pack";
+import { REGEN_MODULES, REGEN_LESSONS } from "../training/regen-pack";
+import { REGEN_OBJECTION_CARDS } from "../training/regen-objection-cards";
 import { PODIATRY_OBJECTION_CARDS } from "../training/objection-cards";
 import { getModuleDocFromCode } from "../training/module-docs";
-import { NORTHWIND_CODE, NORTHWIND_PACK, NORTHWIND_STATIONS } from "../packs";
+import {
+  NORTHWIND_CODE,
+  NORTHWIND_PACK,
+  NORTHWIND_STATIONS,
+  STEMATIC_CODE,
+  STEMATIC_PACK,
+  STEMATIC_STATIONS,
+} from "../packs";
+
+/** Dev-mode pack registry — mirrors the `packs` + `pack_codes` tables. */
+const CODE_PACKS = [
+  { pack: NORTHWIND_PACK, stations: NORTHWIND_STATIONS, code: NORTHWIND_CODE },
+  { pack: STEMATIC_PACK, stations: STEMATIC_STATIONS, code: STEMATIC_CODE },
+];
 import { computeTrainingStatus } from "../training";
 import { DEV_USER } from "../config";
 
@@ -157,6 +172,68 @@ function seedStats(mem: MemoryDb) {
       });
     }
   }
+  // Regen mirror cluster: the specialty must not open empty on a sales call.
+  // Same DEV_SEED_STATS gate, same "Seed Patient" naming — clearly sample data.
+  const regenDays: [number, number][] = [[6, 1], [4, 1], [2, 1], [1, 2], [0, 1]];
+  const regenSlugs = ["regen-knee-single", "regen-shoulder-cuff", "regen-fda-anchor"];
+  let rn = 0;
+  for (const [daysAgo, reps] of regenDays) {
+    for (let r = 0; r < reps; r++) {
+      const id = randomUUID();
+      const startedAt = new Date(Date.now() - daysAgo * 86_400_000 - (r + 2) * 120_000).toISOString();
+      mem.encounters.set(id, {
+        id,
+        userId: DEV_USER.id,
+        scenarioSlug: regenSlugs[rn++ % regenSlugs.length],
+        difficulty: rn % 3 === 0 ? "hard" : "moderate",
+        persona: {
+          personaId: "seed",
+          archetype: "seed",
+          name: "Seed Patient",
+          age: 58,
+          insurance: "Medicare Advantage",
+          occupation: "retired contractor",
+        },
+        transcript: [],
+        status: "graded",
+        startedAt,
+        endedAt: startedAt,
+        usage: { ...EMPTY_USAGE },
+      });
+      mem.grades.set(id, {
+        id: randomUUID(),
+        encounterId: id,
+        closed: rn % 4 !== 0,
+        scores: { rapport: 16, framing: 15, price: 12, objections: 14, close: 15 },
+        total: 72,
+        momentIndex: 3,
+        rewrite: {
+          youSaid: "Honestly, most of our patients see amazing results — I really don't think you'll be disappointed.",
+          better: "I can't promise you a result — nobody honestly can. What I can do is define success for your knee in writing and measure it at twelve weeks.",
+        },
+        moment:
+          "When he asked for a guarantee, you reached for reassurance instead of the written-expectations play — receptivity dipped and the FDA question arrived harder.",
+        worked: [
+          "Opened the FDA answer with a plain 'no' before the nuance.",
+          "Recited his failed-treatment ladder back before recommending.",
+        ],
+        fixes: [
+          "'Amazing results' is an outcome claim — swap it for written expectations.",
+          "The $4,500 needed silence after it, not a financing rescue.",
+        ],
+        drill: "Refuse the guarantee at full volume, then offer the 12-week written definition of success.",
+        compliance: {
+          score: 11,
+          flags: [
+            "\"Most of our patients see amazing results\" — implied outcome claim without support.",
+          ],
+        },
+        createdAt: startedAt,
+        modelRaw: "",
+      });
+    }
+  }
+
   // Older cluster (~5 weeks back) with weaker scores, so the 30-day grade
   // trend has a real "before" to compare against.
   for (let i = 0; i < 5; i++) {
@@ -310,8 +387,12 @@ class MemoryStore implements Store {
   }
 
   private packScenario(slug: string): Scenario | undefined {
-    if (!db().unlockedPackIds.has(NORTHWIND_PACK.id)) return undefined;
-    return NORTHWIND_STATIONS.find((s) => s.slug === slug);
+    for (const { pack, stations } of CODE_PACKS) {
+      if (!db().unlockedPackIds.has(pack.id)) continue;
+      const hit = stations.find((s) => s.slug === slug);
+      if (hit) return hit;
+    }
+    return undefined;
   }
 
   async getScenario(slug: string): Promise<Scenario | null> {
@@ -366,7 +447,7 @@ class MemoryStore implements Store {
 
   async listObjectionCards(userId: string, specialty: string): Promise<ObjectionCard[]> {
     return [
-      ...PODIATRY_OBJECTION_CARDS.filter((c) => c.specialty === specialty),
+      ...[...PODIATRY_OBJECTION_CARDS, ...REGEN_OBJECTION_CARDS].filter((c) => c.specialty === specialty),
       ...db().customCards.filter((c) => c.createdByUserId === userId && c.specialty === specialty),
     ];
   }
@@ -485,6 +566,7 @@ class MemoryStore implements Store {
       worked: input.worked,
       fixes: input.fixes,
       drill: input.drill,
+      compliance: input.compliance ?? null,
       createdAt: new Date().toISOString(),
       modelRaw: input.modelRaw,
     };
@@ -518,15 +600,17 @@ class MemoryStore implements Store {
   /* ------------------------------ training ------------------------------ */
 
   async listTrainingModules(specialty: string): Promise<TrainingModule[]> {
-    return PODIATRY_MODULES.filter((m) => m.specialty === specialty).sort((a, b) => a.order - b.order);
+    return [...PODIATRY_MODULES, ...REGEN_MODULES]
+      .filter((m) => m.specialty === specialty)
+      .sort((a, b) => a.order - b.order);
   }
 
   async listTrainingLessons(specialty: string): Promise<TrainingLesson[]> {
-    return PODIATRY_LESSONS.filter((l) => l.specialty === specialty);
+    return [...PODIATRY_LESSONS, ...REGEN_LESSONS].filter((l) => l.specialty === specialty);
   }
 
   async getTrainingLesson(slug: string): Promise<TrainingLesson | null> {
-    return PODIATRY_LESSONS.find((l) => l.slug === slug) ?? null;
+    return [...PODIATRY_LESSONS, ...REGEN_LESSONS].find((l) => l.slug === slug) ?? null;
   }
 
   async getModuleDoc(moduleSlug: string): Promise<ModuleDoc | null> {
@@ -659,19 +743,21 @@ class MemoryStore implements Store {
   }
 
   async listUnlockedPacks(): Promise<import("../packs").UnlockedPack[]> {
-    if (!db().unlockedPackIds.has(NORTHWIND_PACK.id)) return [];
-    return [{ pack: NORTHWIND_PACK, stations: NORTHWIND_STATIONS }];
+    return CODE_PACKS.filter(({ pack }) => db().unlockedPackIds.has(pack.id)).map(
+      ({ pack, stations }) => ({ pack, stations })
+    );
   }
 
   async redeemPackCode(
     _userId: string,
     code: string
   ): Promise<{ ok: true; packName: string } | { ok: false; error: string }> {
-    if (code.trim().toUpperCase() !== NORTHWIND_CODE) {
+    const entry = CODE_PACKS.find((p) => p.code === code.trim().toUpperCase());
+    if (!entry) {
       return { ok: false, error: "That code doesn't match any pack." };
     }
-    db().unlockedPackIds.add(NORTHWIND_PACK.id);
-    return { ok: true, packName: NORTHWIND_PACK.name };
+    db().unlockedPackIds.add(entry.pack.id);
+    return { ok: true, packName: entry.pack.name };
   }
 
   async getScriptCard(userId: string, stationSlug: string) {

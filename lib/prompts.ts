@@ -67,6 +67,12 @@ ${scenario.objectionSeeds.map((o) => `- ${o}`).join("\n")}
 ${scenario.difficultyNotes ? `\nScenario-specific behavior note: ${scenario.difficultyNotes}` : ""}
 
 If any clinical or insurance detail above conflicts with your persona's usual profile, the scenario's facts win — weave them into your life story naturally.
+${scenario.specialty === "regen" ? `
+REGENERATIVE-MEDICINE PATIENT AWARENESS
+You've done some reading about this industry — you know it's expensive, cash-pay, and that some clinics overpromise. React accordingly, in character:
+- If the ${frontDesk ? "staff member" : "provider"} GUARANTEES an outcome, claims or implies the treatment is FDA approved, quotes a suspiciously precise success rate, says it will "cure", "fix", "regrow" or "reverse" your condition, brushes off risk, or leans on you emotionally to decide — your alarm bells ring. Get NOTICEABLY more guarded, say why in your own words ("hang on — I read nobody's allowed to promise that"), and drop your receptivity sharply. An overpromise is worse than no answer at all.
+- Honesty does the opposite: when they concede limits plainly ("I can't promise you a result", "the evidence for this exact condition is thin", "the doctor makes the final call and might say no"), you relax and trust them MORE, even though the news is worse. Reward candor with warmth and rising receptivity.
+- These reactions stack on top of your difficulty contract; they never replace it.` : ""}
 
 ${DIFFICULTY_CONTRACTS[difficulty]}
 
@@ -283,6 +289,29 @@ Respond with ONLY a JSON object, no markdown fences:
 }`;
 }
 
+const REGEN_COMPLIANCE_RUBRIC = `
+COMPLIANCE AXIS (regenerative medicine only — score 0-20, reported separately; it does NOT count toward "total"):
+This specialty sells cash-pay biologics under active regulatory scrutiny. Grade every PROVIDER line against these rules.
+
+FLAG AND PENALIZE (each violation is a flag; score by severity and count):
+- Guaranteeing or strongly implying an outcome ("this will fix it", "you'll be pain-free", any money-back framing of results)
+- Stating or implying FDA approval of the product or treatment, or dodging a direct FDA question with misdirection
+- Cure/treat/reverse claims for serious disease (stroke, neurodegeneration, systemic illness)
+- Invented or unsupported success percentages ("85% of our patients...")
+- Minimizing risk or waving off a stated safety concern
+- Pressuring a distressed patient or family member — urgency, emotional leverage, or closing on grief
+- Asserting product availability the clinic cannot promise, or making the supplier's claims into clinical promises
+
+REWARD (these RAISE the score):
+- Plainly conceding limits of the evidence, unprompted or when asked
+- Deferring the clinical call to the supervising physician, including "the physician may decline the case"
+- Correcting the patient's over-optimism even when it risks the sale
+- Offering expectations in writing; defining concrete success criteria and a review date
+- Closing anyway, honestly — compliance and closing are not opposites, and a rep who does both is the model
+
+Bands: 17-20 clean AND actively honest (concessions, physician deferral, written expectations); 13-16 clean but passive — nothing false, nothing conceded; 9-12 one borderline overstatement, self-corrected or minor; 5-8 one clear violation, uncorrected; 0-4 multiple violations, or any outcome guarantee / FDA-approval claim / promise made to a distressed family member.
+HARD RULE: if any flagged line exists, the "rewrite" MUST target the single worst flagged line and produce compliant language that still moves toward the close.`;
+
 const RUBRIC_DEFINITIONS = `RUBRIC (score each 0–20, evidence-first):
 Before scoring a category, locate the specific PROVIDER lines relevant to it; place the performance in a band based on that evidence, then pick the exact score within the band. Use the FULL 0–20 range. The middle band (9–12) must be earned by genuinely mixed evidence — when a skill was never demonstrated, score it 0–8; never park a category at 10–12 as a default. Real reps produce spread: expect a standout category and a weak one, not five similar numbers.
 
@@ -385,7 +414,7 @@ STATION
 - Difficulty: ${difficulty}
 
 ${scenario.role === "front_desk" ? FRONT_DESK_RUBRIC_DEFINITIONS : RUBRIC_DEFINITIONS}
-
+${scenario.specialty === "regen" ? REGEN_COMPLIANCE_RUBRIC : ""}
 TRANSCRIPT
 ${lines}
 
@@ -401,7 +430,8 @@ Respond with ONLY a JSON object, no markdown fences, no commentary, exactly this
   "rewrite": {"you_said": "the provider's single weakest line, quoted VERBATIM from the transcript", "better": "that same moment rewritten in the provider's own voice, 1-2 sentences, applying the rubric skill that failed"},
   "worked": ["2-4 specific things the provider did well, each citing what they said"],
   "fixes": ["2-4 specific fixes, each naming what was said and what to say instead"],
-  "drill": "ONE specific line or technique to practice on the next rep, phrased as an instruction with example wording"
+  "drill": "ONE specific line or technique to practice on the next rep, phrased as an instruction with example wording"${scenario.specialty === "regen" ? `,
+  "compliance": {"score": 0-20, "flags": ["each flagged PROVIDER line quoted or tightly paraphrased, with the violation named — empty array if clean"]}` : ""}
 }
 "total" must equal the sum of the five scores. If a rubric category never came up (e.g. the patient never objected because the provider closed instantly on easy), score it on what evidence exists and note that in "worked" or "fixes".`;
 }

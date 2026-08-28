@@ -104,6 +104,13 @@ export function ScriptCardPage({
         ))}
       </View>
 
+      {lines.marginLine && (
+        <>
+          <Text style={styles.label}>Margin — clinic copy only</Text>
+          <Text style={styles.line}>{lines.marginLine}</Text>
+        </>
+      )}
+
       <View style={styles.footer} fixed>
         <Text style={styles.footerClinic}>{clinicName ?? ""}</Text>
         <Text style={styles.wordmark}>CLOSER CLINIC</Text>

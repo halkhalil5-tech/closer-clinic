@@ -217,10 +217,13 @@ export async function listRosterForUser(
       .filter((s) => !s.isPrep)
       .map((s) => applyOverride(s, bySlug.get(s.slug) ?? null)),
     builtIn: base.map((s) => applyOverride(s, bySlug.get(s.slug) ?? null)),
-    packs: packs.map((p) => ({
-      pack: p.pack,
-      stations: p.stations.map((s) => applyOverride(s, bySlug.get(s.slug) ?? null)),
-    })),
+    packs: packs
+      // A pack rides the specialty it was built for; unlocks persist across switches.
+      .filter((p) => p.pack.specialty === specialty)
+      .map((p) => ({
+        pack: p.pack,
+        stations: p.stations.map((s) => applyOverride(s, bySlug.get(s.slug) ?? null)),
+      })),
     editedSlugs: overrides.map((o) => o.scenarioSlug),
     overrideConfigs: Object.fromEntries(overrides.map((o) => [o.scenarioSlug, o.config])),
   };

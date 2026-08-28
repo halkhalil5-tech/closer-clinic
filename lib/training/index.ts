@@ -147,6 +147,20 @@ export interface SectionRecommendation {
  */
 export function recommendSection(
   rubricKey: keyof RubricScores,
+  gradeText: string,
+  specialty?: string
+): SectionRecommendation {
+  const rec = recommendSectionBase(rubricKey, gradeText);
+  // Module slugs are a global PK; non-podiatry ladders prefix them. Section
+  // ids are shared across specialties by design, so deep links carry over.
+  if (specialty && specialty !== "podiatry") {
+    return { ...rec, moduleSlug: `${specialty}-${rec.moduleSlug}` };
+  }
+  return rec;
+}
+
+function recommendSectionBase(
+  rubricKey: keyof RubricScores,
   gradeText: string
 ): SectionRecommendation {
   const t = gradeText.toLowerCase();

@@ -21,6 +21,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
     scores: grade.scores,
     drill: grade.drill,
     moment: grade.moment,
+    compliance: grade.compliance ?? null,
   });
 }
 
@@ -150,6 +151,7 @@ export async function POST(_req: Request, ctx: { params: Promise<{ id: string }>
     worked: result.worked,
     fixes: result.fixes,
     drill: result.drill,
+    compliance: result.compliance ?? null,
     modelRaw: raw,
   });
 

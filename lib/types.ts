@@ -1,5 +1,5 @@
 export type Difficulty = "easy" | "moderate" | "hard";
-export type Specialty = "podiatry" | "dental" | "medspa";
+export type Specialty = "podiatry" | "dental" | "medspa" | "regen";
 export type EncounterStatus = "active" | "graded" | "abandoned";
 
 export type StationRole = "provider" | "front_desk";
@@ -29,6 +29,9 @@ export interface Scenario {
   insuranceOverride?: string;
   isCustom: boolean;
   active: boolean;
+  /** Vendor-pack stations only: margin framing for the printed script card
+   *  (patient price vs clinic cost). NEVER surfaced to the roleplay patient. */
+  marginNote?: string;
 }
 
 export type Gender = "m" | "f";
@@ -123,6 +126,8 @@ export interface GradeRow {
   worked: string[];
   fixes: string[];
   drill: string;
+  /** Regen graders only: compliance sub-score + the specific flagged lines. */
+  compliance?: { score: number; flags: string[] } | null;
   createdAt: string;
 }
 

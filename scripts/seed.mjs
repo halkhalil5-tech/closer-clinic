@@ -53,21 +53,28 @@ for (const s of SCENARIOS) {
 console.log(`Seeded ${SCENARIOS.length} scenarios.`);
 
 // ------------------------------ vendor packs ------------------------------
-const { NORTHWIND_PACK, NORTHWIND_STATIONS, NORTHWIND_CODE } = await import("../lib/packs.ts");
-{
+const {
+  NORTHWIND_PACK, NORTHWIND_STATIONS, NORTHWIND_CODE,
+  STEMATIC_PACK, STEMATIC_STATIONS, STEMATIC_CODE,
+} = await import("../lib/packs.ts");
+const VENDOR_PACKS = [
+  { pack: NORTHWIND_PACK, stations: NORTHWIND_STATIONS, code: NORTHWIND_CODE },
+  { pack: STEMATIC_PACK, stations: STEMATIC_STATIONS, code: STEMATIC_CODE },
+];
+for (const { pack, stations, code } of VENDOR_PACKS) {
   const { error } = await supabase.from("packs").upsert(
     {
-      id: NORTHWIND_PACK.id,
-      name: NORTHWIND_PACK.name,
-      vendor: NORTHWIND_PACK.vendor,
-      specialty: NORTHWIND_PACK.specialty,
-      branding: NORTHWIND_PACK.branding,
-      distribution: NORTHWIND_PACK.distribution,
+      id: pack.id,
+      name: pack.name,
+      vendor: pack.vendor,
+      specialty: pack.specialty,
+      branding: pack.branding,
+      distribution: pack.distribution,
     },
     { onConflict: "id" }
   );
   if (error) { console.error("pack upsert failed:", error.message); process.exit(1); }
-  for (const s of NORTHWIND_STATIONS) {
+  for (const s of stations) {
     const { error: e } = await supabase.from("scenarios").upsert(
       {
         slug: s.slug,
@@ -82,10 +89,11 @@ const { NORTHWIND_PACK, NORTHWIND_STATIONS, NORTHWIND_CODE } = await import("../
         close_goal: s.closeGoal,
         objection_seeds: s.objectionSeeds,
         difficulty_notes: s.difficultyNotes ?? null,
+        margin_note: s.marginNote ?? null,
         is_custom: false,
         active: true,
         sort_order: sort++,
-        pack_id: NORTHWIND_PACK.id,
+        pack_id: pack.id,
       },
       { onConflict: "slug" }
     );
@@ -93,19 +101,22 @@ const { NORTHWIND_PACK, NORTHWIND_STATIONS, NORTHWIND_CODE } = await import("../
     console.log(`✓ ${s.slug} (pack)`);
   }
   const { error: ce } = await supabase.from("pack_codes").upsert(
-    { code: NORTHWIND_CODE, pack_id: NORTHWIND_PACK.id },
+    { code, pack_id: pack.id },
     { onConflict: "code" }
   );
   if (ce) { console.error("pack code failed:", ce.message); process.exit(1); }
-  console.log(`✓ pack code ${NORTHWIND_CODE}`);
+  console.log(`✓ pack code ${code}`);
 }
 
 // ------------------------- training content -------------------------
 // Same canonical-source pattern: packs live in lib/training/*, the seed
 // upserts them. A dental pack is another import + spread here.
 const { PODIATRY_MODULES, PODIATRY_LESSONS } = await import("../lib/training/podiatry-pack.ts");
+const { REGEN_MODULES, REGEN_LESSONS } = await import("../lib/training/regen-pack.ts");
+const ALL_MODULES = [...PODIATRY_MODULES, ...REGEN_MODULES];
+const ALL_LESSONS = [...PODIATRY_LESSONS, ...REGEN_LESSONS];
 
-for (const m of PODIATRY_MODULES) {
+for (const m of ALL_MODULES) {
   const { error } = await supabase.from("training_modules").upsert(
     {
       slug: m.slug,
@@ -125,7 +136,7 @@ for (const m of PODIATRY_MODULES) {
   console.log(`✓ module ${m.slug}`);
 }
 
-for (const l of PODIATRY_LESSONS) {
+for (const l of ALL_LESSONS) {
   const { error } = await supabase.from("training_lessons").upsert(
     {
       slug: l.slug,
@@ -145,12 +156,14 @@ for (const l of PODIATRY_LESSONS) {
   console.log(`✓ lesson ${l.slug}`);
 }
 console.log(
-  `Seeded ${PODIATRY_MODULES.length} training modules and ${PODIATRY_LESSONS.length} lessons.`
+  `Seeded ${ALL_MODULES.length} training modules and ${ALL_LESSONS.length} lessons.`
 );
 
 // ------------------------- objection card deck -------------------------
 const { PODIATRY_OBJECTION_CARDS } = await import("../lib/training/objection-cards.ts");
-for (const c of PODIATRY_OBJECTION_CARDS) {
+const { REGEN_OBJECTION_CARDS } = await import("../lib/training/regen-objection-cards.ts");
+const ALL_CARDS = [...PODIATRY_OBJECTION_CARDS, ...REGEN_OBJECTION_CARDS];
+for (const c of ALL_CARDS) {
   const { error } = await supabase.from("objection_cards").upsert(
     {
       id: c.id,
@@ -167,11 +180,13 @@ for (const c of PODIATRY_OBJECTION_CARDS) {
     process.exit(1);
   }
 }
-console.log(`Seeded ${PODIATRY_OBJECTION_CARDS.length} objection cards.`);
+console.log(`Seeded ${ALL_CARDS.length} objection cards.`);
 
 // ------------------------- module documents -------------------------
 const { PODIATRY_MODULE_DOCS } = await import("../lib/training/module-docs.ts");
-for (const d of PODIATRY_MODULE_DOCS) {
+const { REGEN_MODULE_DOCS } = await import("../lib/training/regen-module-docs.ts");
+const ALL_DOCS = [...PODIATRY_MODULE_DOCS, ...REGEN_MODULE_DOCS];
+for (const d of ALL_DOCS) {
   const { error } = await supabase.from("training_module_docs").upsert(
     {
       module_slug: d.moduleSlug,
@@ -194,4 +209,4 @@ for (const d of PODIATRY_MODULE_DOCS) {
   }
   console.log(`✓ module doc ${d.moduleSlug}`);
 }
-console.log(`Seeded ${PODIATRY_MODULE_DOCS.length} module docs.`);
+console.log(`Seeded ${ALL_DOCS.length} module docs.`);

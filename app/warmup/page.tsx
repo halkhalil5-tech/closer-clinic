@@ -1,14 +1,18 @@
 import Link from "next/link";
-import { WARMUP_CARDS } from "@/lib/training/podiatry-pack";
+import { getStore } from "@/lib/store";
+import { warmupCardsFor } from "@/lib/training/warmup";
 import { WarmupDeck } from "@/components/warmup-deck";
 
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 
 /**
  * Pre-room warmup: a 60-second flashcard pass over the plays, built to be
  * glanced at in the hallway before a real exam-room conversation.
  */
-export default function WarmupPage() {
+export default async function WarmupPage() {
+  const store = await getStore();
+  const profile = await store.getCurrentUser();
+  const cards = warmupCardsFor(profile?.specialty ?? "podiatry");
   return (
     <main className="mx-auto flex h-dvh w-full max-w-md flex-col px-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-[calc(env(safe-area-inset-top)+0.75rem)]">
       <div className="flex items-center justify-between">
@@ -20,7 +24,7 @@ export default function WarmupPage() {
           Done ✕
         </Link>
       </div>
-      <WarmupDeck cards={WARMUP_CARDS} />
+      <WarmupDeck cards={cards} />
     </main>
   );
 }

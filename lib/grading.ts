@@ -22,6 +22,10 @@ export const GradeResultSchema = z.object({
     .nullish(),
   fixes: z.array(z.string().min(1)).min(1).max(6),
   drill: z.string().min(1),
+  /** Regen graders only; absent (and never required) for other specialties. */
+  compliance: z
+    .object({ score, flags: z.array(z.string()).max(12) })
+    .nullish(),
 });
 
 export type GradeResult = z.infer<typeof GradeResultSchema>;

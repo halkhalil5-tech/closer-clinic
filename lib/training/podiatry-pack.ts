@@ -503,3 +503,4 @@ export const WARMUP_CARDS: WarmupCard[] = [
     line: "Recommend what the exam supports. Respect a genuine no the first time — chart it, set a trigger, keep the patient.",
   },
 ];
+

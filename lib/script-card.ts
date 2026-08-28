@@ -19,6 +19,8 @@ export interface ScriptCardLines {
   closeLine: string;
   /** The 3-step "if they say maybe" box. */
   ifMaybe: string[];
+  /** Vendor-pack stations only: the margin line (patient price vs clinic cost). */
+  marginLine?: string;
 }
 
 export function scriptCardContentHash(scenario: Scenario): string {
@@ -31,6 +33,7 @@ export function scriptCardContentHash(scenario: Scenario): string {
     scenario.closeGoal,
     scenario.objectionSeeds,
     scenario.role ?? "provider",
+    scenario.marginNote ?? null,
   ]);
   return createHash("sha256").update(basis).digest("hex").slice(0, 16);
 }
@@ -48,14 +51,17 @@ STATION
 - The clinic's real objections for this service:
 ${scenario.objectionSeeds.map((o) => `  - ${o}`).join("\n")}
 
-Rules:
+${scenario.marginNote ? `VENDOR MARGIN CONTEXT (for the card's margin line ONLY — never patient-facing language):
+${scenario.marginNote}
+` : ""}Rules:
 - priceLine: state the number plainly and stop — no apology, no justification tail.
 - objections: pick the THREE most consequential from the list above (quote them tightly), each with a response that isolates or reframes and re-asks. Never a discount.
 - closeLine: an assumptive or alternative ${frontDesk ? "scheduling" : ""} close.
-- ifMaybe: exactly 3 short steps for "let me think about it" — validate, isolate with a question, set a concrete next step with a date.
+- ifMaybe: exactly 3 short steps for "let me think about it" — validate, isolate with a question, set a concrete next step with a date.${scenario.marginNote ? `
+- marginLine: ONE compact line for the clinic's eyes only, from the vendor margin context: patient price vs clinic cost and any availability caveat. Plain numbers, no hype.` : ""}
 
 Respond with ONLY a JSON object, no markdown fences:
-{"priceLine": "...", "objections": [{"objection": "...", "response": "..."}, {..}, {..}], "closeLine": "...", "ifMaybe": ["...", "...", "..."]}`;
+{"priceLine": "...", "objections": [{"objection": "...", "response": "..."}, {..}, {..}], "closeLine": "...", "ifMaybe": ["...", "...", "..."]${scenario.marginNote ? `, "marginLine": "..."` : ""}}`;
 }
 
 export function stubScriptCardJson(scenario: Scenario): string {
@@ -71,6 +77,7 @@ export function stubScriptCardJson(scenario: Scenario): string {
       "[DEV STUB] Isolate the real objection with a question.",
       "[DEV STUB] Book the follow-up with a date before they leave.",
     ],
+    ...(scenario.marginNote ? { marginLine: `[DEV STUB] ${scenario.marginNote}` } : {}),
   } satisfies ScriptCardLines);
 }
 
@@ -91,5 +98,8 @@ export function parseScriptCardLines(raw: string): ScriptCardLines {
     objections: parsed.objections.slice(0, 3),
     closeLine: parsed.closeLine,
     ifMaybe: parsed.ifMaybe.slice(0, 3),
+    ...(typeof parsed.marginLine === "string" && parsed.marginLine.length > 0
+      ? { marginLine: parsed.marginLine }
+      : {}),
   };
 }

@@ -10,7 +10,7 @@ import "server-only";
 const PAGE_CAP = 10;
 const FETCH_TIMEOUT_MS = 8000;
 const PAGE_TEXT_CAP = 8000;
-const SERVICE_LINK = /service|pricing|price|treatment|procedure|fee|offer|menu|care/i;
+const SERVICE_LINK = /service|pricing|price|treatment|procedure|fee|offer|menu|care|regenerative|stem|biologic|prp|injection|iv-|longevity|wellness/i;
 const EXCLUDED_LINK = /testimonial|review|story|stories|blog|news|patient-portal|privacy|terms/i;
 
 export interface CrawledPage {

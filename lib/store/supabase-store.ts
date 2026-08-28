@@ -40,6 +40,7 @@ function mapScenario(r: any): Scenario {
     closeGoal: r.close_goal,
     objectionSeeds: r.objection_seeds ?? [],
     difficultyNotes: r.difficulty_notes ?? undefined,
+    marginNote: r.margin_note ?? undefined,
     insuranceOverride: r.insurance_override ?? undefined,
     isCustom: r.is_custom,
     active: r.active,
@@ -145,6 +146,7 @@ function mapGrade(r: any): GradeRow {
     worked: r.worked ?? [],
     fixes: r.fixes ?? [],
     drill: r.drill,
+    compliance: r.compliance ?? null,
     createdAt: r.created_at,
   };
 }
@@ -474,6 +476,7 @@ export class SupabaseStore implements Store {
         worked: input.worked,
         fixes: input.fixes,
         drill: input.drill,
+        compliance: input.compliance ?? null,
         model_raw: input.modelRaw,
       })
       .select("*")

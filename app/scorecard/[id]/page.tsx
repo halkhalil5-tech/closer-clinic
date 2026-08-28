@@ -14,12 +14,21 @@ import { GradeHero } from "@/components/grade-hero";
 import { ScoreBars } from "@/components/score-bars";
 import { RewriteCards } from "@/components/rewrite-cards";
 import { ReceptivityChart } from "@/components/receptivity-chart";
+import { SampleDataChip } from "@/components/sample-data-chip";
+import { CompliancePanel } from "@/components/compliance-panel";
 
 export const dynamic = "force-dynamic";
 
 const RUBRIC_KEYS: (keyof RubricScores)[] = ["rapport", "framing", "price", "objections", "close"];
 
-export default async function ScorecardPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function ScorecardPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams?: Promise<{ demo?: string }>;
+}) {
+  const demo = (await searchParams)?.demo === "1";
   const user = await getAuthedUser();
   if (!user) redirect("/login");
 
@@ -101,6 +110,9 @@ export default async function ScorecardPage({ params }: { params: Promise<{ id: 
           encounterId={encounter.id}
         />
       </section>
+
+      {/* compliance axis — regen graders only */}
+      {grade.compliance && <CompliancePanel compliance={grade.compliance} />}
 
       {/* sub-scores */}
       <section className="mt-3 rounded-xl border border-line bg-bg p-6 shadow-sm">
@@ -202,7 +214,8 @@ export default async function ScorecardPage({ params }: { params: Promise<{ id: 
         const lowest = RUBRIC_KEYS.reduce((min, k) => (grade.scores[k] < grade.scores[min] ? k : min));
         const rec = recommendSection(
           lowest,
-          `${grade.moment} ${grade.fixes.join(" ")} ${grade.rewrite?.youSaid ?? ""}`
+          `${grade.moment} ${grade.fixes.join(" ")} ${grade.rewrite?.youSaid ?? ""}`,
+          scenario?.specialty
         );
         const mod = RUBRIC_KEYS.indexOf(lowest) + 1; // module order = rubric order + 1
         return (
@@ -256,6 +269,7 @@ export default async function ScorecardPage({ params }: { params: Promise<{ id: 
           Change scenario
         </Link>
       </div>
+      {demo && <SampleDataChip />}
     </main>
   );
 }
