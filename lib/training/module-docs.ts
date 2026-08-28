@@ -1,5 +1,4 @@
 import type { ModuleDoc } from "../types";
-import { REGEN_MODULE_DOCS } from "./regen-module-docs";
 
 /**
  * Standardized module documents — the reading layer of each module.
@@ -725,9 +724,5 @@ export const PODIATRY_MODULE_DOCS: ModuleDoc[] = [
 ];
 
 export function getModuleDocFromCode(moduleSlug: string): ModuleDoc | null {
-  return (
-    PODIATRY_MODULE_DOCS.find((d) => d.moduleSlug === moduleSlug) ??
-    REGEN_MODULE_DOCS.find((d) => d.moduleSlug === moduleSlug) ??
-    null
-  );
+  return PODIATRY_MODULE_DOCS.find((d) => d.moduleSlug === moduleSlug) ?? null;
 }

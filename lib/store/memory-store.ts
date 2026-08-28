@@ -26,6 +26,7 @@ import { REGEN_MODULES, REGEN_LESSONS } from "../training/regen-pack";
 import { REGEN_OBJECTION_CARDS } from "../training/regen-objection-cards";
 import { PODIATRY_OBJECTION_CARDS } from "../training/objection-cards";
 import { getModuleDocFromCode } from "../training/module-docs";
+import { REGEN_MODULE_DOCS } from "../training/regen-module-docs";
 import {
   NORTHWIND_CODE,
   NORTHWIND_PACK,
@@ -614,7 +615,11 @@ class MemoryStore implements Store {
   }
 
   async getModuleDoc(moduleSlug: string): Promise<ModuleDoc | null> {
-    return getModuleDocFromCode(moduleSlug);
+    return (
+      getModuleDocFromCode(moduleSlug) ??
+      REGEN_MODULE_DOCS.find((d) => d.moduleSlug === moduleSlug) ??
+      null
+    );
   }
 
   async getLessonProgress(userId: string): Promise<LessonProgressRow[]> {
