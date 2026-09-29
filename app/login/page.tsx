@@ -16,6 +16,10 @@ export default function LoginPage() {
       <Suspense>
         <AuthForm mode="login" />
       </Suspense>
+      <div className="mt-10 flex justify-center gap-5 text-[12px] text-muted">
+        <a href="/privacy" className="underline">Privacy</a>
+        <a href="/terms" className="underline">Terms</a>
+      </div>
     </main>
   );
 }

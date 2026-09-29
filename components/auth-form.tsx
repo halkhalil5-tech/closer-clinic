@@ -127,6 +127,14 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
           {busy ? "One sec" : mode === "signup" ? "Create account" : "Sign in"}
         </Button>
 
+      {mode === "signup" && (
+        <p className="text-center text-[11.5px] leading-snug text-muted">
+          By creating an account you agree to the{" "}
+          <a href="/terms" className="underline">Terms</a> and{" "}
+          <a href="/privacy" className="underline">Privacy Policy</a>.
+        </p>
+      )}
+
       <div className="my-0.5 flex items-center gap-3">
         <div className="h-px flex-1 bg-line" />
         <span className="microlabel">or</span>
