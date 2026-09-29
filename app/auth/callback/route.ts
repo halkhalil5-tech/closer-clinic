@@ -5,7 +5,10 @@ import { createClient } from "@/lib/supabase/server";
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/home";
+  // Same-origin paths only: a bare "/" start still admits "//evil.com"
+  // (scheme-relative), so require a path that can't re-parse as a host.
+  const rawNext = searchParams.get("next") ?? "/home";
+  const next = /^\/(?!\/)[\w\-./?=&#%~+]*$/.test(rawNext) ? rawNext : "/home";
 
   if (code) {
     const supabase = await createClient();
@@ -13,7 +16,7 @@ export async function GET(request: Request) {
     if (!error) {
       // New users land on onboarding; the home page redirects them there
       // if their profile isn't complete, so /home is always a safe target.
-      return NextResponse.redirect(`${origin}${next.startsWith("/") ? next : "/home"}`);
+      return NextResponse.redirect(`${origin}${next}`);
     }
   }
   return NextResponse.redirect(`${origin}/login?error=auth`);

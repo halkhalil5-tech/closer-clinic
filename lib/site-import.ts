@@ -1,5 +1,7 @@
 import "server-only";
 
+import { lookup } from "node:dns/promises";
+
 /**
  * Practice-website import: fetch the homepage plus obvious services/pricing
  * pages (same-domain, depth ≤ 2, max 10 pages), then extract service names,
@@ -39,15 +41,79 @@ function htmlToText(html: string): string {
     .slice(0, PAGE_TEXT_CAP);
 }
 
+const MAX_REDIRECTS = 3;
+const MAX_BODY_BYTES = 2_000_000;
+
+function isPrivateV4(ip: string): boolean {
+  const o = ip.split(".").map(Number);
+  if (o.length !== 4 || o.some((n) => Number.isNaN(n))) return true;
+  return (
+    o[0] === 0 || o[0] === 10 || o[0] === 127 ||
+    (o[0] === 100 && o[1] >= 64 && o[1] <= 127) ||
+    (o[0] === 169 && o[1] === 254) ||
+    (o[0] === 172 && o[1] >= 16 && o[1] <= 31) ||
+    (o[0] === 192 && o[1] === 168) ||
+    o[0] >= 224
+  );
+}
+
+function isPrivateAddress(addr: string): boolean {
+  const a = addr.toLowerCase();
+  if (a.includes(":")) {
+    // IPv6: loopback, unspecified, link-local, unique-local, and v4-mapped.
+    if (a === "::" || a === "::1") return true;
+    if (a.startsWith("fe8") || a.startsWith("fe9") || a.startsWith("fea") || a.startsWith("feb")) return true;
+    if (a.startsWith("fc") || a.startsWith("fd")) return true;
+    const mapped = a.match(/^::ffff:(\d+\.\d+\.\d+\.\d+)$/);
+    return mapped ? isPrivateV4(mapped[1]) : false;
+  }
+  return isPrivateV4(a);
+}
+
+/**
+ * SSRF guard: only plain http(s) on default ports, to hostnames whose EVERY
+ * resolved address is public. Blocks localhost, RFC1918, link-local (cloud
+ * metadata), CGNAT, and v6 equivalents. DNS is re-resolved per request;
+ * redirects are followed manually so every hop passes the same check.
+ */
+async function assertPublicUrl(u: URL): Promise<boolean> {
+  if (u.protocol !== "http:" && u.protocol !== "https:") return false;
+  if (u.port && u.port !== "80" && u.port !== "443") return false;
+  if (u.username || u.password) return false;
+  const host = u.hostname.toLowerCase().replace(/^\[|\]$/g, "");
+  if (host === "localhost" || host.endsWith(".localhost") || host.endsWith(".local") || host.endsWith(".internal")) return false;
+  if (/^[\d.]+$/.test(host) || host.includes(":")) return !isPrivateAddress(host);
+  try {
+    const addrs = await lookup(host, { all: true, verbatim: true });
+    return addrs.length > 0 && addrs.every((x) => !isPrivateAddress(x.address));
+  } catch {
+    return false;
+  }
+}
+
 async function fetchPage(url: string): Promise<string | null> {
   try {
-    const res = await fetch(url, {
-      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
-      headers: { "User-Agent": "CloserClinic-Importer/1.0 (+services & pricing only)" },
-      redirect: "follow",
-    });
-    if (!res.ok || !(res.headers.get("content-type") ?? "").includes("html")) return null;
-    return await res.text();
+    let current = new URL(url);
+    for (let hop = 0; hop <= MAX_REDIRECTS; hop++) {
+      if (!(await assertPublicUrl(current))) return null;
+      const res = await fetch(current.toString(), {
+        signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+        headers: { "User-Agent": "CloserClinic-Importer/1.0 (+services & pricing only)" },
+        redirect: "manual",
+      });
+      if (res.status >= 300 && res.status < 400) {
+        const loc = res.headers.get("location");
+        if (!loc || hop === MAX_REDIRECTS) return null;
+        current = new URL(loc, current);
+        continue;
+      }
+      if (!res.ok || !(res.headers.get("content-type") ?? "").includes("html")) return null;
+      const len = Number(res.headers.get("content-length") ?? "0");
+      if (len > MAX_BODY_BYTES) return null;
+      const text = await res.text();
+      return text.length > MAX_BODY_BYTES ? null : text;
+    }
+    return null;
   } catch {
     return null;
   }
