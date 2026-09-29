@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getAuthedUser } from "@/lib/auth";
 import { getStore } from "@/lib/store";
-import { MEDICAL_KEYWORDS } from "@/lib/voice/medical-terms";
+import { keywordsFor } from "@/lib/voice/medical-terms";
 
 /**
  * Server-side Deepgram transcription for press-to-talk audio. Medical model +
@@ -27,6 +27,7 @@ export async function POST(req: Request) {
   const store = await getStore();
   const encounter = await store.getEncounter(encounterId, user.id);
   if (!encounter) return NextResponse.json({ error: "Encounter not found" }, { status: 404 });
+  const profile = await store.getCurrentUser();
 
   const audio = await req.arrayBuffer();
   if (audio.byteLength === 0) return NextResponse.json({ error: "No audio" }, { status: 400 });
@@ -39,7 +40,7 @@ export async function POST(req: Request) {
   dgUrl.searchParams.set("smart_format", "true");
   dgUrl.searchParams.set("punctuate", "true");
   dgUrl.searchParams.set("language", "en-US");
-  for (const term of MEDICAL_KEYWORDS) {
+  for (const term of keywordsFor(profile?.specialty)) {
     dgUrl.searchParams.append("keywords", `${term}:2`);
   }
 
