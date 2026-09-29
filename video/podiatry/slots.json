@@ -1,0 +1,65 @@
+{
+  "slots": [
+    {
+      "id": "00-title",
+      "start": 0,
+      "len": 6
+    },
+    {
+      "id": "01-import",
+      "start": 6,
+      "len": 8.5
+    },
+    {
+      "id": "02-personas",
+      "start": 14.5,
+      "len": 9.06
+    },
+    {
+      "id": "03-voice",
+      "start": 23.56,
+      "len": 8.5
+    },
+    {
+      "id": "04-recep",
+      "start": 32.06,
+      "len": 8.5
+    },
+    {
+      "id": "05-grades",
+      "start": 40.56,
+      "len": 8.5
+    },
+    {
+      "id": "06-rewrite",
+      "start": 49.06,
+      "len": 8.5
+    },
+    {
+      "id": "07-cards",
+      "start": 57.56,
+      "len": 8.5
+    },
+    {
+      "id": "08-frontdesk",
+      "start": 66.06,
+      "len": 8.5
+    },
+    {
+      "id": "09-drills",
+      "start": 74.56,
+      "len": 8.5
+    },
+    {
+      "id": "10-progress",
+      "start": 83.06,
+      "len": 8.5
+    },
+    {
+      "id": "11-part2",
+      "start": 91.56,
+      "len": 10.01
+    }
+  ],
+  "part2Start": 101.57
+}

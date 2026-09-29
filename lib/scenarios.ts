@@ -184,6 +184,30 @@ export const SCENARIOS: Scenario[] = [
       "The high-deductible math is the unlock: through insurance they'd pay MORE. A provider who does that math out loud, then offers 'we can do it right now, you're already numb-able,' should win. Watch for the provider forgetting to actually ask for the decision.",
   },
   {
+    slug: "shockwave-achilles",
+    specialty: "podiatry",
+    title: "Shockwave — Achilles tendinopathy",
+    serviceDesc: "Extracorporeal shockwave therapy (ESWT) for chronic mid-portion Achilles tendinopathy, weekly sessions",
+    priceDisplay: "$250/session",
+    priceStructure:
+      "$250 per session; most patients need 3–5 weekly sessions. A 3-session package at $675 can be offered once. Cash-pay — quote the per-session number plainly and hold it.",
+    clinicalContext:
+      "Chronic mid-portion Achilles tendinopathy, ~6 months. Recreational runner in their late 40s. Already tried: relative rest, NSAIDs, heel lifts, and a completed course of physical therapy with eccentric loading — still symptomatic. Exam: tender fusiform thickening 3–5 cm above the insertion, pain with single-leg heel raise. This is degenerative tendinosis, not acute inflammation. ESWT is a guideline-supported next step for recalcitrant cases: typically 3–5 weekly sessions, improvement accrues over weeks to months after the course, meaningful benefit in roughly two-thirds of patients — not guaranteed, and honest framing matters. Cash-pay because most payers class ESWT as investigational. Corticosteroid injection near the Achilles is avoided (tendon rupture risk) and you have said so.",
+    patientCc:
+      "It's been six months of this heel thing. I rested it, I took the anti-inflammatories, I did every calf exercise the physical therapist gave me — and I still can't run. So what exactly is this shockwave machine, and why haven't we tried it before now?",
+    closeGoal:
+      "Patient agrees to start ESWT at the quoted per-session price and books the first session before leaving.",
+    objectionSeeds: [
+      "Is this just something you're selling me because you bought the machine?",
+      "Does my insurance cover any of this?",
+      "That's real money out of pocket for something that might not work.",
+      "What are the actual odds this fixes it?",
+      "Let me think about it and get back to you.",
+    ],
+    difficultyNotes:
+      "The patient is a frustrated, slightly skeptical runner who has done everything asked of them. They should push, in roughly this order: the 'are you selling me?' suspicion, the insurance question, the price, and a 'let me think about it' stall. They respond to honest mechanism talk, realistic odds, and zero pressure; they shut down at hype or guarantees. SPEECH STYLE: terse and direct — one to two short sentences per reply, never a monologue; they ask one thing at a time. They always try 'let me think about it' once, late in the visit, before they will agree to anything.",
+  },
+  {
     slug: "stratum-wj-achilles",
     specialty: "podiatry",
     title: "Wharton's jelly injection (Achilles)",

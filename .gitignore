@@ -40,3 +40,17 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 marketing/
+video/*/raw*/
+video/*/bg/
+video/*/da*/
+video/*/pa/
+video/*/vo/
+video/*/frames/
+video/*/*.mp4
+video/*/*.mp3
+video/*/*.m4a
+video/*/*.png
+video/*/cc2p*
+video/*/.tlvars
+video/*/phone.fc
+video/podiatry/node_modules
