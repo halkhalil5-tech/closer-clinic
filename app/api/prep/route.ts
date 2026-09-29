@@ -13,6 +13,7 @@ import { splitReceptivity } from "@/lib/receptivity";
 import { scrubFreeText } from "@/lib/scrub";
 import { agesFromBand, WORRY_MAX_CHARS } from "@/lib/prep";
 import type { Scenario, TranscriptMessage } from "@/lib/types";
+import { dailyLimitResponse } from "@/lib/daily-limit";
 
 export const maxDuration = 60;
 
@@ -91,6 +92,8 @@ export async function POST(req: Request) {
   const body = Schema.safeParse(await req.json().catch(() => null));
   if (!body.success) return NextResponse.json({ error: "Fill in the form." }, { status: 400 });
   const store = await getStore();
+  const limited = await dailyLimitResponse(store, user.id);
+  if (limited) return limited;
 
   // "Run it again with a different personality": same one-off scenario,
   // fresh persona (excluding the one they just faced when possible).

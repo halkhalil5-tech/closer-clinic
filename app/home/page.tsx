@@ -43,7 +43,7 @@ export default async function HomePage({
     store.listUnlocks(user.id),
   ]);
   const stats = computeStats(history);
-  const locked = unlocks.length === 0;
+  const locked = !unlocks.some((u) => u.via === "curriculum" || u.via === "test_out");
 
   // Rep analytics → training cross-link: weakest rubric category over the
   // last 10 reps, when it averages under 12/20.

@@ -27,12 +27,20 @@ export async function POST(req: Request) {
 
   const store = await getStore();
 
-  // Station gating: reps need an unlock (curriculum or test-out) — except
-  // the very first rep, which is always free: a new user must hear the
-  // patient talk back before any gate. The test-out path is also always
-  // open (/api/test-out), so nobody is hard-walled behind content.
+  // Station gating: base stations need EARNED progression (a curriculum or
+  // test-out unlock, either grants every base station) or a station-specific
+  // unlock; a custom station is open to its creator. Saving a custom service
+  // used to satisfy the old any-unlock check and skip the curriculum. The
+  // very first rep is always free: a new user must hear the patient talk
+  // back before any gate.
   const unlocks = await store.listUnlocks(user.id);
-  if (unlocks.length === 0) {
+  const scenarioForGate = await store.getScenario(body.data.scenarioSlug);
+  const slugOpen =
+    unlocks.some((u) => u.stationSlug === body.data.scenarioSlug) ||
+    (scenarioForGate?.isCustom
+      ? scenarioForGate.createdByUserId === user.id
+      : unlocks.some((u) => u.via === "curriculum" || u.via === "test_out"));
+  if (!slugOpen) {
     const prior = await store.listEncountersWithGrades(user.id, { limit: 1 });
     if (prior.length > 0) {
       return NextResponse.json(

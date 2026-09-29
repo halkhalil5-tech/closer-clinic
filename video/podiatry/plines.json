@@ -1,0 +1,65 @@
+[
+  {
+    "idx": 0,
+    "text": "Well, it's about time — six months I've been dealing with this Achilles thing, and I've done everything your people told me to do. I heard you've got some kind of shockwave device now, so let's talk about that.",
+    "say": 1.7,
+    "endSay": 15.04,
+    "file": "pa/p0.mp3",
+    "dur": 12.852125,
+    "start": 2.187875
+  },
+  {
+    "idx": 1,
+    "text": "Okay, but — and I'm going to be straight with you — is this something you're recommending because it's actually right for me, or because you've got a machine sitting in the back that needs to pay for itself?",
+    "say": 26.26,
+    "endSay": 47.63,
+    "file": "pa/p1.mp3",
+    "dur": 11.52,
+    "start": 36.11
+  },
+  {
+    "idx": 2,
+    "text": "Alright, so walk me through it — what exactly did you find on the exam that makes you think this is the right call for me specifically?",
+    "say": 102.11,
+    "endSay": 109.93,
+    "file": "pa/p2.mp3",
+    "dur": 7.00075,
+    "start": 102.92925000000001
+  },
+  {
+    "idx": 3,
+    "text": "Okay, that's... actually a straight answer, I'll give you that. So does my insurance cover any of this, or are you about to tell me I'm writing a check?",
+    "say": 122.64,
+    "endSay": 131.95,
+    "file": "pa/p3.mp3",
+    "dur": 8.254625,
+    "start": 123.69537499999998
+  },
+  {
+    "idx": 4,
+    "text": "$250 a session... so we're talking, what, $750 to over a thousand dollars depending on how many I need? That's real money for something that might not work.",
+    "say": 145.16,
+    "endSay": 157.49,
+    "file": "pa/p4.mp3",
+    "dur": 9.743625,
+    "start": 147.746375
+  },
+  {
+    "idx": 5,
+    "text": "What are the actual odds it gets me running again specifically, given where I'm at with this thing?",
+    "say": 174.21,
+    "endSay": 180.02,
+    "file": "pa/p5.mp3",
+    "dur": 5.51175,
+    "start": 174.50825
+  },
+  {
+    "idx": 6,
+    "text": "Thursday afternoon works — and I'll do the three-session package.",
+    "say": 196.25,
+    "endSay": 200.54,
+    "file": "pa/p6.mp3",
+    "dur": 4.257875,
+    "start": 196.28212499999998
+  }
+]

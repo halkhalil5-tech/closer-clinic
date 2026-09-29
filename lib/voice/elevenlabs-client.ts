@@ -108,6 +108,9 @@ export class ElevenLabsTts implements TextToSpeech {
     if (this.audio) {
       this.audio.pause();
       this.audio.removeAttribute("src");
+      // The play promises settle on 'ended'; pause() never fires it, so an
+      // interrupt used to strand the pending speak() forever.
+      this.audio.dispatchEvent(new Event("ended"));
     }
     if (this.objectUrl) {
       URL.revokeObjectURL(this.objectUrl);

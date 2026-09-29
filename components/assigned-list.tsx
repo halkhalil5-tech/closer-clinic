@@ -12,7 +12,7 @@ export interface AssignedItem {
   title: string;
   dueLabel: string;
   tone: "normal" | "soon" | "overdue";
-  state: "not_started" | "in_progress" | "done";
+  state: "not_started" | "in_progress" | "done" | "unknown";
   counted: number;
   target: number;
   bestLetter: string | null;

@@ -221,7 +221,7 @@ export interface AssignmentRow {
   active: boolean;
 }
 
-export type AssignmentSeatState = "not_started" | "in_progress" | "done";
+export type AssignmentSeatState = "not_started" | "in_progress" | "done" | "unknown";
 
 export interface AssignmentSeatStatus {
   state: AssignmentSeatState;

@@ -8,8 +8,8 @@ export default function manifest(): MetadataRoute.Manifest {
       "AI patient roleplay for medical case acceptance. Walk into the room, ask for the close, get graded.",
     start_url: "/home",
     display: "standalone",
-    background_color: "#10151a",
-    theme_color: "#10151a",
+    background_color: "#ffffff",
+    theme_color: "#ffffff",
     orientation: "portrait",
     icons: [
       { src: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },

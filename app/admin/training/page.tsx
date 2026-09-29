@@ -4,6 +4,7 @@ import { getAuthedUser } from "@/lib/auth";
 import { getStore, listRosterForUser } from "@/lib/store";
 import { assignmentStatus, dueLabel, dueTone } from "@/lib/assignments";
 import type { AssignmentSeatStatus } from "@/lib/types";
+import { isSupabaseConfigured } from "@/lib/config";
 import { RequireCurriculumToggle } from "@/components/require-curriculum-toggle";
 import { AssignmentCreate, AssignmentRetire } from "@/components/assignment-admin";
 import { SeatRoleToggle } from "@/components/seat-role-toggle";
@@ -37,12 +38,18 @@ export default async function AdminTrainingPage() {
         if (seat.userId === user.id) {
           return { name: seat.name, status: assignmentStatus(a, myHistory, sessions) };
         }
-        const canned: AssignmentSeatStatus[] = [
-          { state: "done", countedReps: a.targetReps, bestLetter: "B+" },
-          { state: "in_progress", countedReps: 1, bestLetter: "C" },
-          { state: "not_started", countedReps: 0, bestLetter: null },
-        ];
-        return { name: seat.name, status: canned[i % canned.length] };
+        if (!isSupabaseConfigured()) {
+          // Dev demo only: seeded teammates get stable illustrative states.
+          const canned: AssignmentSeatStatus[] = [
+            { state: "done", countedReps: a.targetReps, bestLetter: "B+" },
+            { state: "in_progress", countedReps: 1, bestLetter: "C" },
+            { state: "not_started", countedReps: 0, bestLetter: null },
+          ];
+          return { name: seat.name, status: canned[i % canned.length] };
+        }
+        // Real teammates: their history isn't wired up yet — say so rather
+        // than invent a status.
+        return { name: seat.name, status: { state: "unknown", countedReps: 0, bestLetter: null } };
       });
       return { assignment: a, seatStates };
     })
@@ -165,7 +172,9 @@ export default async function AdminTrainingPage() {
                       ? `done${status.bestLetter ? ` · ${status.bestLetter}` : ""}`
                       : status.state === "in_progress"
                         ? `${status.countedReps}/${a.targetReps}${status.bestLetter ? ` · best ${status.bestLetter}` : ""}`
-                        : "not started"}
+                        : status.state === "unknown"
+                          ? "—"
+                          : "not started"}
                   </span>
                 </div>
               ))}

@@ -6,6 +6,7 @@ import { buildPatientSystemPrompt, PATIENT_OPENING_INSTRUCTION } from "@/lib/pro
 import { generatePatientReply } from "@/lib/anthropic";
 import { splitReceptivity } from "@/lib/receptivity";
 import { TEST_OUT_PASS_TOTAL, type TranscriptMessage } from "@/lib/types";
+import { dailyLimitResponse } from "@/lib/daily-limit";
 
 export const maxDuration = 60;
 
@@ -19,6 +20,8 @@ export async function POST() {
   if (!user) return NextResponse.json({ error: "Not signed in" }, { status: 401 });
 
   const store = await getStore();
+  const limited = await dailyLimitResponse(store, user.id);
+  if (limited) return limited;
   const profile = await store.getCurrentUser();
   const specialty = profile?.specialty ?? "podiatry";
 

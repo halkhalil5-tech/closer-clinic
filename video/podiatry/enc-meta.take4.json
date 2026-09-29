@@ -1,0 +1,172 @@
+{
+  "id": "e9441742-c49b-43e5-bdec-5fac1ec295ef",
+  "marks": [
+    {
+      "t": 0.62,
+      "kind": "sessionEnter"
+    },
+    {
+      "t": 1.66,
+      "kind": "say",
+      "who": "patient",
+      "text": "Hey, good to see you. So, listen — it's been six months of babying this heel, doing everything right, and I'm still not running, so... I want to understand what this shockwave therapy actually is, and whether it's genuinely the next step or just something new to try."
+    },
+    {
+      "t": 18,
+      "kind": "endSay",
+      "who": "patient"
+    },
+    {
+      "t": 18.89,
+      "kind": "doc",
+      "who": "doctor",
+      "text": "Sound-wave pulses that wake up a tendon stuck in a healing rut. And yes — it's the guideline next step precisely because the basics failed.",
+      "dur": 8.266304,
+      "file": "da/d0.mp3"
+    },
+    {
+      "t": 28.21,
+      "kind": "say",
+      "who": "patient",
+      "text": "Okay, \"stuck in a healing rut\" — I actually get that, I sell supplements and I know sometimes the body just needs a different kind of signal to kick things back into gear. But I guess what I'm wondering is... is this something you're recommending because it's genuinely the right call for my specific situation, or is this just, like, the machine you happen to have in the office?",
+      "receptivity": 35
+    },
+    {
+      "t": 49.06,
+      "kind": "endSay",
+      "who": "patient"
+    },
+    {
+      "t": 49.94,
+      "kind": "doc",
+      "who": "doctor",
+      "text": "Your exam and six months of failed treatment drive this — not the machine. I'd send you elsewhere before I'd waste your time.",
+      "dur": 7.105306,
+      "file": "da/d1.mp3"
+    },
+    {
+      "t": 58.25,
+      "kind": "say",
+      "who": "patient",
+      "text": "Okay... okay, that's a fair answer, I appreciate that. So what does my insurance cover for this, because I'm on a marketplace plan and those things can be pretty unpredictable with anything that sounds even a little bit outside the mainstream.",
+      "receptivity": 45
+    },
+    {
+      "t": 71.58,
+      "kind": "endSay",
+      "who": "patient"
+    },
+    {
+      "t": 72.45,
+      "kind": "doc",
+      "who": "doctor",
+      "text": "Most insurers call ESWT investigational — so this is cash-pay. It's $250 a session, or $675 if you commit to the first three upfront.",
+      "dur": 11.749297,
+      "file": "da/d2.mp3"
+    },
+    {
+      "t": 85.28,
+      "kind": "say",
+      "who": "patient",
+      "text": "Well... two-fifty a session, and you're saying I might need three to five of those — so we're potentially talking over a thousand dollars out of pocket for something that might not work. That's, I mean, I sell supplements for a living so I'm not anti-spending money on your health, but that's real money, and I just want to know — what are the actual odds here?",
+      "receptivity": 35
+    },
+    {
+      "t": 106.65,
+      "kind": "endSay",
+      "who": "patient"
+    },
+    {
+      "t": 107.53,
+      "kind": "doc",
+      "who": "doctor",
+      "text": "Two out of three patients get meaningful improvement — that's real, but it's not a guarantee, and I'll always tell you that straight.",
+      "dur": 6.965986,
+      "file": "da/d3.mp3"
+    },
+    {
+      "t": 115.84,
+      "kind": "say",
+      "who": "patient",
+      "text": "Hm... two out of three, I mean, that's actually better than I expected you to say, honestly — I thought you'd oversell it. Okay, so, look — can I just have a few days to think it over and maybe do a little more reading on it?",
+      "receptivity": 52
+    },
+    {
+      "t": 127.66,
+      "kind": "endSay",
+      "who": "patient"
+    },
+    {
+      "t": 128.54,
+      "kind": "doc",
+      "who": "doctor",
+      "text": "Absolutely — what's the main thing you'd want to answer before deciding?",
+      "dur": 4.504671,
+      "file": "da/d4.mp3"
+    },
+    {
+      "t": 134.34,
+      "kind": "say",
+      "who": "patient",
+      "text": "I guess I just want to make sure that this is really... like, that the sound wave thing is actually doing something biological, not just, you know, a placebo effect dressed up in expensive equipment. And I want to know if there's anything more natural I could be layering in alongside it — like, would something like turmeric or collagen supplementation help the tendon heal faster while I'm doing the sessions?",
+      "receptivity": 52
+    },
+    {
+      "t": 153.19,
+      "kind": "endSay",
+      "who": "patient"
+    },
+    {
+      "t": 154.07,
+      "kind": "doc",
+      "who": "doctor",
+      "text": "The biology is real — microtrauma from the pulses triggers genuine collagen remodeling, well-documented in imaging studies. Collagen supplementation has decent early evidence for tendons; turmeric's fine, just don't expect it to carry the load.",
+      "dur": 16.439728,
+      "file": "da/d5.mp3"
+    },
+    {
+      "t": 171.42,
+      "kind": "say",
+      "who": "patient",
+      "text": "Okay, that's... that actually makes a lot of sense to me, the microtrauma triggering the collagen remodeling — that's basically what I tell customers about certain supplements, that you need to create the right environment for the body to do its thing. So you're saying this is kind of working with the body's own repair process, not just masking something. I can get behind that framing. So... what would the next step look like if I wanted to move forward?",
+      "receptivity": 72
+    },
+    {
+      "t": 197.8,
+      "kind": "endSay",
+      "who": "patient"
+    },
+    {
+      "t": 198.68,
+      "kind": "doc",
+      "who": "doctor",
+      "text": "I'll hold a slot for you — no charge to cancel — Tuesday morning or Thursday afternoon, which works better?",
+      "dur": 7.244626,
+      "file": "da/d6.mp3"
+    },
+    {
+      "t": 207,
+      "kind": "say",
+      "who": "patient",
+      "text": "Thursday afternoon works for me. Do I pay the two-fifty when I come in, or do you want something now to hold the spot?",
+      "receptivity": 92
+    },
+    {
+      "t": 214.3,
+      "kind": "endSay",
+      "who": "patient"
+    },
+    {
+      "t": 215.22,
+      "kind": "endClick"
+    },
+    {
+      "t": 235.66,
+      "kind": "scorecard"
+    },
+    {
+      "t": 250.69,
+      "kind": "end"
+    }
+  ]
+}

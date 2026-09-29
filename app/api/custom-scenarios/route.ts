@@ -38,7 +38,16 @@ export async function POST(req: Request) {
   // Relaxed scrub at save time: the strict person-name gate already ran on
   // the user's raw inputs; drafted text legitimately contains Title Case
   // service names. Dates, record-like numbers, and profanity still reject.
-  for (const text of [body.data.patientCc, body.data.clinicalContext, ...body.data.objectionSeeds]) {
+  const freeText = [
+    body.data.title,
+    body.data.serviceDesc,
+    body.data.clinicalContext,
+    body.data.patientCc,
+    body.data.closeGoal,
+    ...body.data.objectionSeeds,
+    ...(body.data.cards ?? []).flatMap((c) => [c.front, c.isolate, c.reframe, c.close]),
+  ];
+  for (const text of freeText) {
     const scrub = scrubFreeText(text, { allowNames: true });
     if (!scrub.ok) return NextResponse.json({ error: scrub.reason }, { status: 400 });
   }

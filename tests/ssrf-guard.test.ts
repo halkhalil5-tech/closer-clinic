@@ -25,3 +25,22 @@ describe("site importer SSRF guard", () => {
     });
   }
 });
+
+describe("IPv6 disguises", () => {
+  const blocked = [
+    "http://[::ffff:a9fe:a9fe]/",
+    "http://[::ffff:169.254.169.254]/",
+    "http://[::ffff:7f00:1]/",
+    "http://[64:ff9b::a9fe:a9fe]/",
+    "http://[fe80::1]/",
+    "http://[fd00::2]/",
+    "http://[2002:a9fe:a9fe::1]/",
+  ];
+  for (const url of blocked) {
+    it(`refuses ${url}`, async () => {
+      const { pages, error } = await crawlSite(url);
+      expect(pages).toHaveLength(0);
+      expect(error).toBeTruthy();
+    });
+  }
+});

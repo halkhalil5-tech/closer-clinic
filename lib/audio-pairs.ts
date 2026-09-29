@@ -280,13 +280,16 @@ export async function getOrCreateReplay(input: {
     .slice(0, 16);
 
   if (admin) {
-    const { data: cached } = await admin
+    // limit(1), not maybeSingle: legacy duplicate rows made maybeSingle
+    // error out, which read as a permanent cache miss and re-billed TTS.
+    const { data: cachedRows } = await admin
       .from("audio_assets")
       .select("*")
       .eq("kind", "replay")
       .eq("encounter_id", input.encounterId)
       .eq("content_hash", hash)
-      .maybeSingle();
+      .limit(1);
+    const cached = cachedRows?.[0];
     if (cached) {
       const { data: signed } = await admin.storage
         .from("audio-replays")
@@ -330,15 +333,18 @@ export async function getOrCreateReplay(input: {
     .from("audio-replays")
     .upload(path, rendered.audio, { contentType: "audio/mpeg", upsert: true });
   if (error) throw error;
-  await admin.from("audio_assets").insert({
-    kind: "replay",
-    content_hash: hash,
-    script: { lines: rendered.lines },
-    storage_path: path,
-    duration_ms: rendered.durationMs,
-    encounter_id: input.encounterId,
-    user_id: input.userId,
-  });
+  await admin.from("audio_assets").upsert(
+    {
+      kind: "replay",
+      content_hash: hash,
+      script: { lines: rendered.lines },
+      storage_path: path,
+      duration_ms: rendered.durationMs,
+      encounter_id: input.encounterId,
+      user_id: input.userId,
+    },
+    { onConflict: "kind,encounter_id,content_hash" }
+  );
   const { data: signed } = await admin.storage.from("audio-replays").createSignedUrl(path, 3600);
   return {
     status: "ready",

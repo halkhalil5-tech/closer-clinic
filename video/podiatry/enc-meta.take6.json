@@ -1,0 +1,152 @@
+{
+  "id": "c3337b44-5ce1-4b78-9914-48481b0f0e13",
+  "marks": [
+    {
+      "t": 0.65,
+      "kind": "sessionEnter"
+    },
+    {
+      "t": 1.7,
+      "kind": "say",
+      "who": "patient",
+      "text": "Well, it's about time — six months I've been dealing with this Achilles thing, and I've done everything your people told me to do. I heard you've got some kind of shockwave device now, so let's talk about that."
+    },
+    {
+      "t": 15.04,
+      "kind": "endSay",
+      "who": "patient"
+    },
+    {
+      "t": 15.94,
+      "kind": "doc",
+      "who": "doctor",
+      "text": "You've been patient and you did the work — that actually matters here. Shockwave is exactly the right next step when the basics have been done right and haven't fixed it.",
+      "dur": 9.380862,
+      "file": "da/d0.mp3"
+    },
+    {
+      "t": 26.26,
+      "kind": "say",
+      "who": "patient",
+      "text": "Okay, but — and I'm going to be straight with you — is this something you're recommending because it's actually right for me, or because you've got a machine sitting in the back that needs to pay for itself?",
+      "receptivity": 35
+    },
+    {
+      "t": 47.63,
+      "kind": "endSay",
+      "who": "patient"
+    },
+    {
+      "t": 94.31,
+      "kind": "doc",
+      "who": "doctor",
+      "text": "Fair question. Your exam and your treatment history are what's driving this — if those didn't fit, I'd tell you to skip it.",
+      "dur": 6.873107,
+      "file": "da/d1.mp3"
+    },
+    {
+      "t": 102.11,
+      "kind": "say",
+      "who": "patient",
+      "text": "Alright, so walk me through it — what exactly did you find on the exam that makes you think this is the right call for me specifically?",
+      "receptivity": 35
+    },
+    {
+      "t": 109.93,
+      "kind": "endSay",
+      "who": "patient"
+    },
+    {
+      "t": 110.81,
+      "kind": "doc",
+      "who": "doctor",
+      "text": "You've got a tender, fusiform thickening right at mid-tendon — that's classic degenerative tendinosis, the exact pattern shockwave is designed to kick-start healing in.",
+      "dur": 10.49542,
+      "file": "da/d2.mp3"
+    },
+    {
+      "t": 122.64,
+      "kind": "say",
+      "who": "patient",
+      "text": "Okay, that's... actually a straight answer, I'll give you that. So does my insurance cover any of this, or are you about to tell me I'm writing a check?",
+      "receptivity": 45
+    },
+    {
+      "t": 131.95,
+      "kind": "endSay",
+      "who": "patient"
+    },
+    {
+      "t": 132.84,
+      "kind": "doc",
+      "who": "doctor",
+      "text": "Most insurers call it investigational, so yes — you're writing a check. $250 a session, or $675 if you start with three. That's the number, said once.",
+      "dur": 11.192018,
+      "file": "da/d3.mp3"
+    },
+    {
+      "t": 145.16,
+      "kind": "say",
+      "who": "patient",
+      "text": "$250 a session... so we're talking, what, $750 to over a thousand dollars depending on how many I need? That's real money for something that might not work.",
+      "receptivity": 45
+    },
+    {
+      "t": 157.49,
+      "kind": "endSay",
+      "who": "patient"
+    },
+    {
+      "t": 158.37,
+      "kind": "doc",
+      "who": "doctor",
+      "text": "Honest answer: it helps about two out of three people, and it's not guaranteed — that's exactly why I won't push you. Want me to hold a slot for next week — Tuesday morning or Thursday afternoon — cancel any time, no charge?",
+      "dur": 14.907211,
+      "file": "da/d4.mp3"
+    },
+    {
+      "t": 174.21,
+      "kind": "say",
+      "who": "patient",
+      "text": "What are the actual odds it gets me running again specifically, given where I'm at with this thing?",
+      "receptivity": 55
+    },
+    {
+      "t": 180.02,
+      "kind": "endSay",
+      "who": "patient"
+    },
+    {
+      "t": 181.41,
+      "kind": "doc",
+      "who": "doctor",
+      "text": "Two-thirds of patients with your exact picture get meaningful improvement — running included — but I can't promise you're in that group. Want to hold Tuesday morning or Thursday afternoon, cancel any time, no charge?",
+      "dur": 13.606893,
+      "file": "da/d5.mp3"
+    },
+    {
+      "t": 196.25,
+      "kind": "say",
+      "who": "patient",
+      "text": "Thursday afternoon works — and I'll do the three-session package.",
+      "receptivity": 85
+    },
+    {
+      "t": 200.54,
+      "kind": "endSay",
+      "who": "patient"
+    },
+    {
+      "t": 201.47,
+      "kind": "endClick"
+    },
+    {
+      "t": 223.09,
+      "kind": "scorecard"
+    },
+    {
+      "t": 238.13,
+      "kind": "end"
+    }
+  ]
+}

@@ -10,7 +10,7 @@ export interface ScrubResult {
   reason?: string;
 }
 
-const HONORIFIC_NAME = /\b(?:mr|mrs|ms|dr|miss)\.?\s+[A-Z][a-z]+/i;
+const HONORIFIC_NAME = /\b(?:[Mm]r|[Mm]rs|[Mm]s|[Dd]r|[Mm]iss)\.?\s+[A-Z][a-z]+/;
 const FULL_NAME = /\b[A-Z][a-z]{2,}\s+[A-Z][a-z]{2,}\b/;
 const DOB_LIKE = /\b\d{1,2}[/-]\d{1,2}[/-]\d{2,4}\b/;
 const LONG_NUMBER = /\d[\d\s()-]{6,}\d/;

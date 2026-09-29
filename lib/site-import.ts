@@ -1,6 +1,8 @@
 import "server-only";
 
 import { lookup } from "node:dns/promises";
+import { request as httpRequest } from "node:http";
+import { request as httpsRequest } from "node:https";
 
 /**
  * Practice-website import: fetch the homepage plus obvious services/pricing
@@ -46,7 +48,7 @@ const MAX_BODY_BYTES = 2_000_000;
 
 function isPrivateV4(ip: string): boolean {
   const o = ip.split(".").map(Number);
-  if (o.length !== 4 || o.some((n) => Number.isNaN(n))) return true;
+  if (o.length !== 4 || o.some((n) => Number.isNaN(n) || n > 255)) return true;
   return (
     o[0] === 0 || o[0] === 10 || o[0] === 127 ||
     (o[0] === 100 && o[1] >= 64 && o[1] <= 127) ||
@@ -57,61 +59,136 @@ function isPrivateV4(ip: string): boolean {
   );
 }
 
-function isPrivateAddress(addr: string): boolean {
-  const a = addr.toLowerCase();
-  if (a.includes(":")) {
-    // IPv6: loopback, unspecified, link-local, unique-local, and v4-mapped.
-    if (a === "::" || a === "::1") return true;
-    if (a.startsWith("fe8") || a.startsWith("fe9") || a.startsWith("fea") || a.startsWith("feb")) return true;
-    if (a.startsWith("fc") || a.startsWith("fd")) return true;
-    const mapped = a.match(/^::ffff:(\d+\.\d+\.\d+\.\d+)$/);
-    return mapped ? isPrivateV4(mapped[1]) : false;
+/** Parse an IPv6 literal into its 8 groups; null when malformed. */
+function v6Groups(host: string): number[] | null {
+  let h = host.toLowerCase();
+  // dotted-quad tail (::ffff:169.254.169.254) → two trailing hex groups
+  const tail = h.match(/^(.*:)(\d+\.\d+\.\d+\.\d+)$/);
+  if (tail) {
+    const o = tail[2].split(".").map(Number);
+    if (o.length !== 4 || o.some((n) => Number.isNaN(n) || n > 255)) return null;
+    h = `${tail[1]}${(((o[0] << 8) | o[1]) >>> 0).toString(16)}:${(((o[2] << 8) | o[3]) >>> 0).toString(16)}`;
   }
-  return isPrivateV4(a);
+  const halves = h.split("::");
+  if (halves.length > 2) return null;
+  const left = halves[0] ? halves[0].split(":").filter(Boolean) : [];
+  const right = halves.length === 2 && halves[1] ? halves[1].split(":").filter(Boolean) : [];
+  const groups =
+    halves.length === 2
+      ? [...left, ...Array(8 - left.length - right.length).fill("0"), ...right]
+      : left;
+  if (groups.length !== 8) return null;
+  const out: number[] = [];
+  for (const g of groups) {
+    if (!/^[0-9a-f]{1,4}$/.test(g)) return null;
+    out.push(parseInt(g, 16));
+  }
+  return out;
 }
+
+function isPrivateAddress(addr: string): boolean {
+  const a = addr.toLowerCase().replace(/^\[|\]$/g, "").split("%")[0];
+  if (!a.includes(":")) return isPrivateV4(a);
+  const g = v6Groups(a);
+  if (!g) return true; // unparseable → refuse
+  const embeddedV4 = (hi: number, lo: number) =>
+    isPrivateV4(`${hi >> 8}.${hi & 255}.${lo >> 8}.${lo & 255}`);
+  const leadZero = (n: number) => g.slice(0, n).every((x) => x === 0);
+  if (leadZero(8)) return true;                                   // ::
+  if (leadZero(7) && g[7] === 1) return true;                     // ::1
+  if (g[0] >= 0xfe80 && g[0] <= 0xfebf) return true;              // link-local
+  if (g[0] >> 8 === 0xfc || g[0] >> 8 === 0xfd) return true;      // unique-local
+  if (leadZero(5) && g[5] === 0xffff) return embeddedV4(g[6], g[7]);       // v4-mapped (hex or dotted)
+  if (leadZero(6)) return embeddedV4(g[6], g[7]);                 // v4-compatible (deprecated)
+  if (g[0] === 0x64 && g[1] === 0xff9b && g.slice(2, 6).every((x) => x === 0))
+    return embeddedV4(g[6], g[7]);                                // NAT64
+  if (g[0] === 0x2002) return embeddedV4(g[1], g[2]);             // 6to4
+  return false;
+}
+
+interface PinnedTarget { address: string; family: number }
 
 /**
  * SSRF guard: only plain http(s) on default ports, to hostnames whose EVERY
- * resolved address is public. Blocks localhost, RFC1918, link-local (cloud
- * metadata), CGNAT, and v6 equivalents. DNS is re-resolved per request;
- * redirects are followed manually so every hop passes the same check.
+ * resolved address is public. Returns the address the caller must connect
+ * to — the socket is pinned to it so a second DNS answer (rebinding) can't
+ * swap in an internal host between check and connect.
  */
-async function assertPublicUrl(u: URL): Promise<boolean> {
-  if (u.protocol !== "http:" && u.protocol !== "https:") return false;
-  if (u.port && u.port !== "80" && u.port !== "443") return false;
-  if (u.username || u.password) return false;
+async function assertPublicUrl(u: URL): Promise<PinnedTarget | null> {
+  if (u.protocol !== "http:" && u.protocol !== "https:") return null;
+  if (u.port && u.port !== "80" && u.port !== "443") return null;
+  if (u.username || u.password) return null;
   const host = u.hostname.toLowerCase().replace(/^\[|\]$/g, "");
-  if (host === "localhost" || host.endsWith(".localhost") || host.endsWith(".local") || host.endsWith(".internal")) return false;
-  if (/^[\d.]+$/.test(host) || host.includes(":")) return !isPrivateAddress(host);
+  if (host === "localhost" || host.endsWith(".localhost") || host.endsWith(".local") || host.endsWith(".internal")) return null;
+  if (/^[\d.]+$/.test(host) || host.includes(":")) {
+    if (isPrivateAddress(host)) return null;
+    return { address: host, family: host.includes(":") ? 6 : 4 };
+  }
   try {
     const addrs = await lookup(host, { all: true, verbatim: true });
-    return addrs.length > 0 && addrs.every((x) => !isPrivateAddress(x.address));
+    if (addrs.length === 0 || addrs.some((x) => isPrivateAddress(x.address))) return null;
+    return { address: addrs[0].address, family: addrs[0].family };
   } catch {
-    return false;
+    return null;
   }
+}
+
+interface PinnedResponse { status: number; contentType: string; location: string | null; body: string | null }
+
+/** GET over a socket pinned to the pre-validated address (TLS still verifies the hostname). */
+function pinnedGet(u: URL, pin: PinnedTarget): Promise<PinnedResponse | null> {
+  return new Promise((resolve) => {
+    const mod = u.protocol === "https:" ? httpsRequest : httpRequest;
+    const req = mod(
+      u,
+      {
+        lookup: ((_h: string, opts: unknown, cb: unknown) => {
+          const done = (typeof opts === "function" ? opts : cb) as (e: null, a: string, f: number) => void;
+          done(null, pin.address, pin.family);
+        }) as never,
+        headers: { "User-Agent": "CloserClinic-Importer/1.0 (+services & pricing only)" },
+        timeout: FETCH_TIMEOUT_MS,
+      },
+      (res) => {
+        const status = res.statusCode ?? 0;
+        const contentType = String(res.headers["content-type"] ?? "");
+        const location = res.headers.location ?? null;
+        if (status >= 300 && status < 400) {
+          res.resume();
+          return resolve({ status, contentType, location, body: null });
+        }
+        let size = 0;
+        const chunks: Buffer[] = [];
+        res.on("data", (c: Buffer) => {
+          size += c.length;
+          if (size > MAX_BODY_BYTES) { req.destroy(); resolve(null); return; }
+          chunks.push(c);
+        });
+        res.on("end", () => resolve({ status, contentType, location, body: Buffer.concat(chunks).toString("utf8") }));
+        res.on("error", () => resolve(null));
+      }
+    );
+    req.on("timeout", () => { req.destroy(); resolve(null); });
+    req.on("error", () => resolve(null));
+    req.end();
+  });
 }
 
 async function fetchPage(url: string): Promise<string | null> {
   try {
     let current = new URL(url);
     for (let hop = 0; hop <= MAX_REDIRECTS; hop++) {
-      if (!(await assertPublicUrl(current))) return null;
-      const res = await fetch(current.toString(), {
-        signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
-        headers: { "User-Agent": "CloserClinic-Importer/1.0 (+services & pricing only)" },
-        redirect: "manual",
-      });
+      const pin = await assertPublicUrl(current);
+      if (!pin) return null;
+      const res = await pinnedGet(current, pin);
+      if (!res) return null;
       if (res.status >= 300 && res.status < 400) {
-        const loc = res.headers.get("location");
-        if (!loc || hop === MAX_REDIRECTS) return null;
-        current = new URL(loc, current);
+        if (!res.location || hop === MAX_REDIRECTS) return null;
+        current = new URL(res.location, current);
         continue;
       }
-      if (!res.ok || !(res.headers.get("content-type") ?? "").includes("html")) return null;
-      const len = Number(res.headers.get("content-length") ?? "0");
-      if (len > MAX_BODY_BYTES) return null;
-      const text = await res.text();
-      return text.length > MAX_BODY_BYTES ? null : text;
+      if (res.status !== 200 || !res.contentType.includes("html") || res.body === null) return null;
+      return res.body;
     }
     return null;
   } catch {

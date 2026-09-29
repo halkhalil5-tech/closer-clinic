@@ -6,6 +6,7 @@ import { rollPersona } from "@/lib/personas";
 import { buildDrillPatientSystemPrompt, DRILL_OPENING_INSTRUCTION } from "@/lib/prompts";
 import { generatePatientReply } from "@/lib/anthropic";
 import type { TranscriptMessage } from "@/lib/types";
+import { dailyLimitResponse } from "@/lib/daily-limit";
 
 export const maxDuration = 60;
 
@@ -20,6 +21,8 @@ export async function POST(req: Request) {
   if (!body.success) return NextResponse.json({ error: "Invalid request" }, { status: 400 });
 
   const store = await getStore();
+  const limited = await dailyLimitResponse(store, user.id);
+  if (limited) return limited;
   const lesson = await store.getTrainingLesson(body.data.lessonSlug);
   if (!lesson?.drill) return NextResponse.json({ error: "No drill for this lesson" }, { status: 404 });
 

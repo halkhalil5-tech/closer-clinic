@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getAuthedUser } from "@/lib/auth";
 import { getStore } from "@/lib/store";
 import type { TranscriptMessage } from "@/lib/types";
+import { dailyLimitResponse } from "@/lib/daily-limit";
 
 /**
  * Redo the Moment: restart the encounter from 2 provider turns before the
@@ -14,6 +15,8 @@ export async function POST(_req: Request, ctx: { params: Promise<{ id: string }>
 
   const { id } = await ctx.params;
   const store = await getStore();
+  const limited = await dailyLimitResponse(store, user.id);
+  if (limited) return limited;
   const source = await store.getEncounter(id, user.id);
   if (!source) return NextResponse.json({ error: "Encounter not found" }, { status: 404 });
 
