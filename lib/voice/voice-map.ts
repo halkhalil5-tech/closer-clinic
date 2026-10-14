@@ -70,8 +70,53 @@ const VOICES: Record<string, VoicePair> = {
 
 const DEFAULT_VOICE = "21m00Tcm4TlvDq8ikWAM"; // Rachel — safe neutral fallback
 
+// Derm archetypes — reuse the vetted American roster; pairings chosen for
+// age/energy fit with each archetype.
+const DERM_VOICES: Record<string, VoicePair> = {
+  "derm-glp1": {
+    m: { id: "CwhRBWXzGAHq8TQ4Fs17", name: "Roger — deliberate middle-aged male" },
+    f: { id: "XrExE9yKIg1WjnnlVkGX", name: "Matilda — warm American female" },
+  },
+  "derm-genz": {
+    m: { id: "iP95p4xoKVk53GoZ742B", name: "Chris — fast casual American male" },
+    f: { id: "cgSgspJ2msm6clMCkdW9", name: "Jessica — quick expressive female" },
+  },
+  "derm-male-first": {
+    m: { id: "pNInz6obpgDQGcFmaJgB", name: "Adam — blunt deep American male" },
+    f: { id: "9BWtsMINqrJLrRacOk9x", name: "Aria — husky middle-aged female" },
+  },
+  "derm-shopper": {
+    m: { id: "iP95p4xoKVk53GoZ742B", name: "Chris — fast casual male" },
+    f: { id: "cgSgspJ2msm6clMCkdW9", name: "Jessica — quick expressive female" },
+  },
+  "derm-fitz": {
+    m: { id: "nPczCjzI2devNBz1zQrb", name: "Brian — polished precise male" },
+    f: { id: "21m00Tcm4TlvDq8ikWAM", name: "Rachel — dry, level American female" },
+  },
+  "derm-redo": {
+    m: { id: "TX3LPaxmHKxFdv7VOQHJ", name: "Liam — gentle careful American male" },
+    f: { id: "LcfcDJNUP1GQjkzn1xUU", name: "Emily — calm considerate female" },
+  },
+  "derm-downtime": {
+    m: { id: "nPczCjzI2devNBz1zQrb", name: "Brian — polished precise male" },
+    f: { id: "21m00Tcm4TlvDq8ikWAM", name: "Rachel — dry, level female" },
+  },
+  "derm-medical-visit": {
+    m: { id: "pqHfZKP75CvOlQylNhV4", name: "Bill — older American male" },
+    f: { id: "XrExE9yKIg1WjnnlVkGX", name: "Matilda — warm female" },
+  },
+  "derm-spouse": {
+    m: { id: "cjVigY5qzO86Huf0OWal", name: "Eric — friendly middle-aged male" },
+    f: { id: "LcfcDJNUP1GQjkzn1xUU", name: "Emily — calm considerate female" },
+  },
+  "derm-reviews": {
+    m: { id: "iP95p4xoKVk53GoZ742B", name: "Chris — fast casual male" },
+    f: { id: "9BWtsMINqrJLrRacOk9x", name: "Aria — husky expressive female" },
+  },
+};
+
 export function voiceFor(personaId: string, gender: Gender | undefined): string {
-  const pair = VOICES[personaId];
+  const pair = VOICES[personaId] ?? DERM_VOICES[personaId];
   if (!pair) return DEFAULT_VOICE;
   return (gender === "m" ? pair.m : pair.f).id;
 }
