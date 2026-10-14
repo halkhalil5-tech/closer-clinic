@@ -5,7 +5,8 @@ import { WARMUP_CARDS } from "@/lib/training/podiatry-pack";
 
 describe("pickFirstRepStation", () => {
   it("picks the highest-priced provider station the warmup deck rehearses", () => {
-    const pick = pickFirstRepStation(SCENARIOS, WARMUP_CARDS);
+    // Mirror the real call site: home passes the user's specialty roster only.
+    const pick = pickFirstRepStation(SCENARIOS.filter((s) => s.specialty === "podiatry"), WARMUP_CARDS);
     // The deck's "Say it plainly" card rehearses the $600 series.
     expect(pick?.slug).toBe("shockwave-plantar-fasciitis");
   });
