@@ -6,7 +6,10 @@ import { voiceFor } from "./voice/voice-map";
  * unlimited reps. These never touch the DB; an encounter stores a resolved
  * PersonaSnapshot so grading and history are stable even if this file changes.
  */
+import { DERM_PERSONAS } from "./derm/personas";
+
 export const PERSONAS: Persona[] = [
+  ...DERM_PERSONAS,
   {
     id: "price-anchored-retiree",
     archetype: "Price-anchored retiree",
@@ -257,10 +260,11 @@ export function rollPersona(
   rand: () => number = Math.random,
   archetypeIds?: string[]
 ): PersonaSnapshot {
+  const generalPool = PERSONAS.filter((p) => !p.specialty);
   const pool = archetypeIds?.length
     ? PERSONAS.filter((p) => archetypeIds.includes(p.id))
-    : PERSONAS;
-  const persona = pick(pool.length > 0 ? pool : PERSONAS, rand);
+    : generalPool;
+  const persona = pick(pool.length > 0 ? pool : generalPool, rand);
   const [lo, hi] = persona.ageRange;
   const who = pick(persona.namePool, rand);
   return {

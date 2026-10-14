@@ -24,6 +24,7 @@ import { listScenarios as codeScenarios, getScenario as codeScenario } from "../
 import { PODIATRY_MODULES, PODIATRY_LESSONS } from "../training/podiatry-pack";
 import { REGEN_MODULES, REGEN_LESSONS } from "../training/regen-pack";
 import { REGEN_OBJECTION_CARDS } from "../training/regen-objection-cards";
+import { DERM_OBJECTION_CARDS } from "../derm/compile";
 import { PODIATRY_OBJECTION_CARDS } from "../training/objection-cards";
 import { getModuleDocFromCode } from "../training/module-docs";
 import { REGEN_MODULE_DOCS } from "../training/regen-module-docs";
@@ -448,7 +449,7 @@ class MemoryStore implements Store {
 
   async listObjectionCards(userId: string, specialty: string): Promise<ObjectionCard[]> {
     return [
-      ...[...PODIATRY_OBJECTION_CARDS, ...REGEN_OBJECTION_CARDS].filter((c) => c.specialty === specialty),
+      ...[...PODIATRY_OBJECTION_CARDS, ...REGEN_OBJECTION_CARDS, ...DERM_OBJECTION_CARDS].filter((c) => c.specialty === specialty),
       ...db().customCards.filter((c) => c.createdByUserId === userId && c.specialty === specialty),
     ];
   }

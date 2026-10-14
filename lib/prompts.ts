@@ -312,6 +312,36 @@ REWARD (these RAISE the score):
 Bands: 17-20 clean AND actively honest (concessions, physician deferral, written expectations); 13-16 clean but passive — nothing false, nothing conceded; 9-12 one borderline overstatement, self-corrected or minor; 5-8 one clear violation, uncorrected; 0-4 multiple violations, or any outcome guarantee / FDA-approval claim / promise made to a distressed family member.
 HARD RULE: if any flagged line exists, the "rewrite" MUST target the single worst flagged line and produce compliant language that still moves toward the close.`;
 
+const DERM_RUBRIC_OVERLAY = `
+DERM LENS (this is a cash-pay aesthetic dermatology consult; apply the five categories through these definitions):
+- rapport = DISCOVERY: did they uncover the real concern and the motivation behind it (an event, confidence, aging, post-weight-loss change)? Generic compliments or launching into product talk without discovery scores low.
+- framing = EDUCATION: mechanism and a REALISTIC timeline in plain language (onset, peak, duration, downtime). Overstated or vague timelines score low.
+- price = PLAN & PACKAGES: reward a combination plan across modalities plus a package or membership with clear pricing. Selling a single item when the consult surfaced multiple concerns caps this category at 12.
+- close = CLOSE & REBOOKING: an explicit booking ask AND retention — the next appointment set and a skincare regimen or maintenance cadence named. A booking ask with no rebooking plan caps this category at 14.
+- objections: unchanged — acknowledge, clarify, reframe on value; price-shopper comparisons are answered on value, never by matching a discount.`;
+
+const DERM_COMPLIANCE_RUBRIC = `
+COMPLIANCE AXIS (aesthetic dermatology — score 0-20, reported separately; it does NOT count toward "total"):
+Grade every PROVIDER line against these rules.
+
+FLAG AND PENALIZE (each violation is a flag; score by severity and count):
+- Guaranteeing outcomes, or the words "permanent", "painless", "no risk" (or equivalents) applied to a treatment
+- Skipping informed-consent essentials for what is being sold: vascular occlusion for filler; PIH/burn risk for lasers and IPL; real downtime for resurfacing and RF microneedling; ptosis/asymmetry for neuromodulators
+- Skipping screening the module requires: pregnancy/breastfeeding, Fitzpatrick type before any light/laser device, recent isotretinoin before resurfacing or microneedling, active infection at the site, anticoagulants, keloid history, relevant autoimmune disease
+- Exosome/PDRN/PRP overclaims: no injected exosome product is FDA-approved; calling these "stem cell therapy", claiming FDA approval, or promising hair regrowth as a certain result is a severe violation
+- Stating an off-label use as if it were on-label
+- High-pressure tactics: fake scarcity, "today only" pricing, closing past a stable informed no
+- Non-physician staff (injector/aesthetician stations) making diagnoses or medical-necessity statements
+
+REWARD (these RAISE the score):
+- Screening questions asked naturally, BEFORE the close
+- Risks named plainly without being asked, with realistic downtime
+- Accurate framing of off-label or evidence-limited treatments while still recommending confidently where appropriate
+- Value-based closing with honest urgency only (real schedule, real series timing)
+
+Bands: 17-20 screened, consented, and honest unprompted; 13-16 clean but passive; 9-12 one borderline overstatement or one screening gap, minor; 5-8 one clear violation uncorrected; 0-4 multiple violations, any outcome guarantee, or an FDA/stem-cell overclaim.
+HARD RULE: if any flagged line exists, the "rewrite" MUST target the single worst flagged line and produce compliant language that still moves toward the close.`;
+
 const RUBRIC_DEFINITIONS = `RUBRIC (score each 0–20, evidence-first):
 Before scoring a category, locate the specific PROVIDER lines relevant to it; place the performance in a band based on that evidence, then pick the exact score within the band. Use the FULL 0–20 range. The middle band (9–12) must be earned by genuinely mixed evidence — when a skill was never demonstrated, score it 0–8; never park a category at 10–12 as a default. Real reps produce spread: expect a standout category and a weak one, not five similar numbers.
 
@@ -414,7 +444,7 @@ STATION
 - Difficulty: ${difficulty}
 
 ${scenario.role === "front_desk" ? FRONT_DESK_RUBRIC_DEFINITIONS : RUBRIC_DEFINITIONS}
-${scenario.specialty === "regen" ? REGEN_COMPLIANCE_RUBRIC : ""}
+${scenario.specialty === "regen" ? REGEN_COMPLIANCE_RUBRIC : scenario.specialty === "derm" ? DERM_COMPLIANCE_RUBRIC : ""}${scenario.specialty === "derm" ? DERM_RUBRIC_OVERLAY : ""}
 TRANSCRIPT
 ${lines}
 
@@ -430,7 +460,7 @@ Respond with ONLY a JSON object, no markdown fences, no commentary, exactly this
   "rewrite": {"you_said": "the provider's single weakest line, quoted VERBATIM from the transcript", "better": "that same moment rewritten in the provider's own voice, 1-2 sentences, applying the rubric skill that failed"},
   "worked": ["2-4 specific things the provider did well, each citing what they said"],
   "fixes": ["2-4 specific fixes, each naming what was said and what to say instead"],
-  "drill": "ONE specific line or technique to practice on the next rep, phrased as an instruction with example wording"${scenario.specialty === "regen" ? `,
+  "drill": "ONE specific line or technique to practice on the next rep, phrased as an instruction with example wording"${scenario.specialty === "regen" || scenario.specialty === "derm" ? `,
   "compliance": {"score": 0-20, "flags": ["each flagged PROVIDER line quoted or tightly paraphrased, with the violation named — empty array if clean"]}` : ""}
 }
 "total" must equal the sum of the five scores. If a rubric category never came up (e.g. the patient never objected because the provider closed instantly on easy), score it on what evidence exists and note that in "worked" or "fixes".`;

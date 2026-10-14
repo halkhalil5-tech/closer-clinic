@@ -80,7 +80,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Unknown scenario" }, { status: 404 });
   }
 
-  const persona = rollPersona();
+  const persona = rollPersona(Math.random, scenarioForGate?.personaPool);
   if (scenario.insuranceOverride) persona.insurance = scenario.insuranceOverride;
   const systemPrompt = buildPatientSystemPrompt(scenario, persona, body.data.difficulty);
 

@@ -38,6 +38,8 @@ for (const s of SCENARIOS) {
       objection_seeds: s.objectionSeeds,
       difficulty_notes: s.difficultyNotes ?? null,
       insurance_override: s.insuranceOverride ?? null,
+      close_script: s.closeScript ?? null,
+      persona_pool: s.personaPool ?? null,
       is_custom: false,
       active: s.active,
       sort_order: sort++,
@@ -162,7 +164,8 @@ console.log(
 // ------------------------- objection card deck -------------------------
 const { PODIATRY_OBJECTION_CARDS } = await import("../lib/training/objection-cards.ts");
 const { REGEN_OBJECTION_CARDS } = await import("../lib/training/regen-objection-cards.ts");
-const ALL_CARDS = [...PODIATRY_OBJECTION_CARDS, ...REGEN_OBJECTION_CARDS];
+const { DERM_OBJECTION_CARDS } = await import("../lib/derm/compile.ts");
+const ALL_CARDS = [...PODIATRY_OBJECTION_CARDS, ...REGEN_OBJECTION_CARDS, ...DERM_OBJECTION_CARDS];
 for (const c of ALL_CARDS) {
   const { error } = await supabase.from("objection_cards").upsert(
     {

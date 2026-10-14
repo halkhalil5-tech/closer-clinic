@@ -27,13 +27,23 @@ const REGEN: string[] = [
   "bone on bone", "debridement", "ultrasound", "cortisone",
 ];
 
+const DERM: string[] = [
+  "neuromodulator", "Botox", "Dysport", "Daxxify", "Jeuveau", "masseter",
+  "hyperhidrosis", "hyaluronic", "filler", "Skinvive", "Sculptra",
+  "Radiesse", "biostimulator", "Morpheus8", "microneedling", "IPL", "BBL",
+  "photofacial", "rosacea", "Fitzpatrick", "hyperpigmentation", "melasma",
+  "isotretinoin", "tretinoin", "retinoid", "resurfacing", "erbium",
+  "seborrheic keratosis", "cherry angioma", "milia", "PRP", "exosomes",
+  "polynucleotides", "vascular occlusion", "ptosis",
+];
+
 const DENTAL: string[] = [
   "occlusal", "periodontal", "prophylaxis", "veneers", "aligners", "bruxism",
 ];
 
 export function keywordsFor(specialty: string | null | undefined): string[] {
   const pack =
-    specialty === "dental" ? DENTAL : specialty === "regen" ? REGEN : PODIATRY;
+    specialty === "dental" ? DENTAL : specialty === "regen" ? REGEN : specialty === "derm" ? DERM : PODIATRY;
   return [...pack, ...SHARED];
 }
 

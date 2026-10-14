@@ -88,7 +88,7 @@ export default async function ScorecardPage({
     day: "numeric",
     year: "numeric",
   });
-  const labels = rubricLabelsFor(scenario?.role);
+  const labels = rubricLabelsFor(scenario?.role, scenario?.specialty);
   const receptivitySeries = encounter.transcript
     .filter((m) => m.role === "patient" && typeof m.receptivity === "number")
     .map((m) => m.receptivity as number);

@@ -55,8 +55,9 @@ ${scenario.marginNote ? `VENDOR MARGIN CONTEXT (for the card's margin line ONLY 
 ${scenario.marginNote}
 ` : ""}Rules:
 - priceLine: state the number plainly and stop — no apology, no justification tail.
-- objections: pick the THREE most consequential from the list above (quote them tightly), each with a response that isolates or reframes and re-asks. Never a discount.
-- closeLine: an assumptive or alternative ${frontDesk ? "scheduling" : ""} close.
+- objections: pick the THREE most consequential from the list above (quote them tightly), each with a response that isolates or reframes and re-asks. Never a discount. Never disparage competitors or speculate about their products or skill — reframe on what THIS clinic does, not what others do wrong.
+- closeLine: an assumptive or alternative ${frontDesk ? "scheduling" : ""} close.${scenario.closeScript ? `
+- closeLine MUST be this clinic-approved close, lightly tightened if needed, never replaced: "${scenario.closeScript}"` : ""}
 - ifMaybe: exactly 3 short steps for "let me think about it" — validate, isolate with a question, set a concrete next step with a date.${scenario.marginNote ? `
 - marginLine: ONE compact line for the clinic's eyes only, from the vendor margin context: patient price vs clinic cost and any availability caveat. Plain numbers, no hype.` : ""}
 

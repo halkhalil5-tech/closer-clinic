@@ -1,4 +1,5 @@
 import type { Scenario } from "./types";
+import { DERM_SCENARIOS } from "./derm/compile";
 
 /**
  * Launch scenario library. This is the canonical source: the Supabase seed
@@ -542,6 +543,8 @@ export const SCENARIOS: Scenario[] = [
       "'I'll call you' is a soft no unless the desk converts it: the win is the patient picking the callback time themselves. Pressuring past the spouse conversation is a fail — the conversation is legitimate; the vagueness is the enemy. Holding the slot must be framed as zero-commitment convenience.",
   },
 ].map((s) => ({ ...s, isCustom: false, active: true })) as Scenario[];
+
+SCENARIOS.push(...DERM_SCENARIOS);
 
 export function getScenario(slug: string): Scenario | undefined {
   return SCENARIOS.find((s) => s.slug === slug && s.active);

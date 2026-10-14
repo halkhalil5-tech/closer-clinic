@@ -5,7 +5,7 @@ import { getStore } from "@/lib/store";
 
 const ProfileSchema = z.object({
   name: z.string().trim().max(120).optional(),
-  specialty: z.enum(["podiatry", "regen", "dental", "medspa"]).optional(),
+  specialty: z.enum(["podiatry", "regen", "dental", "medspa", "derm"]).optional(),
   onboarded: z.boolean().optional(),
 });
 

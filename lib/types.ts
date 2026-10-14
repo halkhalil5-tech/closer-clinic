@@ -1,5 +1,5 @@
 export type Difficulty = "easy" | "moderate" | "hard";
-export type Specialty = "podiatry" | "dental" | "medspa" | "regen";
+export type Specialty = "podiatry" | "dental" | "medspa" | "regen" | "derm";
 export type EncounterStatus = "active" | "graded" | "abandoned";
 
 export type StationRole = "provider" | "front_desk";
@@ -27,6 +27,10 @@ export interface Scenario {
   /** When set, the scenario dictates the patient's insurance situation and the
    *  rolled persona's insurance is replaced (e.g. high-deductible plans). */
   insuranceOverride?: string;
+  /** Mandated close language for the printable script card (derm modules). */
+  closeScript?: string;
+  /** Restrict persona rolls to these archetype ids (specialty persona pools). */
+  personaPool?: string[];
   isCustom: boolean;
   active: boolean;
   /** Vendor-pack stations only: margin framing for the printed script card
@@ -39,6 +43,8 @@ export type Gender = "m" | "f";
 export interface Persona {
   id: string;
   archetype: string;
+  /** Specialty-scoped archetypes are rolled only via an explicit personaPool. */
+  specialty?: Specialty;
   namePool: { name: string; gender: Gender }[];
   ageRange: [number, number];
   insuranceTypes: string[];
@@ -445,8 +451,18 @@ export const FRONT_DESK_RUBRIC_LABELS: Record<keyof RubricScores, string> = {
   close: "Locking the calendar",
 };
 
-export function rubricLabelsFor(role?: StationRole): Record<keyof RubricScores, string> {
-  return role === "front_desk" ? FRONT_DESK_RUBRIC_LABELS : RUBRIC_LABELS;
+export const DERM_RUBRIC_LABELS: Record<keyof RubricScores, string> = {
+  rapport: "Discovery",
+  framing: "Education",
+  price: "Plan & packages",
+  objections: "Objection handling",
+  close: "Close & rebooking",
+};
+
+export function rubricLabelsFor(role?: StationRole, specialty?: Specialty | string | null): Record<keyof RubricScores, string> {
+  if (role === "front_desk") return FRONT_DESK_RUBRIC_LABELS;
+  if (specialty === "derm") return DERM_RUBRIC_LABELS;
+  return RUBRIC_LABELS;
 }
 
 export const RUBRIC_LABELS: Record<keyof RubricScores, string> = {
