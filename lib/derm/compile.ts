@@ -1,5 +1,6 @@
 import type { ObjectionCard, Scenario } from "../types";
 import { DERM_MODULES, type DermModule } from "./modules";
+import { DERM_CROSS_STATIONS } from "./stations";
 
 /**
  * Compile the derm module registry into the engine's existing primitives.
@@ -42,5 +43,5 @@ export function dermCards(m: DermModule): ObjectionCard[] {
   }));
 }
 
-export const DERM_SCENARIOS: Scenario[] = DERM_MODULES.map(dermStation);
+export const DERM_SCENARIOS: Scenario[] = [...DERM_MODULES.map(dermStation), ...DERM_CROSS_STATIONS];
 export const DERM_OBJECTION_CARDS: ObjectionCard[] = DERM_MODULES.flatMap(dermCards);

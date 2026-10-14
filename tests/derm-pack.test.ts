@@ -8,14 +8,23 @@ import { buildGraderPrompt } from "@/lib/prompts";
 import { rubricLabelsFor } from "@/lib/types";
 
 describe("derm module compiler", () => {
-  it("every module compiles to a complete station", () => {
+  it("every station is well-formed; module stations carry the full block", () => {
+    const moduleSlugs = new Set(DERM_MODULES.map((m) => `derm-${m.key}`));
     for (const s of DERM_SCENARIOS) {
       expect(s.specialty).toBe("derm");
       expect(s.slug.startsWith("derm-")).toBe(true);
-      expect(s.objectionSeeds.length).toBeGreaterThanOrEqual(6);
       expect(s.closeScript).toBeTruthy();
       expect(s.personaPool?.length).toBeGreaterThan(0);
-      expect(s.clinicalContext).toContain("SCREENING THE PROVIDER MUST COMPLETE");
+      expect(s.objectionSeeds.length).toBeGreaterThanOrEqual(5);
+      if (moduleSlugs.has(s.slug)) {
+        expect(s.objectionSeeds.length).toBeGreaterThanOrEqual(6);
+        expect(s.clinicalContext).toContain("SCREENING THE PROVIDER MUST COMPLETE");
+      }
+    }
+  });
+  it("the six cross-cutting encounter types exist", () => {
+    for (const slug of ["derm-fd-price-call", "derm-fd-checkout", "derm-followup-convert", "derm-injector-consult", "derm-financing", "derm-medical-bridge"]) {
+      expect(DERM_SCENARIOS.some((s) => s.slug === slug)).toBe(true);
     }
   });
   it("modules carry screening + consent + packages", () => {
