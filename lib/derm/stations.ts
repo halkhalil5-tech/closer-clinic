@@ -11,6 +11,7 @@ export const DERM_CROSS_STATIONS: Scenario[] = [
     slug: "derm-fd-price-call",
     specialty: "derm",
     role: "front_desk",
+    fdContext: "phone",
     title: "Phone: “How much is Botox?”",
     serviceDesc: "Front-desk phone inquiry from a price-shopping caller",
     priceDisplay: "$14/unit",

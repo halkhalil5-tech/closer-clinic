@@ -29,6 +29,9 @@ export interface Scenario {
   insuranceOverride?: string;
   /** Mandated close language for the printable script card (derm modules). */
   closeScript?: string;
+  /** Front-desk stations: the conversation's setting. Default "checkout";
+   *  "phone" = inbound call from someone who hasn't visited yet. */
+  fdContext?: "checkout" | "phone";
   /** Restrict persona rolls to these archetype ids (specialty persona pools). */
   personaPool?: string[];
   isCustom: boolean;

@@ -42,6 +42,7 @@ function mapScenario(r: any): Scenario {
     difficultyNotes: r.difficulty_notes ?? undefined,
     marginNote: r.margin_note ?? undefined,
     closeScript: r.close_script ?? undefined,
+    fdContext: r.fd_context ?? undefined,
     personaPool: r.persona_pool ?? undefined,
     insuranceOverride: r.insurance_override ?? undefined,
     isCustom: r.is_custom,

@@ -39,6 +39,7 @@ for (const s of SCENARIOS) {
       difficulty_notes: s.difficultyNotes ?? null,
       insurance_override: s.insuranceOverride ?? null,
       close_script: s.closeScript ?? null,
+      fd_context: s.fdContext ?? null,
       persona_pool: s.personaPool ?? null,
       is_custom: false,
       active: s.active,

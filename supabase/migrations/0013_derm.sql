@@ -18,3 +18,4 @@ alter table public.packs add constraint packs_specialty_check check (specialty i
 
 alter table public.scenarios add column if not exists close_script text;
 alter table public.scenarios add column if not exists persona_pool text[];
+alter table public.scenarios add column if not exists fd_context text check (fd_context in ('checkout','phone'));

@@ -3,7 +3,7 @@ import { z } from "zod";
 import { getAuthedUser } from "@/lib/auth";
 import { getStore, resolveScenarioForUser } from "@/lib/store";
 import { rollPersona } from "@/lib/personas";
-import { buildPatientSystemPrompt, FRONT_DESK_OPENING_INSTRUCTION, PATIENT_OPENING_INSTRUCTION } from "@/lib/prompts";
+import { buildPatientSystemPrompt, openingInstructionFor } from "@/lib/prompts";
 import { generatePatientReply } from "@/lib/anthropic";
 import { splitReceptivity } from "@/lib/receptivity";
 import { computeTrainingStatus } from "@/lib/training";
@@ -88,7 +88,7 @@ export async function POST(req: Request) {
   const opening: TranscriptMessage[] = [
     {
       role: "event",
-      text: scenario.role === "front_desk" ? FRONT_DESK_OPENING_INSTRUCTION : PATIENT_OPENING_INSTRUCTION,
+      text: openingInstructionFor(scenario),
       at: new Date().toISOString(),
     },
   ];

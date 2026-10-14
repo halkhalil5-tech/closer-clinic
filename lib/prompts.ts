@@ -40,14 +40,17 @@ ${persona.objectionFlavor}`
     : `WHO YOU ARE\nA realistic patient matching the profile below.`;
 
   const frontDesk = scenario.role === "front_desk";
-  return `You are roleplaying a PATIENT ${
-    frontDesk
-      ? "at the CHECKOUT DESK of a medical office, talking to the front-desk staff member after your visit. The clinical decision already happened in the room; what's on the table now is scheduling, deposits, and follow-through"
-      : "in a medical office visit"
+  const fdPhone = frontDesk && scenario.fdContext === "phone";
+  return `You are roleplaying a ${fdPhone ? "CALLER" : "PATIENT"} ${
+    fdPhone
+      ? "on the PHONE with a medical office's front desk. You have never visited this clinic — you are calling with a question, usually about price, and you are probably comparing several clinics"
+      : frontDesk
+        ? "at the CHECKOUT DESK of a medical office, talking to the front-desk staff member after your visit. The clinical decision already happened in the room; what's on the table now is scheduling, deposits, and follow-through"
+        : "in a medical office visit"
   }. This is a training simulation for the ${
     frontDesk ? "front-desk staff member" : "provider"
   }, but you must never acknowledge that. You are a real person ${
-    frontDesk ? "standing at the checkout counter, often with somewhere to be" : "in an exam room"
+    fdPhone ? "on a phone call, ready to hang up if this feels like a runaround" : frontDesk ? "standing at the checkout counter, often with somewhere to be" : "in an exam room"
   }.
 
 PATIENT PROFILE
@@ -94,6 +97,15 @@ export const PATIENT_OPENING_INSTRUCTION =
 
 export const FRONT_DESK_OPENING_INSTRUCTION =
   "[EVENT] You've just stepped up to the checkout desk after your visit; the staff member hasn't spoken yet — you speak first. Open in character with what you want (or want to avoid) at checkout, per your situation. Never open as if replying to something. 1–2 sentences.";
+
+export const FRONT_DESK_PHONE_OPENING_INSTRUCTION =
+  "[EVENT] You are CALLING the clinic on the phone — you have never visited. The staff member just answered with a greeting. Open in character with the question you called to ask, per your situation. 1–2 sentences.";
+
+/** Pick the right opener for a scenario (fd phone stations differ). */
+export function openingInstructionFor(scenario: Scenario): string {
+  if (scenario.role !== "front_desk") return PATIENT_OPENING_INSTRUCTION;
+  return scenario.fdContext === "phone" ? FRONT_DESK_PHONE_OPENING_INSTRUCTION : FRONT_DESK_OPENING_INSTRUCTION;
+}
 
 export const CLOCK_NUDGE_EVENT =
   "[EVENT] You are starting to feel like this visit is running long — you glance at the clock. From now on you are politely trying to wrap up; if the provider hasn't gotten to the point, you push them to.";
@@ -443,7 +455,7 @@ STATION
 - Patient: ${snapshot.name}, ${snapshot.age}, ${snapshot.occupation}, ${snapshot.insurance} — archetype: ${snapshot.archetype}
 - Difficulty: ${difficulty}
 
-${scenario.role === "front_desk" ? FRONT_DESK_RUBRIC_DEFINITIONS : RUBRIC_DEFINITIONS}
+${scenario.role === "front_desk" ? `${scenario.fdContext === "phone" ? "NOTE: this front-desk conversation is an INBOUND PHONE INQUIRY — the caller has never visited; converting the call into a booked consult IS the calendar-and-payment reality being graded.\n" : ""}${FRONT_DESK_RUBRIC_DEFINITIONS}` : RUBRIC_DEFINITIONS}
 ${scenario.specialty === "regen" ? REGEN_COMPLIANCE_RUBRIC : scenario.specialty === "derm" ? DERM_COMPLIANCE_RUBRIC : ""}${scenario.specialty === "derm" ? DERM_RUBRIC_OVERLAY : ""}
 TRANSCRIPT
 ${lines}
