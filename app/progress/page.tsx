@@ -7,6 +7,7 @@ import { computeStats } from "@/lib/stats";
 import { computeTrainingStatus } from "@/lib/training";
 import { averageLetter, dimensionLetterFor, isoDaysAgo, letterColorFor } from "@/lib/letter-grades";
 import { AppNav } from "@/components/app-nav";
+import { rubricLabelsFor } from "@/lib/types";
 import { SampleDataChip } from "@/components/sample-data-chip";
 import { SimVsRealChart, ScenarioBars, type RealDayPoint } from "@/components/charts";
 import { OutcomeLog, type LogService } from "@/components/outcome-log";
@@ -335,7 +336,7 @@ export default async function ProgressPage({
           <section className="mt-3 flex items-baseline justify-between border border-amber/40 bg-amber/[0.07] px-3 py-2.5">
             <div>
               <div className="microlabel text-amber">Weakest category</div>
-              <div className="display mt-0.5 text-[15px] text-ink">{stats.weakestRubric.label}</div>
+              <div className="display mt-0.5 text-[15px] text-ink">{rubricLabelsFor(undefined, specialty)[stats.weakestRubric.key]}</div>
             </div>
             <span
               className="font-mono text-[15px] font-semibold tabular-nums"

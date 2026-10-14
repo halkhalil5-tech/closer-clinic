@@ -9,7 +9,7 @@ import { pickFirstRepStation } from "@/lib/first-rep";
 import { WARMUP_CARDS } from "@/lib/training/podiatry-pack";
 import { FirstRepStart } from "@/components/first-rep-start";
 import { findWeakSkill, moduleForRubric } from "@/lib/training";
-import { RUBRIC_LABELS } from "@/lib/types";
+import { RUBRIC_LABELS , rubricLabelsFor, specialtyLabel } from "@/lib/types";
 import { AppNav } from "@/components/app-nav";
 import { AssignedList, type AssignedItem } from "@/components/assigned-list";
 import { assignmentStatus, dueTone, dueLabel } from "@/lib/assignments";
@@ -99,7 +99,7 @@ export default async function HomePage({
       <header className="px-4 pt-[calc(env(safe-area-inset-top)+0.75rem)]">
         <div className="flex items-baseline justify-between">
           <span className="microlabel">Closer Clinic</span>
-          <span className="text-xs capitalize text-muted">{specialty}</span>
+          <span className="text-xs text-muted">{specialtyLabel(specialty)}</span>
         </div>
         <h1 className="display mt-2 text-[28px] text-bone">Stations</h1>
 
@@ -185,7 +185,7 @@ export default async function HomePage({
           >
             <span className="text-[13.5px] leading-snug text-dim">
               Your{" "}
-              <span className="font-semibold text-ink">{RUBRIC_LABELS[weak.rubricKey]}</span>{" "}
+              <span className="font-semibold text-ink">{rubricLabelsFor(undefined, specialty)[weak.rubricKey]}</span>{" "}
               is your weakest skill —{" "}
               <span
                 className="font-mono text-[12px] font-semibold tabular-nums"

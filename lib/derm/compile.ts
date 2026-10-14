@@ -1,6 +1,6 @@
 import type { ObjectionCard, Scenario } from "../types";
-import { DERM_MODULES, type DermModule } from "./modules";
-import { DERM_CROSS_STATIONS } from "./stations";
+import { DERM_MODULES, type DermModule } from "./modules.ts";
+import { DERM_CROSS_STATIONS } from "./stations.ts";
 
 /**
  * Compile the derm module registry into the engine's existing primitives.

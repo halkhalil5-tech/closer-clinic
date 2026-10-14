@@ -1,5 +1,5 @@
 import type { Scenario } from "./types";
-import { DERM_SCENARIOS } from "./derm/compile";
+import { DERM_SCENARIOS } from "./derm/compile.ts";
 
 /**
  * Launch scenario library. This is the canonical source: the Supabase seed

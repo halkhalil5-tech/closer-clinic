@@ -4,7 +4,7 @@ import { getAuthedUser } from "@/lib/auth";
 import { getStore } from "@/lib/store";
 import { readingMinutes, rubricAverage } from "@/lib/training";
 import { dimensionLetterFor, letterColorFor } from "@/lib/letter-grades";
-import { RUBRIC_LABELS } from "@/lib/types";
+import { RUBRIC_LABELS, rubricLabelsFor } from "@/lib/types";
 import { ModuleDocView } from "@/components/module-doc-view";
 
 export const dynamic = "force-dynamic";
@@ -68,7 +68,7 @@ export default async function ModulePage({ params }: { params: Promise<{ slug: s
           }`}
         >
           <span className="text-[12.5px] text-dim">
-            Your {RUBRIC_LABELS[mod.rubricKey]} · last {skill.reps} reps
+            Your {rubricLabelsFor(undefined, mod.specialty)[mod.rubricKey]} · last {skill.reps} reps
           </span>
           <span
             className={`font-mono text-[14px] font-semibold tabular-nums ${

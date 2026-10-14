@@ -468,6 +468,18 @@ export function rubricLabelsFor(role?: StationRole, specialty?: Specialty | stri
   return RUBRIC_LABELS;
 }
 
+export const SPECIALTY_LABELS: Record<string, string> = {
+  podiatry: "Podiatry",
+  regen: "Regenerative medicine",
+  derm: "Cash-pay dermatology",
+  dental: "Dental",
+  medspa: "Med spa / plastics",
+};
+
+export function specialtyLabel(s: string | null | undefined): string {
+  return (s && SPECIALTY_LABELS[s]) || "Podiatry";
+}
+
 export const RUBRIC_LABELS: Record<keyof RubricScores, string> = {
   rapport: "Rapport & listening",
   framing: "Clinical framing",

@@ -6,7 +6,7 @@ import { voiceFor } from "./voice/voice-map";
  * unlimited reps. These never touch the DB; an encounter stores a resolved
  * PersonaSnapshot so grading and history are stable even if this file changes.
  */
-import { DERM_PERSONAS } from "./derm/personas";
+import { DERM_PERSONAS } from "./derm/personas.ts";
 
 export const PERSONAS: Persona[] = [
   ...DERM_PERSONAS,

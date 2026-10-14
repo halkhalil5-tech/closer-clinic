@@ -1,3 +1,4 @@
+import { specialtyLabel } from "@/lib/types";
 import { redirect } from "next/navigation";
 import { getAuthedUser } from "@/lib/auth";
 import { getStore } from "@/lib/store";
@@ -50,7 +51,7 @@ export default async function TrainPage() {
       <header className="px-4 pt-[calc(env(safe-area-inset-top)+0.75rem)]">
         <div className="flex items-baseline justify-between">
           <span className="microlabel">Closer Clinic</span>
-          <span className="text-xs capitalize text-muted">{specialty}</span>
+          <span className="text-xs text-muted">{specialtyLabel(specialty)}</span>
         </div>
         <h1 className="display mt-2 text-[28px] text-bone">Train</h1>
 
