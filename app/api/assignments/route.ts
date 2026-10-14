@@ -9,6 +9,8 @@ const Schema = z.object({
   dueAt: z.string().min(4),
   targetReps: z.number().int().min(1).max(20),
   minGrade: z.enum(["A", "B", "C", "D"]).nullable().default(null),
+  /** Optional display title (starter sets label by week); scrubbed length. */
+  title: z.string().trim().min(3).max(80).optional(),
   seats: z.literal("all").default("all"),
 });
 
@@ -33,6 +35,7 @@ export async function POST(req: Request) {
     title = scenario.title;
     stationSlug = scenario.slug;
   }
+  if (body.data.title) title = body.data.title;
 
   const due = new Date(body.data.dueAt);
   if (Number.isNaN(due.getTime()) || due.getTime() < Date.now()) {

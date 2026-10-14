@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
+import { DERM_FIRST_30_DAYS } from "@/lib/derm/first-30-days";
 import { useRouter } from "next/navigation";
 
 interface StationOpt {
@@ -46,6 +47,36 @@ export function AssignmentCreate({ stations }: { stations: StationOpt[] }) {
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Couldn't assign.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function seedStarter() {
+    if (busy) return;
+    setBusy(true);
+    setError(null);
+    try {
+      for (const a of DERM_FIRST_30_DAYS) {
+        const due = new Date(Date.now() + a.dueInDays * 86_400_000).toISOString().slice(0, 10);
+        const res = await fetch("/api/assignments", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            kind: a.kind,
+            stationSlug: a.stationSlug ?? undefined,
+            title: a.title,
+            dueAt: `${due}T23:59:00`,
+            targetReps: a.targetReps,
+            minGrade: a.minGrade,
+            seats: "all",
+          }),
+        });
+        if (!res.ok) throw new Error((await res.json()).error || "Couldn't seed the starter set.");
+      }
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Couldn't seed the starter set.");
     } finally {
       setBusy(false);
     }
@@ -106,6 +137,15 @@ export function AssignmentCreate({ stations }: { stations: StationOpt[] }) {
         className="display w-full tracking-tight">
           {busy ? "Assigning" : "Assign to team"}
         </Button>
+      {stations.some((s) => s.slug.startsWith("derm-")) && (
+        <button
+          onClick={seedStarter}
+          disabled={busy}
+          className="mt-2 w-full py-2 text-center text-[11px] font-semibold uppercase tracking-[0.14em] text-primary disabled:opacity-50"
+        >
+          {busy ? "Seeding…" : "Seed the “first 30 days” derm starter set (8 assignments)"}
+        </button>
+      )}
     </div>
   );
 }

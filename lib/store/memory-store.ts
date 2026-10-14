@@ -23,11 +23,13 @@ import type { EncounterWithGrade, Store, TeamTrainingRow } from "./index";
 import { listScenarios as codeScenarios, getScenario as codeScenario } from "../scenarios";
 import { PODIATRY_MODULES, PODIATRY_LESSONS } from "../training/podiatry-pack";
 import { REGEN_MODULES, REGEN_LESSONS } from "../training/regen-pack";
+import { DERM_TRAINING_MODULES, DERM_LESSONS } from "../training/derm-pack";
 import { REGEN_OBJECTION_CARDS } from "../training/regen-objection-cards";
 import { DERM_OBJECTION_CARDS } from "../derm/compile";
 import { PODIATRY_OBJECTION_CARDS } from "../training/objection-cards";
 import { getModuleDocFromCode } from "../training/module-docs";
 import { REGEN_MODULE_DOCS } from "../training/regen-module-docs";
+import { DERM_MODULE_DOCS } from "../training/derm-module-docs";
 import {
   NORTHWIND_CODE,
   NORTHWIND_PACK,
@@ -602,23 +604,24 @@ class MemoryStore implements Store {
   /* ------------------------------ training ------------------------------ */
 
   async listTrainingModules(specialty: string): Promise<TrainingModule[]> {
-    return [...PODIATRY_MODULES, ...REGEN_MODULES]
+    return [...PODIATRY_MODULES, ...REGEN_MODULES, ...DERM_TRAINING_MODULES]
       .filter((m) => m.specialty === specialty)
       .sort((a, b) => a.order - b.order);
   }
 
   async listTrainingLessons(specialty: string): Promise<TrainingLesson[]> {
-    return [...PODIATRY_LESSONS, ...REGEN_LESSONS].filter((l) => l.specialty === specialty);
+    return [...PODIATRY_LESSONS, ...REGEN_LESSONS, ...DERM_LESSONS].filter((l) => l.specialty === specialty);
   }
 
   async getTrainingLesson(slug: string): Promise<TrainingLesson | null> {
-    return [...PODIATRY_LESSONS, ...REGEN_LESSONS].find((l) => l.slug === slug) ?? null;
+    return [...PODIATRY_LESSONS, ...REGEN_LESSONS, ...DERM_LESSONS].find((l) => l.slug === slug) ?? null;
   }
 
   async getModuleDoc(moduleSlug: string): Promise<ModuleDoc | null> {
     return (
       getModuleDocFromCode(moduleSlug) ??
       REGEN_MODULE_DOCS.find((d) => d.moduleSlug === moduleSlug) ??
+      DERM_MODULE_DOCS.find((d) => d.moduleSlug === moduleSlug) ??
       null
     );
   }

@@ -99,3 +99,28 @@ lib/voice/           STT/TTS interface + Web Speech implementation
 supabase/            migration SQL (schema + RLS) and pgTAP RLS tests
 scripts/seed.mjs     seeds the scenarios table from lib/scenarios.ts
 ```
+
+## Adding or editing a derm procedure module
+
+All Cash-Pay Dermatology content is data in `lib/derm/`:
+
+- `modules.ts` — the 10 procedure modules. Each `DermModule` carries pricing
+  defaults, package options, screening questions, consent essentials,
+  objections (with isolate/reframe/close model answers), upsell paths,
+  rebooking cadence, the mandated script-card close, and a persona pool.
+  **To add a module, add one object here** — it compiles automatically into a
+  station, objection flashcards, and script-card content via `compile.ts`.
+- `stations.ts` — the six cross-cutting encounter types (phone price call,
+  checkout, follow-up, injector scope, financing, medical→aesthetic bridge).
+- `personas.ts` — derm patient archetypes. Tagged `specialty: "derm"`, so
+  they are only ever rolled through a station's `personaPool`.
+- `first-30-days.ts` — the starter assignment set admins seed with one click.
+
+Training content lives in `lib/training/derm-pack.ts` (ladder, quizzes,
+drills, warmup deck) and `derm-module-docs.ts` (module reading).
+
+Prices in `modules.ts` are **defaults** — clinics override per station via
+the normal price-editing flow; nothing hardcodes procedure copy in components.
+After editing content, `npm run seed` upserts production. Grading uses the
+shared 5-dimension rubric relabeled for derm, plus the derm Compliance axis
+in `lib/prompts.ts` (`DERM_COMPLIANCE_RUBRIC` / `DERM_RUBRIC_OVERLAY`).

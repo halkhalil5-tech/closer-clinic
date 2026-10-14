@@ -14,7 +14,7 @@ import { request as httpsRequest } from "node:https";
 const PAGE_CAP = 10;
 const FETCH_TIMEOUT_MS = 8000;
 const PAGE_TEXT_CAP = 8000;
-const SERVICE_LINK = /service|pricing|price|treatment|procedure|fee|offer|menu|care|regenerative|stem|biologic|prp|injection|iv-|longevity|wellness/i;
+const SERVICE_LINK = /service|pricing|price|treatment|procedure|fee|offer|menu|care|regenerative|stem|biologic|prp|injection|iv-|longevity|wellness|botox|dysport|filler|laser|aesthetic|cosmetic|skin|peel|facial|microneedling|ipl|bbl|resurfacing|hair-removal|membership/i;
 const EXCLUDED_LINK = /testimonial|review|story|stories|blog|news|patient-portal|privacy|terms/i;
 
 export interface CrawledPage {
@@ -275,7 +275,7 @@ export function heuristicExtract(pages: CrawledPage[]): ExtractedService[] {
       const price = section.match(/\$\s?\d[\d,]*(?:\s*(?:per|\/)\s*\w+)?/)?.[0]?.replace(/\s+/g, " ") ?? null;
       // Keep only sections that look like clinical services: price present or
       // treatment-ish words in the name/body.
-      if (!price && !/therapy|treatment|laser|injection|surgery|orthotic|care|program|session/i.test(name + bodyText)) {
+      if (!price && !/therapy|treatment|laser|injection|surgery|orthotic|care|program|session|botox|filler|peel|facial|microneedling|resurfacing|membership/i.test(name + bodyText)) {
         continue;
       }
       if (!services.has(name.toLowerCase())) {

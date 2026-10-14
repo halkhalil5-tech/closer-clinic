@@ -115,8 +115,9 @@ for (const { pack, stations, code } of VENDOR_PACKS) {
 // upserts them. A dental pack is another import + spread here.
 const { PODIATRY_MODULES, PODIATRY_LESSONS } = await import("../lib/training/podiatry-pack.ts");
 const { REGEN_MODULES, REGEN_LESSONS } = await import("../lib/training/regen-pack.ts");
-const ALL_MODULES = [...PODIATRY_MODULES, ...REGEN_MODULES];
-const ALL_LESSONS = [...PODIATRY_LESSONS, ...REGEN_LESSONS];
+const { DERM_TRAINING_MODULES, DERM_LESSONS } = await import("../lib/training/derm-pack.ts");
+const ALL_MODULES = [...PODIATRY_MODULES, ...REGEN_MODULES, ...DERM_TRAINING_MODULES];
+const ALL_LESSONS = [...PODIATRY_LESSONS, ...REGEN_LESSONS, ...DERM_LESSONS];
 
 for (const m of ALL_MODULES) {
   const { error } = await supabase.from("training_modules").upsert(
@@ -188,7 +189,8 @@ console.log(`Seeded ${ALL_CARDS.length} objection cards.`);
 // ------------------------- module documents -------------------------
 const { PODIATRY_MODULE_DOCS } = await import("../lib/training/module-docs.ts");
 const { REGEN_MODULE_DOCS } = await import("../lib/training/regen-module-docs.ts");
-const ALL_DOCS = [...PODIATRY_MODULE_DOCS, ...REGEN_MODULE_DOCS];
+const { DERM_MODULE_DOCS } = await import("../lib/training/derm-module-docs.ts");
+const ALL_DOCS = [...PODIATRY_MODULE_DOCS, ...REGEN_MODULE_DOCS, ...DERM_MODULE_DOCS];
 for (const d of ALL_DOCS) {
   const { error } = await supabase.from("training_module_docs").upsert(
     {
