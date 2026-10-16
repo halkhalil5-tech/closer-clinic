@@ -44,3 +44,28 @@ describe("IPv6 disguises", () => {
     });
   }
 });
+
+import { pinnedLookup } from "@/lib/site-import";
+
+describe("pinned DNS hook answers both callback shapes", () => {
+  const pin = { address: "93.184.215.14", family: 4 };
+  it("scalar form", () => {
+    let got: unknown[] = [];
+    pinnedLookup(pin)("example.com", (...a: unknown[]) => (got = a));
+    expect(got).toEqual([null, "93.184.215.14", 4]);
+  });
+  it("array form (all: true — the shape that silently broke imports)", () => {
+    let got: unknown[] = [];
+    pinnedLookup(pin)("example.com", { all: true, hints: 1024 }, (...a: unknown[]) => (got = a));
+    expect(got).toEqual([null, [{ address: "93.184.215.14", family: 4 }]]);
+  });
+});
+
+describe("crawl success path (network)", () => {
+  it("fetches a real public page end to end", async () => {
+    const { pages, error } = await crawlSite("https://example.com");
+    expect(error).toBeUndefined();
+    expect(pages.length).toBeGreaterThan(0);
+    expect(pages[0].text.length).toBeGreaterThan(50);
+  }, 20000);
+});

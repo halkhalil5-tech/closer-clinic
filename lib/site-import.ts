@@ -106,7 +106,7 @@ function isPrivateAddress(addr: string): boolean {
   return false;
 }
 
-interface PinnedTarget { address: string; family: number }
+export interface PinnedTarget { address: string; family: number }
 
 /**
  * SSRF guard: only plain http(s) on default ports, to hostnames whose EVERY
@@ -127,10 +127,27 @@ async function assertPublicUrl(u: URL): Promise<PinnedTarget | null> {
   try {
     const addrs = await lookup(host, { all: true, verbatim: true });
     if (addrs.length === 0 || addrs.some((x) => isPrivateAddress(x.address))) return null;
-    return { address: addrs[0].address, family: addrs[0].family };
+    // Prefer IPv4 — serverless egress is not reliably dual-stack.
+    const pick = addrs.find((x) => x.family === 4) ?? addrs[0];
+    return { address: pick.address, family: pick.family };
   } catch {
     return null;
   }
+}
+
+/**
+ * DNS hook that always answers with the pre-validated address. Node's socket
+ * layer calls this in TWO shapes — scalar, and array when { all: true }
+ * (Happy Eyeballs). Answering the wrong shape kills the connection with
+ * "Invalid IP address: undefined", which silently broke every import.
+ */
+export function pinnedLookup(pin: PinnedTarget) {
+  return (_host: string, opts: unknown, cb?: unknown) => {
+    const options = typeof opts === "function" ? undefined : (opts as { all?: boolean });
+    const done = (typeof opts === "function" ? opts : cb) as (...args: unknown[]) => void;
+    if (options?.all) done(null, [{ address: pin.address, family: pin.family }]);
+    else done(null, pin.address, pin.family);
+  };
 }
 
 interface PinnedResponse { status: number; contentType: string; location: string | null; body: string | null }
@@ -142,10 +159,7 @@ function pinnedGet(u: URL, pin: PinnedTarget): Promise<PinnedResponse | null> {
     const req = mod(
       u,
       {
-        lookup: ((_h: string, opts: unknown, cb: unknown) => {
-          const done = (typeof opts === "function" ? opts : cb) as (e: null, a: string, f: number) => void;
-          done(null, pin.address, pin.family);
-        }) as never,
+        lookup: pinnedLookup(pin) as never,
         headers: { "User-Agent": "CloserClinic-Importer/1.0 (+services & pricing only)" },
         timeout: FETCH_TIMEOUT_MS,
       },
