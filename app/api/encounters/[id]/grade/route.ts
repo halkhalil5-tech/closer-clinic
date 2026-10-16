@@ -119,7 +119,12 @@ export async function POST(_req: Request, ctx: { params: Promise<{ id: string }>
   let gradeUsage = { inputTokens: 0, outputTokens: 0 };
   for (let attempt = 0; attempt < 2 && !result; attempt++) {
     try {
-      const res = await generateGrade(prompt);
+      const res = await generateGrade(
+        prompt,
+        attempt > 0
+          ? `Your previous response was not valid JSON (${String(lastError).slice(0, 120)}). Respond again with ONLY valid JSON — use single quotes inside string values, never unescaped double quotes.`
+          : undefined
+      );
       raw = res.raw;
       gradeUsage = {
         inputTokens: gradeUsage.inputTokens + res.usage.inputTokens,

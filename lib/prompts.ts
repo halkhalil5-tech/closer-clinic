@@ -462,7 +462,7 @@ ${lines}
 
 DETERMINE "closed": true only if the patient clearly agreed to the specific service and to move forward (scheduling, paying, or an unambiguous yes). "I'll think about it", "probably", or agreeing to a follow-up discussion is NOT a close.
 
-Respond with ONLY a JSON object, no markdown fences, no commentary, exactly this shape:
+Respond with ONLY a JSON object, no markdown fences, no commentary, exactly this shape. JSON STRING HYGIENE: when quoting the provider or patient inside any string value, use single quotes for the inner quote — never an unescaped double quote. Keep "moment" to at most 3 sentences and each compliance flag to one line.
 {
   "closed": boolean,
   "scores": {"rapport": 0-20, "framing": 0-20, "price": 0-20, "objections": 0-20, "close": 0-20},

@@ -81,16 +81,17 @@ export async function generatePatientReply(
 }
 
 export async function generateGrade(
-  graderPrompt: string
+  graderPrompt: string,
+  repairNote?: string
 ): Promise<{ raw: string; usage: ModelUsage }> {
   if (!hasModelAccess()) {
     return { raw: stubGradeJson(), usage: { inputTokens: 0, outputTokens: 0 } };
   }
   const res = await client().messages.create({
     model: MODEL,
-    max_tokens: 1200,
+    max_tokens: 2000,
     temperature: 0,
-    messages: [{ role: "user", content: graderPrompt }],
+    messages: [{ role: "user", content: repairNote ? `${graderPrompt}\n\nIMPORTANT: ${repairNote}` : graderPrompt }],
   });
   const raw = res.content
     .filter((b): b is Anthropic.TextBlock => b.type === "text")
