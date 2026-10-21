@@ -54,3 +54,10 @@ video/*/cc2p*
 video/*/.tlvars
 video/*/phone.fc
 video/podiatry/node_modules
+pitch-video/node_modules
+pitch-video/out/
+pitch-video/footage/
+pitch-film/node_modules
+pitch-film/out/
+pitch-film/public/footage/
+pitch-film/public/capture/
