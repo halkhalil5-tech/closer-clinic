@@ -44,7 +44,7 @@ export function ScenarioReviewForm({
     <div className="flex flex-col gap-3.5">
       <label>
         <span className="microlabel">Service name</span>
-        <input value={value.title} onChange={(e) => set({ title: e.target.value })} className={areaCls} />
+        <Input value={value.title} onChange={(e) => set({ title: e.target.value })} className={areaCls} />
       </label>
       <div className="flex gap-3">
         <label className="w-32">
@@ -66,11 +66,11 @@ export function ScenarioReviewForm({
       </div>
       <label>
         <span className="microlabel">Service description</span>
-        <textarea rows={2} value={value.serviceDesc} onChange={(e) => set({ serviceDesc: e.target.value })} className={areaCls} />
+        <Textarea rows={2} value={value.serviceDesc} onChange={(e) => set({ serviceDesc: e.target.value })} className={areaCls} />
       </label>
       <label>
         <span className="microlabel">Patient&apos;s chief complaint (their words)</span>
-        <textarea rows={2} value={value.patientCc} onChange={(e) => set({ patientCc: e.target.value })} className={areaCls} />
+        <Textarea rows={2} value={value.patientCc} onChange={(e) => set({ patientCc: e.target.value })} className={areaCls} />
       </label>
       <label>
         <span className="microlabel">Chart you know walking in</span>
@@ -83,7 +83,7 @@ export function ScenarioReviewForm({
       </label>
       <label>
         <span className="microlabel">Close goal</span>
-        <textarea rows={2} value={value.closeGoal} onChange={(e) => set({ closeGoal: e.target.value })} className={areaCls} />
+        <Textarea rows={2} value={value.closeGoal} onChange={(e) => set({ closeGoal: e.target.value })} className={areaCls} />
       </label>
       {value.cards && value.cards.length > 0 && (
         <div>
